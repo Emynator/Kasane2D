@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Kasane2D.Graphics/Kasane2D.Graphics.csproj" />
+  <Project Path="Kasane2D.Input/Kasane2D.Input.csproj" />
+  <Project Path="Kasane2D.MonoGame.Graphics\Kasane2D.MonoGame.Graphics.csproj" />
+  <Project Path="Kasane2D.MonoGame.Input/Kasane2D.MonoGame.Input.csproj" />
+</Solution>
