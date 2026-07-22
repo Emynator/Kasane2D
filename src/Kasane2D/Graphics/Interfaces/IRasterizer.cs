@@ -8,8 +8,14 @@ public interface IRasterizer
     public ITextureManager TextureManager { get; }
 
     public ISurface CreateSurface();
+    
+    public ISurface CreateSurface(Vec2I dimensions);
 
     public ITilemapSurface CreateTilemapSurface();
+    
+    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize);
+    
+    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize, Vec2I dimensions);
 
     public ISpriteLayer CreateSpriteLayer(int spriteCount);
     

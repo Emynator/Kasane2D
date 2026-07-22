@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Config\" />
       <Folder Include="Input\Enums\" />
       <Folder Include="Input\Interfaces\" />
     </ItemGroup>

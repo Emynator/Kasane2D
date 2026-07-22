@@ -1,7 +1,6 @@
-using Kasane2D.Graphics.Primitives;
 using Kasane2D.Primitives;
 
-namespace Kasane2D.Graphics;
+namespace Kasane2D.Config;
 
 public class GraphicsConfiguration
 {

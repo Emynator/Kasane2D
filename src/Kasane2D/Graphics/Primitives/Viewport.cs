@@ -2,7 +2,7 @@ using Kasane2D.Primitives;
 
 namespace Kasane2D.Graphics.Primitives;
 
-public record struct Viewport
+public struct Viewport
 {
     public Viewport(Vec2I size)
     {

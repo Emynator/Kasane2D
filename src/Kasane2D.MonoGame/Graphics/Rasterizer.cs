@@ -1,3 +1,4 @@
+using Kasane2D.Config;
 using Kasane2D.Graphics;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Graphics.Primitives;
@@ -56,6 +57,14 @@ public class Rasterizer : IRasterizer, IDisposable
         return result;
     }
 
+    public ISurface CreateSurface(Vec2I dimensions)
+    {
+        var result = new MonoGameSurface(device, dimensions, config.ViewportSize);
+        surfaces.Add(result);
+
+        return result;
+    }
+
     public ITilemapSurface CreateTilemapSurface()
     {
         var result = new TilemapSurface
@@ -64,6 +73,38 @@ public class Rasterizer : IRasterizer, IDisposable
             spriteBatch,
             config.TilemapDimensions,
             config.TileSize,
+            config.ViewportSize
+        );
+
+        surfaces.Add(result);
+
+        return result;
+    }
+
+    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize)
+    {
+        var result = new TilemapSurface
+        (
+            device,
+            spriteBatch,
+            config.TilemapDimensions,
+            tileSize,
+            config.ViewportSize
+        );
+
+        surfaces.Add(result);
+
+        return result;
+    }
+
+    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize, Vec2I dimensions)
+    {
+        var result = new TilemapSurface
+        (
+            device,
+            spriteBatch,
+            dimensions,
+            tileSize,
             config.ViewportSize
         );
 
