@@ -1,3 +1,4 @@
+using Kasane2D.Graphics;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Interfaces;
 
@@ -7,7 +8,7 @@ public abstract class EngineMain
 {
     internal IRasterizer? Rasterizer { get; set; }
 
-    internal IRenderer? InternalRenderer { get; set; }
+    internal Renderer? InternalRenderer { get; set; }
 
     internal IEngineRunner? EngineRunner { get; set; }
 

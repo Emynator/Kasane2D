@@ -1,3 +1,4 @@
+using Kasane2D.Config;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.MonoGame.Graphics.Extensions;
 using Kasane2D.Graphics.Primitives;
@@ -9,10 +10,12 @@ namespace Kasane2D.MonoGame.Graphics;
 
 public class TextureManager : ITextureManager
 {
+    private readonly GraphicsConfiguration config;
     private readonly GraphicsDevice device;
 
-    public TextureManager(GraphicsDevice device)
+    public TextureManager(GraphicsConfiguration config, GraphicsDevice device)
     {
+        this.config = config;
         this.device = device;
     }
 
@@ -49,6 +52,15 @@ public class TextureManager : ITextureManager
                 )
             )
         );
+    }
+
+    public ISpriteAtlas CreateSpriteAtlas(Vec2I spriteSize, string filePath)
+    {
+        var texture = !File.Exists(filePath)
+            ? throw new FileNotFoundException($"File '{filePath}' does not exist")
+            : new MonoGameTexture(Texture2D.FromFile(device, filePath));
+        
+        return new SpriteAtlas(texture.Size, spriteSize, texture);
     }
 
     public ISpriteAtlas CreateSpriteAtlas(Vec2I dimensions, Vec2I spriteSize, string filePath)

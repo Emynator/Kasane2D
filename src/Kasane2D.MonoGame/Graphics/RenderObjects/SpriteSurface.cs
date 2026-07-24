@@ -13,6 +13,7 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
     private readonly SpriteBatch spriteBatch;
     private readonly RenderTarget2D surface;
     private readonly RenderTarget2D viewportSurface;
+    private readonly Rectangle clipRect;
 
     public SpriteSurface
         (
@@ -31,10 +32,11 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
         surface = new(device, surfaceSize.X, surfaceSize.Y);
         viewportSurface = new(device, viewportSize.X, viewportSize.Y);
         Sprites = new Sprite[count];
+        clipRect = new Rectangle(spriteSize.X, spriteSize.Y, viewportSize.X, viewportSize.Y);
         
         for (var i = 0; i < count; i++)
         {
-            Sprites[i] = new();
+            Sprites[i] = new(spriteSize);
         }
     }
 
@@ -79,7 +81,7 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
         device.Clear(Color.Transparent);
         
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        spriteBatch.Draw(surface, Viewport.ViewRect.ToRectangle(), Color.White);
+        spriteBatch.Draw(surface, Viewport.ViewRect.ToRectangle(), clipRect, Color.White);
         spriteBatch.End();
     }
 }

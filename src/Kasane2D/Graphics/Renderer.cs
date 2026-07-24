@@ -64,6 +64,11 @@ internal class Renderer : IRenderer
             lastLayer = config.Layer;
         }
 
+        while (idc.TryDequeue(out var remaining))
+        {
+            ConfigureLayer(remaining);
+        }
+
         initialized = true;
     }
 

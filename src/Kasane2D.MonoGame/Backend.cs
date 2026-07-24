@@ -7,20 +7,14 @@ namespace Kasane2D.MonoGame;
 
 public class Backend : IBackend
 {
-    private MonoGameRunner? runner;
-    
-    public IRasterizer CreateRasterizer(GraphicsConfiguration config)
+    public IEngineRunner CreateRunner
+        (
+        EngineMain main,
+        GraphicsConfiguration config,
+        Action<IRasterizer> createRenderer
+        )
     {
-        runner ??= new();
-
-        return new Rasterizer(config, runner.GraphicsDevice);
-    }
-
-    public IEngineRunner CreateRunner(EngineMain main)
-    {
-        runner?.Main = main;
-        
-        return runner ?? throw new InvalidOperationException("Init error?");
+        return new MonoGameRunner(main, config, createRenderer);
     }
 }
 
@@ -29,7 +23,7 @@ public static class BuilderExtensions
     public static EngineBuilder UseMonoGame(this EngineBuilder builder)
     {
         builder.Backend ??= new Backend();
-        
+
         return builder;
     }
 }

@@ -28,17 +28,17 @@ public class Rasterizer : IRasterizer, IDisposable
         this.device = device;
 
         spriteBatch = new(device);
-        textureManager = new(device);
-        backBuffer = new(device, config.SurfaceSize.X, config.SurfaceSize.Y);
+        textureManager = new(config, device);
+        backBuffer = new(device, config.ViewportSize.X, config.ViewportSize.Y);
         
-        var facX = config.ScreenSize.X / config.SurfaceSize.X;
-        var facY = config.ScreenSize.Y / config.SurfaceSize.Y;
+        var facX = config.ScreenSize.X / config.ViewportSize.X;
+        var facY = config.ScreenSize.Y / config.ViewportSize.Y;
         var fac = Math.Min(facX, facY);
-        var width = config.SurfaceSize.X * fac;
-        var height = config.SurfaceSize.Y * fac;
+        var width = config.ViewportSize.X * fac;
+        var height = config.ViewportSize.Y * fac;
         
         upscaleBuffer = new(device, width, height);
-        backBufferRect = new(0, 0, config.SurfaceSize.X, config.SurfaceSize.Y);
+        backBufferRect = new(0, 0, config.ViewportSize.X, config.ViewportSize.Y);
         upscaleRect = new(0, 0, width, height);
         deviceRect = new(0, 0, config.ScreenSize.X, config.ScreenSize.Y);
     }
@@ -51,7 +51,7 @@ public class Rasterizer : IRasterizer, IDisposable
 
     public ISurface CreateSurface()
     {
-        var result = new MonoGameSurface(device, config.SurfaceSize, config.ViewportSize);
+        var result = new MonoGameSurface(device, config.DefaultSurfaceSize, config.ViewportSize);
         surfaces.Add(result);
 
         return result;
@@ -71,8 +71,8 @@ public class Rasterizer : IRasterizer, IDisposable
         (
             device,
             spriteBatch,
-            config.TilemapDimensions,
-            config.TileSize,
+            config.DefaultTilemapDimensions,
+            config.DefaultTileSize,
             config.ViewportSize
         );
 
@@ -87,7 +87,7 @@ public class Rasterizer : IRasterizer, IDisposable
         (
             device,
             spriteBatch,
-            config.TilemapDimensions,
+            config.DefaultTilemapDimensions,
             tileSize,
             config.ViewportSize
         );
@@ -155,7 +155,7 @@ public class Rasterizer : IRasterizer, IDisposable
         }
         
         device.SetRenderTarget(backBuffer);
-        device.Clear(Color.Transparent);
+        device.Clear(Color.Black);
         
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (var surface in surfaces)

@@ -12,6 +12,14 @@ public record struct Vec2I
     
     public static Vec2I Zero => new Vec2I(0, 0);
     
+    public static Vec2I Up => new Vec2I(0, -1);
+    
+    public static Vec2I Down => new Vec2I(0, 1);
+    
+    public static Vec2I Left => new Vec2I(-1, 0);
+    
+    public static Vec2I Right => new Vec2I(1, 0);
+    
     public int X { get; set; }
     
     public int Y { get; set; }

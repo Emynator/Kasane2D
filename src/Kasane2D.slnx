@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="EngineTest/EngineTest.csproj" />
   <Project Path="Kasane2D.MonoGame/Kasane2D.MonoGame.csproj" />
   <Project Path="Kasane2D/Kasane2D.csproj" />
 </Solution>

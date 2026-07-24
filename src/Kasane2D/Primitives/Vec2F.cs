@@ -12,6 +12,14 @@ public record struct Vec2F
     
     public static Vec2F Zero => new Vec2F(0.0f, 0.0f);
     
+    public static Vec2F Up => new Vec2F(0.0f, -1.0f);
+    
+    public static Vec2F Down => new Vec2F(0.0f, 1.0f);
+    
+    public static Vec2F Left => new Vec2F(-1.0f, 0.0f);
+    
+    public static Vec2F Right => new Vec2F(1.0f, 0.0f);
+    
     public float X { get; set; }
     
     public float Y { get; set; }
@@ -28,9 +36,10 @@ public record struct Vec2F
 
     public Vec2I ToVec2I()
     {
-        Floor();
+        var res = Copy();
+        res.Floor();
         
-        return new Vec2I((int)X, (int)Y);
+        return new Vec2I((int)res.X, (int)res.Y);
     }
 
     public float Dot(Vec2F other)

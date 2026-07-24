@@ -5,7 +5,10 @@ namespace Kasane2D.Interfaces;
 
 public interface IBackend
 {
-    public IRasterizer CreateRasterizer(GraphicsConfiguration config);
-    
-    public IEngineRunner CreateRunner(EngineMain main);
+    public IEngineRunner CreateRunner
+        (
+        EngineMain main,
+        GraphicsConfiguration config,
+        Action<IRasterizer> createRenderer
+        );
 }

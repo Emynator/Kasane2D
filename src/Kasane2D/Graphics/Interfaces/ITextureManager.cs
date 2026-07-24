@@ -13,6 +13,8 @@ public interface ITextureManager
     
     public ISpriteAtlas CreateSpriteAtlas(Vec2I dimensions, Vec2I spriteSize);
     
+    public ISpriteAtlas CreateSpriteAtlas(Vec2I spriteSize, string filePath);
+    
     public ISpriteAtlas CreateSpriteAtlas(Vec2I dimensions, Vec2I spriteSize, string filePath);
     
     public void FreeSpriteAtlas(ISpriteAtlas atlas);
