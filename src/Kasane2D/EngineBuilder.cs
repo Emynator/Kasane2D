@@ -69,7 +69,8 @@ public static class EngineBuilderExtensions
             {
                 builder.Main.Rasterizer = rasterizer;
                 builder.Main.InternalRenderer = new Renderer(rasterizer);
-            }
+            },
+            inputSystem => builder.Main.InternalInputSystem = inputSystem
         );
         builder.Main.EngineRunner = runner;
 

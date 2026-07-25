@@ -1,5 +1,6 @@
 using Kasane2D.Config;
 using Kasane2D.Graphics.Interfaces;
+using Kasane2D.Input.Interfaces;
 using Kasane2D.Interfaces;
 using Kasane2D.MonoGame.Graphics;
 
@@ -11,10 +12,11 @@ public class Backend : IBackend
         (
         EngineMain main,
         GraphicsConfiguration config,
-        Action<IRasterizer> createRenderer
+        Action<IRasterizer> createRenderer,
+        Action<IInputSystem> assignInputSystem
         )
     {
-        return new MonoGameRunner(main, config, createRenderer);
+        return new MonoGameRunner(main, config, createRenderer, assignInputSystem);
     }
 }
 

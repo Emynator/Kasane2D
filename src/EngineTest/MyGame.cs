@@ -1,5 +1,6 @@
 using Kasane2D;
 using Kasane2D.Graphics.Interfaces;
+using Kasane2D.Input.Enums;
 using Kasane2D.Primitives;
 
 namespace EngineTest;
@@ -32,11 +33,41 @@ public class MyGame : EngineMain
 
     public override void Tick(double dt)
     {
-        var move = Vec2F.Right * 180.0f * (float)dt;
+        var move = Vec2F.Zero;
+        if (InputSystem.Check(KeyKind.Up) == InputButtonState.Pressed)
+        {
+            move += Vec2F.Up;
+        }
+        if (InputSystem.Check(KeyKind.Down) == InputButtonState.Pressed)
+        {
+            move += Vec2F.Down;
+        }
+        if (InputSystem.Check(KeyKind.Left) == InputButtonState.Pressed)
+        {
+            move += Vec2F.Left;
+        }
+        if (InputSystem.Check(KeyKind.Right) == InputButtonState.Pressed)
+        {
+            move += Vec2F.Right;
+        }
+        move *= 180.0f * (float)dt;
         spritePos += move;
+        
         if (spritePos.X > 408.0f)
         {
             spritePos.X = 0.0f;
+        }
+        if (spritePos.X < 0.0f)
+        {
+            spritePos.X = 408.0f;
+        }
+        if (spritePos.Y > 264.0f)
+        {
+            spritePos.Y = 0.0f;
+        }
+        if (spritePos.Y < 0.0f)
+        {
+            spritePos.Y = 264.0f;
         }
 
         sl.Sprites[0].Position = spritePos.ToVec2I();

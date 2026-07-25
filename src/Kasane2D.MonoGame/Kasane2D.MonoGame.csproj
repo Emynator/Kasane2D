@@ -14,8 +14,4 @@
       <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Input\" />
-    </ItemGroup>
-
 </Project>
