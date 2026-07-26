@@ -1,8 +1,7 @@
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.MonoGame.Graphics.Extensions;
-using Kasane2D.Graphics.Primitives;
 using Kasane2D.MonoGame.Extensions;
-using Kasane2D.Primitives;
+using Kasane2D.Types;
 using Microsoft.Xna.Framework;
 
 namespace Kasane2D.MonoGame.Graphics.RenderObjects;

@@ -1,7 +1,7 @@
 using Kasane2D;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Input.Enums;
-using Kasane2D.Primitives;
+using Kasane2D.Types;
 
 namespace EngineTest;
 

@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Kasane2D.Primitives;
+namespace Kasane2D.Types;
 
 public record struct Vec2F
 {

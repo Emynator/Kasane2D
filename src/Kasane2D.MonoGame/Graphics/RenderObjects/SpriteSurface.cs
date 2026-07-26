@@ -1,8 +1,8 @@
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.MonoGame.Graphics.Extensions;
-using Kasane2D.Graphics.Primitives;
+using Kasane2D.Graphics.Types;
 using Kasane2D.MonoGame.Extensions;
-using Kasane2D.Primitives;
+using Kasane2D.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

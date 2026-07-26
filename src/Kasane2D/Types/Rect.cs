@@ -1,4 +1,4 @@
-namespace Kasane2D.Primitives;
+namespace Kasane2D.Types;
 
 public readonly record struct Rect
 {

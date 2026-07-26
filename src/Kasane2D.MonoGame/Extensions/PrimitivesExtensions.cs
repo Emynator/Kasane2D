@@ -1,4 +1,4 @@
-using Kasane2D.Primitives;
+using Kasane2D.Types;
 using Microsoft.Xna.Framework;
 
 namespace Kasane2D.MonoGame.Extensions;

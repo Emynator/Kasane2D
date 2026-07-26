@@ -1,11 +1,11 @@
 using Kasane2D.Input.Enums;
 using Kasane2D.Input.Interfaces;
-using Kasane2D.Input.Primitives;
+using Kasane2D.Input.Types;
 using Kasane2D.MonoGame.Extensions;
-using Kasane2D.Primitives;
+using Kasane2D.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using KasaneMouseState = Kasane2D.Input.Primitives.MouseState;
+using KasaneMouseState = Kasane2D.Input.Types.MouseState;
 using MouseState = Microsoft.Xna.Framework.Input.MouseState;
 
 namespace Kasane2D.MonoGame.Input;
