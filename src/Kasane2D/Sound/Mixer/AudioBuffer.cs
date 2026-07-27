@@ -4,7 +4,7 @@ namespace Kasane2D.Sound.Mixer;
 
 internal class AudioBuffer : IAudioBuffer
 {
-    private float[] data;
+    private readonly float[] data;
     private int writeIndex = 0;
     private int readIndex = 0;
 

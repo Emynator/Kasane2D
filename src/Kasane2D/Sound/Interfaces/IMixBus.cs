@@ -20,5 +20,11 @@ public interface IMixBus
     
     IReadOnlyCollection<IMixBus> Children { get; }
     
+    IReadOnlyCollection<IAudioEffect> Effects { get; }
+
+    public void AddEffect(IAudioEffect effect);
+    
+    public void RemoveEffect(string name);
+    
     public void Mix(int sampleCount);
 }
