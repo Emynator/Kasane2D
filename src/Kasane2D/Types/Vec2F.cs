@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Kasane2D.Types;
 
 public record struct Vec2F
@@ -27,11 +25,6 @@ public record struct Vec2F
     public Vec2F Copy()
     {
         return new Vec2F(X, Y);
-    }
-
-    public Vector2 ToVector2()
-    {
-        return new(X, Y);
     }
 
     public Vec2I ToVec2I()
@@ -81,6 +74,29 @@ public record struct Vec2F
     {
         X = MathF.Round(X);
         Y = MathF.Round(Y);
+    }
+    
+    public Vec2F CompWiseMul(Vec2F other)
+    {
+        var result = Copy();
+        result.X *= other.X;
+        result.Y *= other.Y;
+        
+        return result;
+    }
+
+    public Vec2F CompWiseDiv(Vec2F other)
+    {
+        var result = Copy();
+        result.X /= other.X;
+        result.Y /= other.Y;
+        
+        return result;
+    }
+
+    public Vec2F Lerp(Vec2F other, float t)
+    {
+        return new Vec2F(float.Lerp(X, other.X, t), float.Lerp(Y, other.Y, t));
     }
 
     public void operator += (Vec2F rhs)
