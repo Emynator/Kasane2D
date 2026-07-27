@@ -11,6 +11,11 @@ public interface IBackend
         EngineMain main,
         GraphicsConfiguration config,
         Action<IRasterizer> createRenderer,
-        Action<IInputSystem> assignInputSystem
+        Action<IInputSystem> assignInputSystem,
+        AudioConfiguration? audioConfig
         );
+    
+    public bool IsSampleRateSupported(int sampleRate);
+    
+    public int[] GetSupportedSampleRates();
 }

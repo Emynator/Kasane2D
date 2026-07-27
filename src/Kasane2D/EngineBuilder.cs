@@ -1,6 +1,6 @@
+using System.Text;
 using Kasane2D.Config;
 using Kasane2D.Graphics;
-using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Interfaces;
 
 namespace Kasane2D;
@@ -12,6 +12,8 @@ public sealed class EngineBuilder
     internal GraphicsConfiguration? GraphicsConfig { get; set; }
 
     internal ICollection<RenderLayerConfig>? RendererConfig { get; set; }
+
+    internal AudioConfiguration? AudioConfig { get; set; }
 
     internal EngineMain? Main { get; set; }
 }
@@ -28,6 +30,13 @@ public static class EngineBuilderExtensions
     public static EngineBuilder ConfigureRenderer(this EngineBuilder builder, ICollection<RenderLayerConfig> config)
     {
         builder.RendererConfig = config;
+
+        return builder;
+    }
+
+    public static EngineBuilder ConfigureAudio(this EngineBuilder builder, AudioConfiguration? config = null)
+    {
+        builder.AudioConfig = config ?? new();
 
         return builder;
     }
@@ -70,9 +79,32 @@ public static class EngineBuilderExtensions
                 builder.Main.Rasterizer = rasterizer;
                 builder.Main.InternalRenderer = new Renderer(rasterizer);
             },
-            inputSystem => builder.Main.InternalInputSystem = inputSystem
+            inputSystem => builder.Main.InternalInputSystem = inputSystem,
+            builder.AudioConfig
         );
         builder.Main.EngineRunner = runner;
+
+        if (builder.AudioConfig is not null)
+        {
+            if (!builder.Backend.IsSampleRateSupported(builder.AudioConfig.SampleRate))
+            {
+                var sampleRateList = builder
+                    .Backend
+                    .GetSupportedSampleRates()
+                    .Aggregate(new StringBuilder(), (sb, val) => sb.Append($", {val}"), sb => sb.ToString())[2..];
+
+                throw new InvalidOperationException
+                (
+                    $"Backend does not support sample rate {
+                        builder.AudioConfig.SampleRate
+                    }. Supported sample rates are: {
+                        sampleRateList
+                    }"
+                );
+            }
+            
+            builder.Main.InternalSoundSystem = new(builder.AudioConfig);
+        }
 
         return new(runner, () => builder.Main.InternalRenderer?.Init(builder.RendererConfig));
     }

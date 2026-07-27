@@ -13,10 +13,21 @@ public class Backend : IBackend
         EngineMain main,
         GraphicsConfiguration config,
         Action<IRasterizer> createRenderer,
-        Action<IInputSystem> assignInputSystem
+        Action<IInputSystem> assignInputSystem,
+        AudioConfiguration? audioConfig
         )
     {
-        return new MonoGameRunner(main, config, createRenderer, assignInputSystem);
+        return new MonoGameRunner(main, config, createRenderer, assignInputSystem, audioConfig);
+    }
+
+    public bool IsSampleRateSupported(int sampleRate)
+    {
+        return sampleRate is 44100 or 48000;
+    }
+
+    public int[] GetSupportedSampleRates()
+    {
+        return [44100, 48000];
     }
 }
 

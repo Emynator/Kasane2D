@@ -1,0 +1,88 @@
+using Kasane2D.Config;
+using Kasane2D.Sound.Interfaces;
+using Kasane2D.Sound.Types;
+
+namespace Kasane2D.Sound.Sfx;
+
+internal class SfxManager : ISfxManager
+{
+    private readonly SemaphoreSlim tlock = new(1, 1);
+    private readonly List<SfxChannel> channels = [];
+    private readonly Queue<AudioFileStream> soundQueue = new();
+    
+    public SfxManager(AudioConfiguration config, IAudioMixer mixer)
+    {
+        ChannelCount = config.SfxChannelCount;
+        var sfxBus = mixer.CreateMixBus("SFX");
+        for (var i = 0; i < ChannelCount; i++)
+        {
+            channels.Add(new(mixer.CreateMixBus($"SFX Channel {i}", sfxBus)));
+        }
+    }
+
+    public int ChannelCount { get; }
+
+    public int BusyChannels => channels.Count(c => c.CurrentFile is not null);
+    
+    public bool AllChannelsBusy => BusyChannels == ChannelCount;
+
+    public int QueueLength => soundQueue.Count;
+    
+    public void Play(AudioFileStream sound)
+    {
+        tlock.Wait();
+
+        var availableChannel = channels.FirstOrDefault(c => c.CurrentFile is null);
+        if (availableChannel is null)
+        {
+            soundQueue.Enqueue(sound);
+
+            tlock.Release();
+            return;
+        }
+        
+        availableChannel.CurrentFile = sound;
+        
+        tlock.Release();
+    }
+
+    public void StopAll()
+    {
+        tlock.Wait();
+        
+        foreach (var channel in channels)
+        {
+            channel.CurrentFile = null;
+        }
+        
+        tlock.Release();
+    }
+
+    public void DropQueue()
+    {
+        tlock.Wait();
+        
+        soundQueue.Clear();
+        
+        tlock.Release();
+    }
+
+    public void Update(int sampleCount)
+    {
+        tlock.Wait();
+
+        Parallel.ForEach(channels, c => c.Update(sampleCount));
+        while (soundQueue.Count > 0)
+        {
+            var availableChannel = channels.FirstOrDefault(c => c.CurrentFile is not null);
+            if (availableChannel is null)
+            {
+                break;
+            }
+            
+            availableChannel.CurrentFile = soundQueue.Dequeue();
+        }
+        
+        tlock.Release();
+    }
+}
