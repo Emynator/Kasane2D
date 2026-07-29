@@ -7,5 +7,5 @@ public interface ISpriteLayer
 {
     public Vec2I SpriteSize { get; }
     
-    public Sprite[] Sprites { get; }
+    public RenderSprite[] Sprites { get; }
 }

@@ -3,9 +3,9 @@ using Kasane2D.Types;
 
 namespace Kasane2D.Graphics.Types;
 
-public struct Sprite
+public struct RenderSprite
 {
-    public Sprite(Vec2I size)
+    public RenderSprite(Vec2I size)
     {
         Size = size;
     }
@@ -19,6 +19,8 @@ public struct Sprite
     public ISpriteAtlas? SpriteAtlas { get; set; } = null;
     
     public Vec2I AtlasIndex { get; set; } = Vec2I.Zero;
+    
+    public bool IsActive { get; set; } = false;
 
     public bool HFlip { get; set; } = false;
 

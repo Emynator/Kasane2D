@@ -32,9 +32,9 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
 
         surface = new(device, surfaceSize.X, surfaceSize.Y);
         viewportSurface = new(device, viewportSize.X, viewportSize.Y);
-        Sprites = new Sprite[count];
+        Sprites = new RenderSprite[count];
         clipRect = new Rectangle(spriteSize.X, spriteSize.Y, viewportSize.X, viewportSize.Y);
-        
+
         for (var i = 0; i < count; i++)
         {
             Sprites[i] = new(spriteSize);
@@ -43,12 +43,12 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
 
     public Vec2I SpriteSize { get; }
 
-    public Sprite[] Sprites { get; }
+    public RenderSprite[] Sprites { get; }
 
     public override void Dispose()
     {
         viewportSurface.Dispose();
-        
+
         base.Dispose();
     }
 
@@ -61,10 +61,15 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
     {
         device.SetRenderTarget(surface);
         device.Clear(Color.Transparent);
-        
+
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (var sprite in Sprites)
         {
+            if (!sprite.IsActive)
+            {
+                continue;
+            }
+
             var atlas = sprite.SpriteAtlas as SpriteAtlas;
             if (atlas is null)
             {
@@ -73,14 +78,34 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
 
             var src = atlas.GetSrcRect(sprite.AtlasIndex);
             var dst = sprite.Rect.ToRectangle();
-            
-            spriteBatch.Draw(atlas.MonoGameTexture.Texture, dst, src, Color.White);
+
+            var effects = SpriteEffects.None;
+            if (sprite.HFlip)
+            {
+                effects |= SpriteEffects.FlipHorizontally;
+            }
+            if (sprite.VFlip)
+            {
+                effects |= SpriteEffects.FlipVertically;
+            }
+
+            spriteBatch.Draw
+            (
+                atlas.MonoGameTexture.Texture,
+                dst,
+                src,
+                Color.White,
+                0.0f,
+                Vector2.Zero,
+                effects,
+                1.0f
+            );
         }
         spriteBatch.End();
-        
+
         device.SetRenderTarget(viewportSurface);
         device.Clear(Color.Transparent);
-        
+
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         spriteBatch.Draw(surface, Viewport.ViewRect.ToRectangle(), clipRect, Color.White);
         spriteBatch.End();

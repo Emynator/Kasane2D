@@ -2,9 +2,9 @@ using Kasane2D.Types;
 
 namespace Kasane2D.Graphics.Types;
 
-public struct Tile
+public struct RenderTile
 {
-    public Tile(Vec2I size)
+    public RenderTile(Vec2I size)
     {
         Size = size;
     }

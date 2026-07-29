@@ -14,7 +14,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
     private readonly SpriteBatch spriteBatch;
     private readonly RenderTarget2D viewportSurface;
     private readonly RenderTarget2D surface;
-    private readonly Tile[,] tiles;
+    private readonly RenderTile[,] tiles;
     private List<Vec2I> tilesToUpdate = [];
     private bool atlasChanged = false;
 
@@ -34,7 +34,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
 
         viewportSurface = new RenderTarget2D(device, viewportSize.X, viewportSize.Y);
         surface = new RenderTarget2D(device, dimensions.X * tileSize.X, dimensions.Y * tileSize.Y);
-        tiles = new Tile[dimensions.X, dimensions.Y];
+        tiles = new RenderTile[dimensions.X, dimensions.Y];
 
         for (var x = 0; x < dimensions.X; x++)
         {
@@ -75,7 +75,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         set
         {
             atlasChanged = true;
-            
+
             if (value is null)
             {
                 Atlas = null;
@@ -94,7 +94,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
     public override void Dispose()
     {
         viewportSurface.Dispose();
-        
+
         base.Dispose();
     }
 
@@ -124,10 +124,10 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
     public override void Rasterize()
     {
         UpdateSurface();
-        
+
         device.SetRenderTarget(viewportSurface);
         device.Clear(Color.Transparent);
-        
+
         spriteBatch.Begin(samplerState: SamplerState.PointWrap);
         spriteBatch.Draw(surface, Viewport.ViewRect.ToRectangle(), Color.White);
         spriteBatch.End();
@@ -142,7 +142,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
 
             return;
         }
-        
+
         if (tilesToUpdate.Count == 0)
         {
             return;
@@ -152,20 +152,39 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         {
             return;
         }
-        
+
         var updates = tilesToUpdate.Distinct().ToList();
-        
+
         device.SetRenderTarget(surface);
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        
+
         foreach (var update in updates)
         {
             var dst = new Rectangle(update.CompWiseMul(TileSize).ToPoint(), TileSize.ToPoint());
             var src = Atlas.GetSrcRect(tiles[update.X, update.Y].AtlasIndex);
-            
-            spriteBatch.Draw(Atlas.MonoGameTexture.Texture, dst, src, Color.White);
+            var effects = SpriteEffects.None;
+            if (tiles[update.X, update.Y].HFlip)
+            {
+                effects |= SpriteEffects.FlipHorizontally;
+            }
+            if (tiles[update.X, update.Y].VFlip)
+            {
+                effects |= SpriteEffects.FlipVertically;
+            }
+
+            spriteBatch.Draw
+            (
+                Atlas.MonoGameTexture.Texture,
+                dst,
+                src,
+                Color.White,
+                0.0f,
+                Vector2.Zero,
+                effects,
+                1.0f
+            );
         }
-        
+
         spriteBatch.End();
         tilesToUpdate = [];
     }
@@ -177,10 +196,10 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         if (Atlas is null)
         {
             device.Clear(Color.Transparent);
-            
+
             return;
         }
-        
+
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         for (var x = 0; x < Dimensions.X; x++)
@@ -190,11 +209,30 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
                 var loc = new Vec2I(x, y).CompWiseMul(TileSize);
                 var dst = new Rectangle(loc.ToPoint(), TileSize.ToPoint());
                 var src = Atlas.GetSrcRect(tiles[x, y].AtlasIndex);
-                
-                spriteBatch.Draw(Atlas.MonoGameTexture.Texture, dst, src, Color.White);
+                var effects = SpriteEffects.None;
+                if (tiles[x, y].HFlip)
+                {
+                    effects |= SpriteEffects.FlipHorizontally;
+                }
+                if (tiles[x, y].VFlip)
+                {
+                    effects |= SpriteEffects.FlipVertically;
+                }
+
+                spriteBatch.Draw
+                (
+                    Atlas.MonoGameTexture.Texture,
+                    dst,
+                    src,
+                    Color.White,
+                    0.0f,
+                    Vector2.Zero,
+                    effects,
+                    1.0f
+                );
             }
         }
-        
+
         spriteBatch.End();
     }
 }
