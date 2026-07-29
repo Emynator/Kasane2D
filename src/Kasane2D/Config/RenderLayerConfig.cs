@@ -6,6 +6,7 @@ public enum LayerType
 {
     Tilemap,
     Sprite,
+    Texture,
 }
 
 public class RenderLayerConfig

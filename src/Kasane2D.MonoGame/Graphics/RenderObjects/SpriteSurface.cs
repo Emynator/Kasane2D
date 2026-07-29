@@ -5,6 +5,7 @@ using Kasane2D.MonoGame.Extensions;
 using Kasane2D.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Kasane2D.MonoGame.Graphics.RenderObjects;
 

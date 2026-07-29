@@ -14,6 +14,11 @@ internal static class PrimitivesExtensions
     {
         return new(point.X, point.Y);
     }
+
+    public static Vector2 ToVector2(this Vec2F vec)
+    {
+        return new(vec.X, vec.Y);
+    }
     
     public static Vec2F ToVec2F(this Vector2 vec)
     {

@@ -1,4 +1,6 @@
 using Kasane2D.Config;
+using Kasane2D.Graphics.Types;
+using Kasane2D.Types;
 
 namespace Kasane2D.Graphics.Interfaces;
 
@@ -13,4 +15,18 @@ public interface IRenderer
     public ISpriteLayer GetSpriteLayer(string name);
     
     public ISlotManager GetSlotManager(string layerName);
+
+    public void BeginDraw(ITextureSurface target);
+
+    public void EndDraw();
+
+    public void Draw(ITexture src, Rect? dstReg = null, Rect? srcRect = null);
+    
+    public void Draw(ISurface src, Rect? dstReg = null, Rect? srcRect = null);
+
+    public void Draw(Rect rect, Color color);
+    
+    public void Draw(Line line, int thickness, Color color);
+
+    public void Draw(Bezier bezier, int thickness, Color color, int precision = 5);
 }

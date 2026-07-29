@@ -1,5 +1,7 @@
 using Kasane2D.Config;
 using Kasane2D.Graphics.Interfaces;
+using Kasane2D.Graphics.Types;
+using Kasane2D.Types;
 
 namespace Kasane2D.Graphics;
 
@@ -108,6 +110,41 @@ internal class Renderer : IRenderer
         return result;
     }
 
+    public void BeginDraw(ITextureSurface target)
+    {
+        rasterizer.BeginDraw(target);
+    }
+
+    public void EndDraw()
+    {
+        rasterizer.EndDraw();
+    }
+
+    public void Draw(ITexture src, Rect? dstReg = null, Rect? srcRect = null)
+    {
+        rasterizer.Draw(src, dstReg, srcRect);
+    }
+
+    public void Draw(ISurface src, Rect? dstReg = null, Rect? srcRect = null)
+    {
+        rasterizer.Draw(src, dstReg, srcRect);
+    }
+
+    public void Draw(Rect rect, Color color)
+    {
+        rasterizer.Draw(rect, color);
+    }
+
+    public void Draw(Line line, int thickness, Color color)
+    {
+        rasterizer.Draw(line, thickness, color);
+    }
+
+    public void Draw(Bezier bezier, int thickness, Color color, int precision = 5)
+    {
+        rasterizer.Draw(bezier, thickness, color, precision);
+    }
+
     private void ConfigureLayer(RenderLayerConfig config)
     {
         switch (config.Type)
@@ -132,18 +169,23 @@ internal class Renderer : IRenderer
                 break;
 
             case LayerType.Sprite:
-                if (config.SpriteSize is not null)
-                {
-                    spriteLayers.Add
-                    (
-                        config.Name,
-                        rasterizer.CreateSpriteLayer(config.SpriteSize.Value, config.SpriteCount!.Value)
-                    );
-                }
-                else
-                {
-                    spriteLayers.Add(config.Name, rasterizer.CreateSpriteLayer(config.SpriteCount!.Value));
-                }
+                spriteLayers.Add
+                (
+                    config.Name,
+                    config.SpriteSize is not null
+                        ? rasterizer.CreateSpriteLayer(config.SpriteSize.Value, config.SpriteCount!.Value)
+                        : rasterizer.CreateSpriteLayer(config.SpriteCount!.Value)
+                );
+                break;
+            
+            case LayerType.Texture:
+                surfaces.Add
+                (
+                    config.Name,
+                    config.Dimensions is not null
+                        ? rasterizer.CreateTextureSurface(config.Dimensions.Value)
+                        : rasterizer.CreateTextureSurface()
+                );
                 break;
         }
     }
