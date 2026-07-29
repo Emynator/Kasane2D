@@ -11,4 +11,6 @@ public interface IRenderer
     public T GetSurface<T>(string name) where T : ISurface;
     
     public ISpriteLayer GetSpriteLayer(string name);
+    
+    public ISlotManager GetSlotManager(string layerName);
 }

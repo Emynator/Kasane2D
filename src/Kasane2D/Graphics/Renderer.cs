@@ -8,6 +8,7 @@ internal class Renderer : IRenderer
     private readonly IRasterizer rasterizer;
     private readonly Dictionary<string, ISurface> surfaces = new();
     private readonly Dictionary<string, ISpriteLayer> spriteLayers = new();
+    private readonly Dictionary<string, ISlotManager> slotManagers = new();
     private bool initialized = false;
 
     public Renderer(IRasterizer rasterizer)
@@ -87,6 +88,24 @@ internal class Renderer : IRenderer
         return !spriteLayers.TryGetValue(name, out var layer)
             ? throw new KeyNotFoundException($"Layer '{name}' not found.")
             : layer;
+    }
+
+    public ISlotManager GetSlotManager(string layerName)
+    {
+        if (slotManagers.TryGetValue(layerName, out var slotManager))
+        {
+            return slotManager;
+        }
+
+        if (!spriteLayers.TryGetValue(layerName, out var layer))
+        {
+            throw new KeyNotFoundException($"Layer '{layerName}' not found.");
+        }
+        
+        var result = new SlotManager(layer);
+        slotManagers.Add(layerName, result);
+        
+        return result;
     }
 
     private void ConfigureLayer(RenderLayerConfig config)
