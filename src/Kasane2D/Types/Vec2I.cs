@@ -47,6 +47,11 @@ public record struct Vec2I
         return (int)Math.Round(Math.Sqrt(X * X + Y * Y));
     }
 
+    public int LengthSquared()
+    {
+        return X * X + Y * Y;
+    }
+
     public Vec2I Normalized()
     {
         var result = Copy();

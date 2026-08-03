@@ -12,23 +12,30 @@ public static class Program
             .UseMonoGame()
             .ConfigureGraphics(new()
             {
-                DefaultTileSize = new(18, 18),
-                DefaultSpriteSize = new(24, 24),
+                DefaultTileSize = new(16, 16),
+                DefaultSpriteSize = new(16, 16),
                 DefaultTilemapDimensions = new(32, 32),
-                ViewportSize = new(384, 216),
-                ScreenSize = new(1152, 648),
+                ViewportSize = new(256, 240),
+                ScreenSize = new(768, 720),
             })
             .ConfigureRenderer
             (
                 [
                     new()
                     {
-                        Name = "BG1",
+                        Name = "Parallax",
                         Type = LayerType.Tilemap,
+                        Dimensions = new(48, 15),
                     },
                     new()
                     {
-                        Name = "Sprite",
+                        Name = "BG",
+                        Type = LayerType.Tilemap,
+                        Dimensions = new(224, 15),
+                    },
+                    new()
+                    {
+                        Name = "Sprites",
                         Type = LayerType.Sprite,
                         SpriteCount = 64,
                     },

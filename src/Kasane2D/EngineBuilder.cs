@@ -77,7 +77,7 @@ public static class EngineBuilderExtensions
             rasterizer =>
             {
                 builder.Main.Rasterizer = rasterizer;
-                builder.Main.InternalRenderer = new Renderer(rasterizer);
+                builder.Main.InternalRenderer = new Renderer(builder.GraphicsConfig, rasterizer);
             },
             inputSystem => builder.Main.InternalInputSystem = inputSystem,
             builder.AudioConfig

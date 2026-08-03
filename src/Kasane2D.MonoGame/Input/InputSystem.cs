@@ -161,6 +161,13 @@ public class InputSystem : IInputSystem
         return keyboardState.GetValueOrDefault(key, InputButtonState.Released);
     }
 
+    public bool IsKeyDown(KeyKind key)
+    {
+        var state = Check(key);
+        
+        return state is InputButtonState.Pressed or InputButtonState.JustPressed;
+    }
+
     public GamepadState GetGamepadState(int index)
     {
         return gamepadStates[index];

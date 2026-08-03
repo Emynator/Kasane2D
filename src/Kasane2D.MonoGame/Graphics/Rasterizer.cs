@@ -55,54 +55,6 @@ public class Rasterizer : IRasterizer, IDisposable
     {
     }
 
-    public ISurface CreateSurface()
-    {
-        var result = new MonoGameSurface(device, config.DefaultSurfaceSize, config.ViewportSize);
-        surfaces.Add(result);
-
-        return result;
-    }
-
-    public ISurface CreateSurface(Vec2I dimensions)
-    {
-        var result = new MonoGameSurface(device, dimensions, config.ViewportSize);
-        surfaces.Add(result);
-
-        return result;
-    }
-
-    public ITilemapSurface CreateTilemapSurface()
-    {
-        var result = new TilemapSurface
-        (
-            device,
-            spriteBatch,
-            config.DefaultTilemapDimensions,
-            config.DefaultTileSize,
-            config.ViewportSize
-        );
-
-        surfaces.Add(result);
-
-        return result;
-    }
-
-    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize)
-    {
-        var result = new TilemapSurface
-        (
-            device,
-            spriteBatch,
-            config.DefaultTilemapDimensions,
-            tileSize,
-            config.ViewportSize
-        );
-
-        surfaces.Add(result);
-
-        return result;
-    }
-
     public ITilemapSurface CreateTilemapSurface(Vec2I tileSize, Vec2I dimensions)
     {
         var result = new TilemapSurface
@@ -119,36 +71,11 @@ public class Rasterizer : IRasterizer, IDisposable
         return result;
     }
 
-    public ITextureSurface CreateTextureSurface()
-    {
-        var result = new TextureSurface(device, spriteBatch, config.DefaultSurfaceSize, config.ViewportSize);
-        surfaces.Add(result);
-        
-        return result;
-    }
-
     public ITextureSurface CreateTextureSurface(Vec2I dimensions)
     {
         var result = new TextureSurface(device, spriteBatch, dimensions, config.ViewportSize);
         surfaces.Add(result);
         
-        return result;
-    }
-
-    public ISpriteLayer CreateSpriteLayer(int spriteCount)
-    {
-        var result = new SpriteSurface
-        (
-            device,
-            spriteBatch,
-            config.ViewportSize + config.DefaultSpriteSize * 2,
-            config.ViewportSize,
-            config.DefaultSpriteSize,
-            spriteCount
-        );
-
-        surfaces.Add(result);
-
         return result;
     }
 
@@ -182,7 +109,8 @@ public class Rasterizer : IRasterizer, IDisposable
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (var surface in surfaces)
         {
-            spriteBatch.Draw(surface.GetSurface(), Vector2.Zero, MgColor.White);
+            var tex = surface.GetSurface();
+            spriteBatch.Draw(tex, Vector2.Zero, MgColor.White);
         }
         spriteBatch.End();
 

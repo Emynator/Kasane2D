@@ -8,13 +8,23 @@ namespace Kasane2D.Graphics;
 internal class Renderer : IRenderer
 {
     private readonly IRasterizer rasterizer;
+    private readonly Vec2I defaultTileSize;
+    private readonly Vec2I defaultTilemapDimensions;
+    private readonly Vec2I defaultSurfaceSize;
+    private readonly Vec2I defaultSpriteSize;
+    private readonly int defaultSpriteCount;
     private readonly Dictionary<string, ISurface> surfaces = new();
     private readonly Dictionary<string, ISpriteLayer> spriteLayers = new();
     private readonly Dictionary<string, ISlotManager> slotManagers = new();
     private bool initialized = false;
 
-    public Renderer(IRasterizer rasterizer)
+    public Renderer(GraphicsConfiguration config, IRasterizer rasterizer)
     {
+        defaultTileSize = config.DefaultTileSize;
+        defaultTilemapDimensions = config.DefaultTilemapDimensions;
+        defaultSurfaceSize = config.DefaultSurfaceSize;
+        defaultSpriteSize = config.DefaultSpriteSize;
+        defaultSpriteCount = config.DefaultSpriteCount;
         this.rasterizer = rasterizer;
     }
 
@@ -103,10 +113,10 @@ internal class Renderer : IRenderer
         {
             throw new KeyNotFoundException($"Layer '{layerName}' not found.");
         }
-        
+
         var result = new SlotManager(layer);
         slotManagers.Add(layerName, result);
-        
+
         return result;
     }
 
@@ -150,42 +160,23 @@ internal class Renderer : IRenderer
         switch (config.Type)
         {
             case LayerType.Tilemap:
-                if (config.TileSize is not null && config.Dimensions is not null)
-                {
-                    surfaces.Add
-                    (
-                        config.Name,
-                        rasterizer.CreateTilemapSurface(config.TileSize.Value, config.Dimensions.Value)
-                    );
-                }
-                else if (config.TileSize is not null)
-                {
-                    surfaces.Add(config.Name, rasterizer.CreateTilemapSurface(config.TileSize.Value));
-                }
-                else
-                {
-                    surfaces.Add(config.Name, rasterizer.CreateTilemapSurface());
-                }
+                var tileSize = config.TileSize ?? defaultTileSize;
+                var dimensions = config.Dimensions ?? defaultTilemapDimensions;
+                surfaces.Add(config.Name, rasterizer.CreateTilemapSurface(tileSize, dimensions));
+
                 break;
 
             case LayerType.Sprite:
-                spriteLayers.Add
-                (
-                    config.Name,
-                    config.SpriteSize is not null
-                        ? rasterizer.CreateSpriteLayer(config.SpriteSize.Value, config.SpriteCount!.Value)
-                        : rasterizer.CreateSpriteLayer(config.SpriteCount!.Value)
-                );
+                var spriteSize = config.SpriteSize ?? defaultSpriteSize;
+                var spriteCount = config.SpriteCount ?? defaultSpriteCount;
+                spriteLayers.Add(config.Name, rasterizer.CreateSpriteLayer(spriteSize, spriteCount));
+                
                 break;
-            
+
             case LayerType.Texture:
-                surfaces.Add
-                (
-                    config.Name,
-                    config.Dimensions is not null
-                        ? rasterizer.CreateTextureSurface(config.Dimensions.Value)
-                        : rasterizer.CreateTextureSurface()
-                );
+                var size = config.Dimensions ?? defaultSurfaceSize;
+                surfaces.Add(config.Name, rasterizer.CreateTextureSurface(size));
+                
                 break;
         }
     }

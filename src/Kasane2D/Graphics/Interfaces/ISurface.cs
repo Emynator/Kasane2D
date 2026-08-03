@@ -9,7 +9,11 @@ public interface ISurface
     
     public Viewport Viewport { get; }
 
-    public void Scroll(Vec2I value);
+    public void ScrollBy(Vec2I value);
 
-    public void Scroll(Vec2F value);
+    public void ScrollBy(Vec2F value);
+    
+    public void ScrollTo(Vec2I value);
+
+    public void ScrollTo(Vec2F value);
 }

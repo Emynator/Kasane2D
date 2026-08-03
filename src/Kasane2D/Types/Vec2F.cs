@@ -1,3 +1,5 @@
+using Kasane2D.Enums;
+
 namespace Kasane2D.Types;
 
 public record struct Vec2F
@@ -27,10 +29,15 @@ public record struct Vec2F
         return new Vec2F(X, Y);
     }
 
-    public Vec2I ToVec2I()
+    public Vec2I ToVec2I(RoundingMode mode = RoundingMode.Floor)
     {
-        var res = Copy();
-        res.Floor();
+        var res = mode switch
+        {
+            RoundingMode.Floor => Floor(),
+            RoundingMode.Nearest => Round(),
+            RoundingMode.Ceil => Ceil(),
+            _ => Floor(),
+        };
         
         return new Vec2I((int)res.X, (int)res.Y);
     }
@@ -50,6 +57,11 @@ public record struct Vec2F
         return MathF.Sqrt(X * X + Y * Y);
     }
 
+    public float LengthSquared()
+    {
+        return X * X + Y * Y;
+    }
+
     public Vec2F Normalized()
     {
         var result = Copy();
@@ -58,22 +70,31 @@ public record struct Vec2F
         return result;
     }
 
-    public void Floor()
+    public Vec2F Floor()
     {
-        X = MathF.Floor(X);
-        Y = MathF.Floor(Y);
+        var result = Copy();
+        result.X = MathF.Floor(X);
+        result.Y = MathF.Floor(Y);
+
+        return result;
     }
 
-    public void Ceil()
+    public Vec2F Ceil()
     {
-        X = MathF.Ceiling(X);
-        Y = MathF.Ceiling(Y);
+        var result = Copy();
+        result.X = MathF.Ceiling(X);
+        result.Y = MathF.Ceiling(Y);
+        
+        return result;
     }
 
-    public void Round()
+    public Vec2F Round()
     {
-        X = MathF.Round(X);
-        Y = MathF.Round(Y);
+        var result = Copy();
+        result.X = MathF.Round(X);
+        result.Y = MathF.Round(Y);
+        
+        return result;
     }
     
     public Vec2F CompWiseMul(Vec2F other)

@@ -41,7 +41,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         {
             for (var y = 0; y < dimensions.Y; y++)
             {
-                tiles[x, y] = new();
+                tiles[x, y] = new(tileSize);
             }
         }
     }
@@ -105,16 +105,60 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         tilesToUpdate.Add(tilePosition);
     }
 
+    public void UpdateAtlasIndex(Vec2I tilePosition, int value)
+    {
+        if (Atlas is null)
+        {
+            throw new InvalidOperationException("Atlas is null!");
+        }
+
+        var x = value % Atlas.Dimensions.X;
+        var y = value / Atlas.Dimensions.X;
+        tiles[tilePosition.X, tilePosition.Y].AtlasIndex = new(x, y);
+        tilesToUpdate.Add(tilePosition);
+    }
+
+    public void UpdateAtlasIndex(int positionX, int positionY, int atlasX, int atlasY)
+    {
+        tiles[positionX, positionY].AtlasIndex = new(atlasX, atlasY);
+        tilesToUpdate.Add(new(positionX, positionY));
+    }
+
+    public void UpdateAtlasIndex(int positionX, int positionY, int value)
+    {
+        if (Atlas is null)
+        {
+            throw new InvalidOperationException("Atlas is null!");
+        }
+
+        var x = value % Atlas.Dimensions.X;
+        var y = value / Atlas.Dimensions.X;
+        tiles[positionX, positionY].AtlasIndex = new(x, y);
+        tilesToUpdate.Add(new(positionX, positionY));
+    }
+
     public void UpdateHFlip(Vec2I tilePosition, bool value)
     {
         tiles[tilePosition.X, tilePosition.Y].HFlip = value;
         tilesToUpdate.Add(tilePosition);
     }
 
+    public void UpdateHFlip(int positionX, int positionY, bool value)
+    {
+        tiles[positionX, positionY].HFlip = value;
+        tilesToUpdate.Add(new(positionX, positionY));
+    }
+
     public void UpdateVFlip(Vec2I tilePosition, bool value)
     {
         tiles[tilePosition.X, tilePosition.Y].VFlip = value;
         tilesToUpdate.Add(tilePosition);
+    }
+
+    public void UpdateVFlip(int positionX, int positionY, bool value)
+    {
+        tiles[positionX, positionY].VFlip = value;
+        tilesToUpdate.Add(new(positionX, positionY));
     }
 
     public override Texture2D GetSurface()
@@ -130,7 +174,13 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         device.Clear(Color.Transparent);
 
         spriteBatch.Begin(samplerState: SamplerState.PointWrap);
-        spriteBatch.Draw(surface, Viewport.ViewRect.ToRectangle(), Color.White);
+        spriteBatch.Draw
+        (
+            surface,
+            new Rectangle(new Point(0, 0), Viewport.Size.ToPoint()),
+            Viewport.ViewRect.ToRectangle(),
+            Color.White
+        );
         spriteBatch.End();
     }
 
@@ -193,11 +243,10 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
     private void RenderSurface()
     {
         device.SetRenderTarget(surface);
+        device.Clear(Color.Transparent);
 
         if (Atlas is null)
         {
-            device.Clear(Color.Transparent);
-
             return;
         }
 

@@ -19,7 +19,7 @@ public abstract class Surface : ISurface
     
     public Viewport Viewport => viewport;
 
-    public void Scroll(Vec2I value)
+    public void ScrollBy(Vec2I value)
     {
         var newPos = viewport.Position + value;
         if (newPos.X < 0)
@@ -42,8 +42,22 @@ public abstract class Surface : ISurface
         viewport.Position = newPos;
     }
 
-    public void Scroll(Vec2F value)
+    public void ScrollBy(Vec2F value)
     {
-        Scroll(value.ToVec2I());
+        ScrollBy(value.ToVec2I());
+    }
+
+    public void ScrollTo(Vec2I value)
+    {
+        var dest = value.Copy();
+        dest.X %= SurfaceSize.X;
+        dest.Y %= SurfaceSize.Y;
+        
+        viewport.Position = dest;
+    }
+
+    public void ScrollTo(Vec2F value)
+    {
+        ScrollTo(value.ToVec2I());
     }
 }

@@ -71,8 +71,7 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
                 continue;
             }
 
-            var atlas = sprite.SpriteAtlas as SpriteAtlas;
-            if (atlas is null)
+            if (sprite.SpriteAtlas is not SpriteAtlas atlas)
             {
                 continue;
             }

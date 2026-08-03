@@ -11,8 +11,18 @@ public interface ITilemapSurface : ISurface
     public ISpriteAtlas? TileAtlas { get; set; }
 
     public void UpdateAtlasIndex(Vec2I tilePosition, Vec2I value);
+    
+    public void UpdateAtlasIndex(Vec2I tilePosition, int value);
+    
+    public void UpdateAtlasIndex(int positionX, int positionY, int atlasX, int atlasY);
+    
+    public void UpdateAtlasIndex(int positionX, int positionY, int value);
 
     public void UpdateHFlip(Vec2I tilePosition, bool value);
     
+    public void UpdateHFlip(int positionX, int positionY, bool value);
+    
     public void UpdateVFlip(Vec2I tilePosition, bool value);
+    
+    public void UpdateVFlip(int positionX, int positionY, bool value);
 }
