@@ -1,7 +1,7 @@
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Types;
 
-namespace EngineTest;
+namespace JumpAndRun;
 
 public class Camera
 {

@@ -4,7 +4,7 @@ using Kasane2D.Input.Enums;
 using Kasane2D.Input.Interfaces;
 using Kasane2D.Types;
 
-namespace EngineTest;
+namespace JumpAndRun;
 
 public class Player
 {

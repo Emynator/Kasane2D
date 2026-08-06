@@ -8,20 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Kasane2D.MonoGame\Kasane2D.MonoGame.csproj" />
+      <ProjectReference Include="..\..\src\Kasane2D.MonoGame\Kasane2D.MonoGame.csproj" />
+      <ProjectReference Include="..\..\src\Kasane2D\Kasane2D.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="assets\BgSheet.png">
+      <None Update="assets\SpriteSheet.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="assets\Sprites.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="assets\test1.wav">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="assets\test2.wav">
+      <None Update="assets\TileSheet.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

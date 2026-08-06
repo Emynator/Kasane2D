@@ -1,6 +1,6 @@
 using Kasane2D.Graphics.Interfaces;
 
-namespace EngineTest;
+namespace JumpAndRun;
 
 public class Map
 {

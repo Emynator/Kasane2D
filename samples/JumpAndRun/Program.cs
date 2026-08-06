@@ -2,7 +2,7 @@
 using Kasane2D.Config;
 using Kasane2D.MonoGame;
 
-namespace EngineTest;
+namespace JumpAndRun;
 
 public static class Program
 {
@@ -23,6 +23,12 @@ public static class Program
                 [
                     new()
                     {
+                        Name = "Parallax",
+                        Type = LayerType.Tilemap,
+                        Dimensions = new(48, 15),
+                    },
+                    new()
+                    {
                         Name = "BG",
                         Type = LayerType.Tilemap,
                         Dimensions = new(224, 15),
@@ -36,7 +42,7 @@ public static class Program
                 ]
             )
             .ConfigureAudio()
-            .WithMain<TestGame>()
+            .WithMain<JumpAndRunGame>()
             .Build();
         
         engine.Run();

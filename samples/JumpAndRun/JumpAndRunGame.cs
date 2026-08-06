@@ -1,9 +1,9 @@
 using Kasane2D;
 using Kasane2D.Graphics.Interfaces;
 
-namespace EngineTest;
+namespace JumpAndRun;
 
-public class MyGame : EngineMain
+public class JumpAndRunGame : EngineMain
 {
     private Map map = null!;
     private Player player = null!;
