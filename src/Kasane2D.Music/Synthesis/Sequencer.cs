@@ -5,12 +5,12 @@ namespace Kasane2D.Music.Synthesis;
 
 internal class Sequencer
 {
+    private readonly SynthVoice voice;
+    
     public Sequencer(SynthVoice voice)
     {
-        Voice = voice;
+        this.voice = voice;
     }
-    
-    public SynthVoice Voice { get; }
 
     public Sequence? CurrentSequence { get; set; }
     
@@ -18,7 +18,7 @@ internal class Sequencer
 
     public void Process(int sampleCount)
     {
-        Voice.Process(sampleCount);
+        voice.Process(sampleCount);
     }
 
     public void Step(int step)
@@ -28,34 +28,42 @@ internal class Sequencer
             return;
         }
 
+        voice.ControlUpdate(CurrentSequence.ControlEvents[step]);
+
         var note = CurrentSequence.Notes[step];
         switch (note.Kind)
         {
             case SequenceNoteEventKind.Begin:
-                Voice.Play(note.Note);
+                voice.Play(note.Note);
                 break;
             
             case SequenceNoteEventKind.Release:
-                Voice.Stop();
+                voice.Stop();
                 break;
         }
     }
 
     public void Next()
     {
-        Reset();
-        
         if (NextSequence is null)
         {
+            Reset();
             return;
         }
         
         CurrentSequence = NextSequence;
         NextSequence = null;
+        Reset();
     }
 
     public void Reset()
     {
-        Voice.Stop();
+        voice.Stop();
+        voice.ControlUpdate(CurrentSequence?.InitialSettings ?? default);
+    }
+
+    public void Stop()
+    {
+        voice.Stop();
     }
 }

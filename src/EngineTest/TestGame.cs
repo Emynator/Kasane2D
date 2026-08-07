@@ -3,6 +3,7 @@ using Kasane2D.Music;
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
+using Kasane2D.Music.Types.SequenceEvents;
 
 namespace EngineTest;
 
@@ -39,6 +40,12 @@ public class TestGame : EngineMain
                 new
                 (
                     "Track 1",
+                    new
+                    (
+                        VolumeUpdate: new(-3),
+                        EnvelopeUpdate: new(50.0f, 150.0f, 0.0f, 10.0f),
+                        GeneratorUpdate: new BasicOscillatorUpdate(BasicWave.Saw)
+                    ),
                     [
                         new(0, 0, NoteEventKind.Begin, Note.A2),
                         new(0, 1, NoteEventKind.Begin, Note.D3),
@@ -47,7 +54,6 @@ public class TestGame : EngineMain
                         new(0, 4, NoteEventKind.Begin, Note.E3),
                         new(0, 5, NoteEventKind.Begin, Note.D3),
                         new(0, 6, NoteEventKind.Hold),
-                        
                         new(1, 0, NoteEventKind.Begin, Note.F3),
                         new(1, 1, NoteEventKind.Begin, Note.E3),
                         new(1, 2, NoteEventKind.Begin, Note.D3),
@@ -55,7 +61,6 @@ public class TestGame : EngineMain
                         new(1, 4, NoteEventKind.Begin, Note.G3),
                         new(1, 5, NoteEventKind.Begin, Note.F3),
                         new(1, 6, NoteEventKind.Hold),
-                        
                         new(2, 0, NoteEventKind.Begin, Note.A3),
                         new(2, 1, NoteEventKind.Begin, Note.G3),
                         new(2, 2, NoteEventKind.Begin, Note.F3),
@@ -63,7 +68,6 @@ public class TestGame : EngineMain
                         new(2, 4, NoteEventKind.Begin, Note.F3),
                         new(2, 5, NoteEventKind.Begin, Note.E3),
                         new(2, 6, NoteEventKind.Hold),
-                        
                         new(3, 0, NoteEventKind.Begin, Note.G3),
                         new(3, 1, NoteEventKind.Begin, Note.F3),
                         new(3, 2, NoteEventKind.Begin, Note.E3),
@@ -77,7 +81,7 @@ public class TestGame : EngineMain
                 ),
             ]
         );
-        
+
         synth?.Play(pattern);
     }
 

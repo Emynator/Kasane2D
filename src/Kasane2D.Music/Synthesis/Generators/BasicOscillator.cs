@@ -1,16 +1,17 @@
 using Kasane2D.Music.Enums;
+using Kasane2D.Music.Types.SequenceEvents;
 
 namespace Kasane2D.Music.Synthesis.Generators;
 
 internal class BasicOscillator : Generator
 {
+    private BasicWave shape = BasicWave.Sine;
+    
     public BasicOscillator(int sampleRate) : base(sampleRate)
     {
     }
 
-    public BasicWave Shape { get; set; } = BasicWave.Sine;
-
-    public double DutyCycle
+    private double DutyCycle
     {
         get;
         set
@@ -30,9 +31,27 @@ internal class BasicOscillator : Generator
         }
     } = 0.5d;
 
+    public override void ControlUpdate(GeneratorUpdate ev)
+    {
+        if (ev is not BasicOscillatorUpdate actual)
+        {
+            return;
+        }
+
+        if (actual.NewWaveShape is not null)
+        {
+            shape = actual.NewWaveShape.Value;
+        }
+
+        if (actual.NewDutyCycle is not null)
+        {
+            DutyCycle = actual.NewDutyCycle.Value;
+        }
+    }
+
     protected override float Generate(double frequency)
     {
-        var result = Shape switch
+        var result = shape switch
         {
             BasicWave.Sine => (float)Math.Sin(Math.Tau * Phase),
             BasicWave.Triangle => (float)(1.0d - 4.0d * Math.Abs(Phase - 0.5d)),

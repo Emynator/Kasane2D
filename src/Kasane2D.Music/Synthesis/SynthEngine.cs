@@ -1,6 +1,7 @@
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
+using Kasane2D.Music.Types.SequenceEvents;
 
 namespace Kasane2D.Music.Synthesis;
 
@@ -31,7 +32,7 @@ internal class SynthEngine : ISynthEngine
         {
             ProcessTracks(sampleCount);
             tlock.Release();
-            
+
             return;
         }
 
@@ -63,7 +64,7 @@ internal class SynthEngine : ISynthEngine
         if (remainingSamples == 0)
         {
             tlock.Release();
-            
+
             return;
         }
 
@@ -80,9 +81,9 @@ internal class SynthEngine : ISynthEngine
 
         foreach (var track in tracks.Values)
         {
-            track.Reset();
+            track.Stop();
         }
-        
+
         nextPattern = null;
         currentPattern = ProcessPattern(pattern);
         foreach (var seq in currentPattern.Value.Sequences)
@@ -94,17 +95,18 @@ internal class SynthEngine : ISynthEngine
 
             track.NextSequence = null;
             track.CurrentSequence = seq.Value;
+            track.Reset();
         }
 
         isPlaying = true;
-        
+
         tlock.Release();
     }
 
     public void Queue(SongPattern pattern)
     {
         tlock.Wait();
-        
+
         nextPattern = ProcessPattern(pattern);
         foreach (var seq in nextPattern.Value.Sequences)
         {
@@ -112,10 +114,10 @@ internal class SynthEngine : ISynthEngine
             {
                 continue;
             }
-            
+
             track.NextSequence = seq.Value;
         }
-        
+
         tlock.Release();
     }
 
@@ -126,17 +128,20 @@ internal class SynthEngine : ISynthEngine
         isPlaying = false;
         foreach (var track in tracks.Values)
         {
-            track.Reset();
+            track.Stop();
         }
-        
+
         tlock.Release();
     }
 
     public void Resume()
     {
         tlock.Wait();
-        
-        isPlaying = true;
+
+        if (currentPattern is not null)
+        {
+            isPlaying = true;
+        }
 
         tlock.Release();
     }
@@ -144,8 +149,10 @@ internal class SynthEngine : ISynthEngine
     public void Stop()
     {
         tlock.Wait();
-        
+
         isPlaying = false;
+        currentStep = 0;
+        carryOverSamples = 0;
         currentPattern = null;
         nextPattern = null;
         foreach (var track in tracks.Values)
@@ -154,7 +161,7 @@ internal class SynthEngine : ISynthEngine
             track.NextSequence = null;
             track.Reset();
         }
-        
+
         tlock.Release();
     }
 
@@ -166,7 +173,11 @@ internal class SynthEngine : ISynthEngine
         var sequences = new Dictionary<string, Sequence>();
         foreach (var trackPattern in pattern.TrackPatterns)
         {
-            sequences.Add(trackPattern.TrackName, CreateSequence(trackPattern, pattern.Length, sequenceSteps, barSteps));
+            sequences.Add
+            (
+                trackPattern.TrackName,
+                CreateSequence(trackPattern, pattern.Length, sequenceSteps, barSteps)
+            );
         }
 
         return new(pattern.Length * barSteps, samplesPerStep, sequences);
@@ -186,7 +197,18 @@ internal class SynthEngine : ISynthEngine
             ProcessBar(noteEventsSlice, controlEventsSlice, noteEvents, controlEvents, sequenceSteps, barSteps);
         }
 
-        return new(sequenceNoteEvents, sequenceControlEvents);
+        return new
+        (
+            new
+            (
+                pattern.InitialSettings.VolumeUpdate,
+                pattern.InitialSettings.PanUpdate,
+                pattern.InitialSettings.EnvelopeUpdate,
+                pattern.InitialSettings.GeneratorUpdate
+            ),
+            sequenceNoteEvents,
+            sequenceControlEvents
+        );
     }
 
     private void ProcessBar
@@ -206,6 +228,15 @@ internal class SynthEngine : ISynthEngine
         var processNext = true;
         for (var i = 0; i < barSteps; i++)
         {
+            var control = controlEvents.FirstOrDefault(ev => ev.Step == i);
+            sequenceControlEvents[i] = new
+            (
+                control.VolumeUpdate,
+                control.PanUpdate,
+                control.EnvelopeUpdate,
+                control.GeneratorUpdate
+            );
+
             if (i == barSteps - 1 && noteFill.Kind is SequenceNoteEventKind.Hold)
             {
                 sequenceNoteEvents[i] = new(Kind: SequenceNoteEventKind.Release);

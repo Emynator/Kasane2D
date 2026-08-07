@@ -26,7 +26,7 @@ public readonly record struct TimeSignature
         return $"{Numerator}/{Denominator}";
     }
 
-    internal int GetSequenceStepsPerBar()
+    public int GetSequenceStepsPerBar()
     {
         return Denominator switch
         {

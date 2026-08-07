@@ -1,29 +1,25 @@
+using Kasane2D.Music.Types.SequenceEvents;
+
 namespace Kasane2D.Music.Types;
 
 internal record class Sequence
 {
-    public static Sequence Empty(int length)
+    public Sequence(SequenceControlEvent initialSettings, SequenceNoteEvent[] notes, SequenceControlEvent[] controlEvents)
     {
-        return new Sequence
-        (
-            new SequenceNoteEvent[length * Constants.SequencerStepsPerQuarterNote * 4],
-            new SequenceControlEvent[length * Constants.SequencerStepsPerQuarterNote * 4]
-        );
-    }
-
-    public Sequence(SequenceNoteEvent[] Notes, SequenceControlEvent[] ControlEvents)
-    {
-        if (Notes.Length != ControlEvents.Length)
+        if (notes.Length != controlEvents.Length)
         {
             throw new ArgumentException("Sequence contains unequal number of notes and control events.");
         }
 
-        Length = Notes.Length;
-        this.Notes = Notes;
-        this.ControlEvents = ControlEvents;
+        Length = notes.Length;
+        InitialSettings = initialSettings;
+        Notes = notes;
+        ControlEvents = controlEvents;
     }
 
     public int Length { get; init; }
+    
+    public SequenceControlEvent InitialSettings { get; init; }
 
     public SequenceNoteEvent[] Notes { get; init; }
 

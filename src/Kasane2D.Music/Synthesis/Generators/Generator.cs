@@ -1,3 +1,5 @@
+using Kasane2D.Music.Types.SequenceEvents;
+
 namespace Kasane2D.Music.Synthesis.Generators;
 
 public abstract class Generator
@@ -18,6 +20,8 @@ public abstract class Generator
             output[i] = Generate(frequency);
         }
     }
+
+    public abstract void ControlUpdate(GeneratorUpdate ev);
 
     protected abstract float Generate(double frequency);
 
