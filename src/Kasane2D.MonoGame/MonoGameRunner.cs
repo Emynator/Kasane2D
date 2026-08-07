@@ -101,11 +101,11 @@ internal class MonoGameRunner : Game, IEngineRunner
         var rightFloat = main.SoundSystem.AudioMixer.Master.OutRight.Read(bufferSize);
         var left = leftFloat
             .Select(s => s >= 0.0f ? MathF.Min(1.0f, s) : MathF.Max(-1.0f, s))
-            .Select(s => (short)(s >= 0.0f ? s * short.MaxValue : s * short.MinValue))
+            .Select(s => (short)(s * (s >= 0.0f ? 32767.0f : 32768.0f)))
             .ToArray();
         var right = rightFloat
             .Select(s => s >= 0.0f ? MathF.Min(1.0f, s) : MathF.Max(-1.0f, s))
-            .Select(s => (short)(s >= 0.0f ? s * short.MaxValue : s * short.MinValue))
+            .Select(s => (short)(s * (s >= 0.0f ? 32767.0f : 32768.0f)))
             .ToArray();
             
         var buffer = new byte[bufferSize * 4];

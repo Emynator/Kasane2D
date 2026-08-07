@@ -9,7 +9,8 @@ internal class SoundSystem : ISoundSystem
 {
     private readonly AudioMixer mixer;
     private readonly SfxManager sfxManager;
-    
+    private readonly List<ISoundSubSystem> subSystems = [];
+
     public SoundSystem(AudioConfiguration config)
     {
         SampleRate = config.SampleRate;
@@ -18,14 +19,27 @@ internal class SoundSystem : ISoundSystem
     }
 
     public int SampleRate { get; }
-    
+
     public IAudioMixer AudioMixer => mixer;
-    
+
     public ISfxManager SfxManager => sfxManager;
-    
+
     public void Process(int sampleCount)
     {
-        sfxManager.Update(sampleCount);
+        var tasks = subSystems.Select(system => Task.Run(() => system.Process(sampleCount))).ToList();
+        tasks.Add(Task.Run(() => sfxManager.Update(sampleCount)));
+        Task.WaitAll(tasks);
+        
         mixer.Master.Mix(sampleCount);
+    }
+
+    public void AddSubSystem(ISoundSubSystem system)
+    {
+        subSystems.Add(system);
+    }
+
+    public void RemoveSubSystem(Guid id)
+    {
+        subSystems.RemoveAll(system => system.Id == id);
     }
 }

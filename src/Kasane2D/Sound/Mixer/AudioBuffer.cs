@@ -75,5 +75,6 @@ internal class AudioBuffer : IAudioBuffer
         }
         
         samples.AsSpan(0, samples.Length).CopyTo(data.AsSpan(writeIndex, samples.Length));
+        writeIndex += samples.Length;
     }
 }

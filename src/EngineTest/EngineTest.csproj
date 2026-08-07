@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Kasane2D.MonoGame\Kasane2D.MonoGame.csproj" />
+      <ProjectReference Include="..\Kasane2D.Music\Kasane2D.Music.csproj" />
     </ItemGroup>
 
     <ItemGroup>

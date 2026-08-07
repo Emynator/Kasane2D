@@ -1,0 +1,17 @@
+using Kasane2D.Music.Enums;
+
+namespace Kasane2D.Music;
+
+public class SynthConfig
+{
+    public required string Name { get; set; }
+    
+    public List<TrackConfig> TrackConfigs { get; set; } = [];
+}
+
+public class TrackConfig
+{
+    public required string Name { get; set; }
+    
+    public required GeneratorKind Kind { get; set; }
+}

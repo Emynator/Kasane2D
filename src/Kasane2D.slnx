@@ -4,5 +4,6 @@
   </Folder>
   <Project Path="EngineTest/EngineTest.csproj" />
   <Project Path="Kasane2D.MonoGame/Kasane2D.MonoGame.csproj" />
+  <Project Path="Kasane2D.Music/Kasane2D.Music.csproj" />
   <Project Path="Kasane2D/Kasane2D.csproj" />
 </Solution>

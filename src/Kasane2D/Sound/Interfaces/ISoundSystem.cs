@@ -9,4 +9,8 @@ public interface ISoundSystem
     public ISfxManager SfxManager { get; }
     
     public void Process(int sampleCount);
+
+    public void AddSubSystem(ISoundSubSystem system);
+    
+    public void RemoveSubSystem(Guid id);
 }
