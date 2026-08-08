@@ -23,6 +23,8 @@ internal class SynthEngine : ISynthEngine
     }
 
     public Guid Id { get; } = Guid.NewGuid();
+    
+    public Conductor? Conductor { get; set; }
 
     public void Process(int sampleCount)
     {
@@ -105,8 +107,6 @@ internal class SynthEngine : ISynthEngine
 
     public void Queue(SongPattern pattern)
     {
-        tlock.Wait();
-
         nextPattern = ProcessPattern(pattern);
         foreach (var seq in nextPattern.Value.Sequences)
         {
@@ -117,8 +117,6 @@ internal class SynthEngine : ISynthEngine
 
             track.NextSequence = seq.Value;
         }
-
-        tlock.Release();
     }
 
     public void Pause()
@@ -304,9 +302,12 @@ internal class SynthEngine : ISynthEngine
 
         currentStep = 0;
         Parallel.ForEach(tracks.Values, track => track.Next());
-        if (nextPattern is not null)
+        currentPattern = nextPattern;
+        nextPattern = null;
+        
+        if (Conductor is not null)
         {
-            currentPattern = nextPattern;
+            Task.Run(() => Conductor.UpdateSynthEngine());
         }
     }
 
