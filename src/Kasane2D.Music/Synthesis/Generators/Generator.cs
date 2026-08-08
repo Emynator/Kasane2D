@@ -23,18 +23,33 @@ public abstract class Generator
 
     public abstract void ControlUpdate(GeneratorUpdate ev);
 
+    public virtual void Reset()
+    {
+    }
+
     protected abstract float Generate(double frequency);
+
+    protected virtual void PhaseCallback()
+    {
+    }
 
     protected void Step(double frequency)
     {
         Phase += frequency / sampleRate;
         if (Phase >= 2.0d)
         {
-            Phase -= Math.Floor(Phase);
+            var cycles = Math.Floor(Phase);
+            Phase -= cycles;
+            
+            for (var i = 0; i < (int)cycles; i++)
+            {
+                PhaseCallback();
+            }
         }
         if (Phase >= 1.0d)
         {
             Phase -= 1.0d;
+            PhaseCallback();
         }
     }
 }

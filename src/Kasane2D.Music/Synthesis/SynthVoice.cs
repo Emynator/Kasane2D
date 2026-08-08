@@ -34,6 +34,7 @@ internal class SynthVoice
     public void Play(Note note)
     {
         frequency = note.Frequency();
+        generator.Reset();
         envelope.Reset();
     }
 

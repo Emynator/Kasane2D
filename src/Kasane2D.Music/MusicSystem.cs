@@ -18,6 +18,7 @@ public static class MusicSystem
             Generator generator = trackConfig.Kind switch
             {
                 GeneratorKind.BasicOscillator => new BasicOscillator(soundSystem.SampleRate),
+                GeneratorKind.DmgNoise => new DmgNoise(soundSystem.SampleRate),
                 _ => new EmptyGenerator(soundSystem.SampleRate),
             };
             

@@ -34,7 +34,7 @@ public class TestGame : EngineMain
             "Dreamer",
             TimeSignature.FourFour,
             80,
-            4,
+            1,
             StepSize.Eighth,
             [
                 new
