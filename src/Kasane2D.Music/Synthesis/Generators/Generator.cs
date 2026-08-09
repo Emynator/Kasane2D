@@ -24,8 +24,9 @@ public abstract class Generator
 
     public abstract void ControlUpdate(GeneratorUpdate ev);
 
-    public virtual void Reset()
+    public void Reset()
     {
+        Phase = 0.0d;
     }
 
     protected abstract float Generate(double frequency);
