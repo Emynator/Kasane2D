@@ -1,8 +1,9 @@
 using Kasane2D.Music.Types.SequenceEvents;
+using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
 namespace Kasane2D.Music.Synthesis.Generators;
 
-public class DmgNoise : Generator
+internal class DmgNoise : Generator
 {
     private bool longMode = true;
     private int stepCount = 1;

@@ -8,6 +8,8 @@ public abstract record class AudioStream(int Length)
 
     public abstract AudioStream Add(AudioStream stream);
 
+    public abstract AudioStream Copy();
+
     protected static float[] ResampleChannel(Span<float> src, int srcSampleRate, int dstSampleRate)
     {
         if (src.Length == 0)
@@ -41,6 +43,8 @@ public abstract record class AudioStream(int Length)
 
 public sealed record class MonoAudioStream(int Length, float[] Samples) : AudioStream(Length)
 {
+    public static MonoAudioStream Empty { get; } = new MonoAudioStream(0, []);
+    
     public override AudioStream Resample(int srcSampleRate, int dstSampleRate)
     {
         var samples = ResampleChannel(Samples, srcSampleRate, dstSampleRate);
@@ -79,10 +83,32 @@ public sealed record class MonoAudioStream(int Length, float[] Samples) : AudioS
 
         return new MonoAudioStream(samples.Length, samples);
     }
+
+    public override AudioStream Copy()
+    {
+        var samples = new float[Length];
+        Samples.AsSpan().CopyTo(samples);
+        
+        return new MonoAudioStream(Length, samples);
+    }
+    
+    public StereoAudioStream ConvertToStereo()
+    {
+        var data = Samples.AsSpan();
+        var left = new float[Length];
+        var right = new float[Length];
+        
+        data.CopyTo(left);
+        data.CopyTo(right);
+        
+        return new StereoAudioStream(Length, left, right);
+    }
 }
 
 public sealed record class StereoAudioStream(int Length, float[] Left, float[] Right) : AudioStream(Length)
 {
+    public static StereoAudioStream Empty { get; } = new StereoAudioStream(0, [], []);
+    
     public override AudioStream Resample(int srcSampleRate, int dstSampleRate)
     {
         var left = ResampleChannel(Left, srcSampleRate, dstSampleRate);
@@ -123,5 +149,27 @@ public sealed record class StereoAudioStream(int Length, float[] Left, float[] R
         }
 
         return new StereoAudioStream(left.Length, left, right);
+    }
+
+    public override AudioStream Copy()
+    {
+        var samplesLeft = new float[Length];
+        Left.AsSpan().CopyTo(samplesLeft);
+        
+        var samplesRight = new float[Length];
+        Right.AsSpan().CopyTo(samplesRight);
+        
+        return new StereoAudioStream(Length, samplesLeft, samplesRight);
+    }
+
+    public MonoAudioStream ConvertToMono()
+    {
+        var samples = new float[Length];
+        for (var i = 0; i < Length; i++)
+        {
+            samples[i] = (Left[i] + Right[i]) * 0.5f;
+        }
+        
+        return new MonoAudioStream(samples.Length, samples);
     }
 }

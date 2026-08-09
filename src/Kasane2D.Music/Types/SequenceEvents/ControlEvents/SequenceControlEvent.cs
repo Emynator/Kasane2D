@@ -1,9 +1,9 @@
-namespace Kasane2D.Music.Types.SequenceEvents;
+using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
-public readonly record struct ControlEvent
+namespace Kasane2D.Music.Types.SequenceEvents.ControlEvents;
+
+internal record struct SequenceControlEvent
     (
-    int Bar = -1,
-    int Step = -1,
     VolumeUpdate VolumeUpdate = default,
     PanUpdate PanUpdate = default,
     EnvelopeUpdate EnvelopeUpdate = default,

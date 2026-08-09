@@ -1,8 +1,9 @@
 using Kasane2D.Music.Types.SequenceEvents;
+using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
 namespace Kasane2D.Music.Synthesis.Generators;
 
-public class EmptyGenerator : Generator
+internal class EmptyGenerator : Generator
 {
     public EmptyGenerator(int sampleRate) : base(sampleRate)
     {

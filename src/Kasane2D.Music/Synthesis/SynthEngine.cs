@@ -2,6 +2,7 @@ using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
 using Kasane2D.Music.Types.SequenceEvents;
+using Kasane2D.Music.Types.SequenceEvents.ControlEvents;
 
 namespace Kasane2D.Music.Synthesis;
 

@@ -17,8 +17,14 @@ public static class MusicSystem
         {
             Generator generator = trackConfig.Kind switch
             {
+                GeneratorKind.Custom => trackConfig.CustomGeneratorFactory is not null
+                    ? trackConfig.CustomGeneratorFactory(soundSystem.SampleRate)
+                    : new EmptyGenerator(soundSystem.SampleRate),
                 GeneratorKind.BasicOscillator => new BasicOscillator(soundSystem.SampleRate),
                 GeneratorKind.DmgNoise => new DmgNoise(soundSystem.SampleRate),
+                GeneratorKind.SidNoise => new SidNoise(soundSystem.SampleRate),
+                GeneratorKind.RetroWaveTable => new RetroWaveTableOscillator(soundSystem.SampleRate),
+                GeneratorKind.Sampler => new Sampler(soundSystem.SampleRate),
                 _ => new EmptyGenerator(soundSystem.SampleRate),
             };
 

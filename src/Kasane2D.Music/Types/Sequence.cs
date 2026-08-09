@@ -1,4 +1,5 @@
 using Kasane2D.Music.Types.SequenceEvents;
+using Kasane2D.Music.Types.SequenceEvents.ControlEvents;
 
 namespace Kasane2D.Music.Types;
 

@@ -1,14 +1,14 @@
-namespace Kasane2D.Music.Types.SequenceEvents;
+namespace Kasane2D.Music.Types.SequenceEvents.ControlEvents;
 
-public readonly record struct VolumeUpdate
+public readonly record struct PanUpdate
 {
-    public VolumeUpdate()
+    public PanUpdate()
     {
         DoUpdate = false;
         Value = 0;
     }
 
-    public VolumeUpdate(int value)
+    public PanUpdate(int value)
     {
         DoUpdate = true;
         Value = value;

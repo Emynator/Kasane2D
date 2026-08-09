@@ -1,4 +1,4 @@
-namespace Kasane2D.Music.Types.SequenceEvents;
+namespace Kasane2D.Music.Types.SequenceEvents.ControlEvents;
 
 public readonly record struct EnvelopeUpdate
 {
