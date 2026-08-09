@@ -5,7 +5,7 @@ namespace Kasane2D.Music.Synthesis.Generators;
 
 internal class SidNoise : Generator
 {
-    private int lfsr;
+    private int lfsr = 0xF00BA55;
     
     public SidNoise(int sampleRate) : base(sampleRate)
     {
