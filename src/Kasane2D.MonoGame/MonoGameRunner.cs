@@ -97,8 +97,8 @@ internal class MonoGameRunner : Game, IEngineRunner
         
         main.SoundSystem.Process(bufferSize);
         
-        var leftFloat = main.SoundSystem.AudioMixer.Master.OutLeft.Read(bufferSize);
-        var rightFloat = main.SoundSystem.AudioMixer.Master.OutRight.Read(bufferSize);
+        var leftFloat = main.SoundSystem.AudioMixer.Master.ReadLeft(bufferSize);
+        var rightFloat = main.SoundSystem.AudioMixer.Master.ReadRight(bufferSize);
         var left = leftFloat
             .Select(s => s >= 0.0f ? MathF.Min(1.0f, s) : MathF.Max(-1.0f, s))
             .Select(s => (short)(s * (s >= 0.0f ? 32767.0f : 32768.0f)))

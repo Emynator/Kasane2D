@@ -7,7 +7,6 @@ namespace Kasane2D.Sound.Mixer;
 internal class AudioMixer : IAudioMixer
 {
     private readonly int bufferSize;
-    private readonly MixBus master;
     private readonly Dictionary<string, IMixBus> busses = new();
 
     public AudioMixer(AudioConfiguration config)
@@ -17,11 +16,13 @@ internal class AudioMixer : IAudioMixer
         var outRight = new AudioBuffer(bufferSize);
         var inLeft = new AudioBuffer(bufferSize);
         var inRight = new AudioBuffer(bufferSize);
-        master = new MixBus("Master", outLeft, outRight, inLeft, inRight, null);
-        busses.Add("Master", master);
+        InternalMaster = new MixBus("Master", outLeft, outRight, inLeft, inRight, null);
+        busses.Add("Master", InternalMaster);
     }
 
-    public IMixBus Master => master;
+    public IMixBus Master => InternalMaster;
+    
+    public MixBus InternalMaster { get; }
 
     public IMixBus CreateMixBus(string name, IMixBus? parent = null)
     {
@@ -39,8 +40,8 @@ internal class AudioMixer : IAudioMixer
         var result = new MixBus(name, outLeft, outRight, inLeft, inRight, parentBus);
         if (parent is null)
         {
-            result.InternalParent = master;
-            master.InternalChildren.Add(result);
+            result.InternalParent = InternalMaster;
+            InternalMaster.InternalChildren.Add(result);
         }
         
         busses.Add(name, result);
@@ -63,7 +64,7 @@ internal class AudioMixer : IAudioMixer
         }
         
         busses.Remove(mixBus.Name);
-        master.InternalChildren.Remove(mixBus);
+        InternalMaster.InternalChildren.Remove(mixBus);
     }
 
     public bool TryGetMixBus(string name, [NotNullWhen(true)] out IMixBus? bus)

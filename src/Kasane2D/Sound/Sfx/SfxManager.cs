@@ -1,4 +1,5 @@
 using Kasane2D.Config;
+using Kasane2D.Sound.Extensions;
 using Kasane2D.Sound.Interfaces;
 using Kasane2D.Sound.Types;
 
@@ -8,12 +9,13 @@ internal class SfxManager : ISfxManager
 {
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly List<SfxChannel> channels = [];
-    private readonly Queue<AudioFileStream> soundQueue = new();
+    private readonly Queue<StereoAudioStream> soundQueue = new();
     
     public SfxManager(AudioConfiguration config, IAudioMixer mixer)
     {
         ChannelCount = config.SfxChannelCount;
         var sfxBus = mixer.CreateMixBus("SFX");
+        sfxBus.Level = -3;
         for (var i = 0; i < ChannelCount; i++)
         {
             channels.Add(new(mixer.CreateMixBus($"SFX Channel {i}", sfxBus)));
@@ -32,16 +34,17 @@ internal class SfxManager : ISfxManager
     {
         tlock.Wait();
 
+        var stream = sound.ReadIn();
         var availableChannel = channels.FirstOrDefault(c => c.CurrentFile is null);
         if (availableChannel is null)
         {
-            soundQueue.Enqueue(sound);
-
+            soundQueue.Enqueue(stream);
             tlock.Release();
+
             return;
         }
         
-        availableChannel.CurrentFile = sound;
+        availableChannel.CurrentFile = stream;
         
         tlock.Release();
     }
@@ -61,9 +64,7 @@ internal class SfxManager : ISfxManager
     public void DropQueue()
     {
         tlock.Wait();
-        
         soundQueue.Clear();
-        
         tlock.Release();
     }
 

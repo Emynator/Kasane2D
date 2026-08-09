@@ -1,6 +1,7 @@
 using Kasane2D.Config;
 using Kasane2D.Sound.Interfaces;
 using Kasane2D.Sound.Mixer;
+using Kasane2D.Sound.MusicPlayback;
 using Kasane2D.Sound.Sfx;
 
 namespace Kasane2D.Sound;
@@ -9,6 +10,7 @@ internal class SoundSystem : ISoundSystem
 {
     private readonly AudioMixer mixer;
     private readonly SfxManager sfxManager;
+    private readonly MusicPlayer musicPlayer;
     private readonly List<ISoundSubSystem> subSystems = [];
 
     public SoundSystem(AudioConfiguration config)
@@ -16,6 +18,7 @@ internal class SoundSystem : ISoundSystem
         SampleRate = config.SampleRate;
         mixer = new(config);
         sfxManager = new(config, mixer);
+        musicPlayer = new(mixer);
     }
 
     public int SampleRate { get; }
@@ -23,14 +26,17 @@ internal class SoundSystem : ISoundSystem
     public IAudioMixer AudioMixer => mixer;
 
     public ISfxManager SfxManager => sfxManager;
+    
+    public IMusicPlayer MusicPlayer => musicPlayer;
 
     public void Process(int sampleCount)
     {
         var tasks = subSystems.Select(system => Task.Run(() => system.Process(sampleCount))).ToList();
         tasks.Add(Task.Run(() => sfxManager.Update(sampleCount)));
+        tasks.Add(Task.Run(() => musicPlayer.Update(sampleCount)));
         Task.WaitAll(tasks);
         
-        mixer.Master.Mix(sampleCount);
+        mixer.InternalMaster.Mix(sampleCount);
     }
 
     public void AddSubSystem(ISoundSubSystem system)

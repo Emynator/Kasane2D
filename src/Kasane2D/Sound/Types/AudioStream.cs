@@ -1,7 +1,14 @@
 namespace Kasane2D.Sound.Types;
 
-public abstract record class AudioStream(int Length)
+public abstract record class AudioStream
 {
+    protected AudioStream(int length)
+    {
+        Length = length;
+    }
+    
+    public int Length { get; }
+    
     public abstract AudioStream Resample(int srcSampleRate, int dstSampleRate);
 
     public abstract AudioStream Slice(int start, int length);
@@ -41,60 +48,77 @@ public abstract record class AudioStream(int Length)
     }
 }
 
-public sealed record class MonoAudioStream(int Length, float[] Samples) : AudioStream(Length)
+public sealed record class MonoAudioStream : AudioStream
 {
     public static MonoAudioStream Empty { get; } = new MonoAudioStream(0, []);
+
+    private readonly float[] samples;
+    
+    public MonoAudioStream(int length, float[] samples) : base(length)
+    {
+        if (samples.Length != length)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        this.samples = samples;
+    }
+
+    public ReadOnlySpan<float> GetSamples()
+    {
+        return samples.AsSpan();
+    }
     
     public override AudioStream Resample(int srcSampleRate, int dstSampleRate)
     {
-        var samples = ResampleChannel(Samples, srcSampleRate, dstSampleRate);
+        var newSamples = ResampleChannel(samples, srcSampleRate, dstSampleRate);
         
-        return new MonoAudioStream(samples.Length, samples);
+        return new MonoAudioStream(newSamples.Length, newSamples);
     }
 
     public override AudioStream Slice(int start, int length)
     {
-        var samples = new float[length];
-        Samples.AsSpan(start, length).CopyTo(samples);
+        var actualLength = Math.Min(length, samples.Length);
+        var newSamples = new float[actualLength];
+        samples.AsSpan(start, actualLength).CopyTo(newSamples);
 
-        return new MonoAudioStream(length, samples);
+        return new MonoAudioStream(actualLength, newSamples);
     }
 
     public override AudioStream Add(AudioStream stream)
     {
-        var samples = new float[Length + stream.Length];
-        Samples.AsSpan().CopyTo(samples);
+        var newSamples = new float[Length + stream.Length];
+        samples.AsSpan().CopyTo(newSamples);
 
-        if (stream is MonoAudioStream monoStream)
+        switch (stream)
         {
-            monoStream.Samples.AsSpan().CopyTo(samples.AsSpan(Length, stream.Length));
+            case MonoAudioStream monoStream:
+                monoStream.GetSamples().CopyTo(newSamples.AsSpan(Length, stream.Length));
+                break;
+            
+            case StereoAudioStream stereoStream:
+                var mono = stereoStream.ConvertToMono();
+                mono.GetSamples().CopyTo(newSamples.AsSpan(Length, stream.Length));
+                break;
+            
+            default:
+                throw new InvalidOperationException();
         }
 
-        if (stream is StereoAudioStream stereoStream)
-        {
-            var mono = new float[stream.Length];
-            for (var i = 0; i < mono.Length; i++)
-            {
-                mono[i] = (stereoStream.Left[i] + stereoStream.Right[i]) / 2.0f;
-            }
-
-            mono.AsSpan().CopyTo(samples.AsSpan(Length, stream.Length));
-        }
-
-        return new MonoAudioStream(samples.Length, samples);
+        return new MonoAudioStream(newSamples.Length, newSamples);
     }
 
     public override AudioStream Copy()
     {
-        var samples = new float[Length];
-        Samples.AsSpan().CopyTo(samples);
+        var newSamples = new float[Length];
+        samples.AsSpan().CopyTo(newSamples);
         
-        return new MonoAudioStream(Length, samples);
+        return new MonoAudioStream(Length, newSamples);
     }
     
     public StereoAudioStream ConvertToStereo()
     {
-        var data = Samples.AsSpan();
+        var data = samples.AsSpan();
         var left = new float[Length];
         var right = new float[Length];
         
@@ -105,61 +129,91 @@ public sealed record class MonoAudioStream(int Length, float[] Samples) : AudioS
     }
 }
 
-public sealed record class StereoAudioStream(int Length, float[] Left, float[] Right) : AudioStream(Length)
+public sealed record class StereoAudioStream : AudioStream
 {
     public static StereoAudioStream Empty { get; } = new StereoAudioStream(0, [], []);
     
+    private readonly float[] left;
+    private readonly float[] right;
+
+    public StereoAudioStream(int length, float[] left, float[] right) : base(length)
+    {
+        if (left.Length != length || right.Length != length)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        this.left = left;
+        this.right = right;
+    }
+
+    public ReadOnlySpan<float> GetLeft()
+    {
+        return left.AsSpan();
+    }
+
+    public ReadOnlySpan<float> GetRight()
+    {
+        return right.AsSpan();
+    }
+    
     public override AudioStream Resample(int srcSampleRate, int dstSampleRate)
     {
-        var left = ResampleChannel(Left, srcSampleRate, dstSampleRate);
-        var right = ResampleChannel(Right, dstSampleRate, dstSampleRate);
+        var newLeft = ResampleChannel(left, srcSampleRate, dstSampleRate);
+        var newRight = ResampleChannel(right, dstSampleRate, dstSampleRate);
         
-        return new StereoAudioStream(Left.Length, left, right);
+        return new StereoAudioStream(left.Length, newLeft, newRight);
     }
 
     public override AudioStream Slice(int start, int length)
     {
-        var left = new float[length];
-        Left.AsSpan(start, length).CopyTo(left);
+        var actualLength = Math.Min(length, Length);
+        var newLeft = new float[actualLength];
+        left.AsSpan(start, actualLength).CopyTo(newLeft);
 
-        var right = new float[length];
-        Right.AsSpan(start, length).CopyTo(right);
+        var newRight = new float[actualLength];
+        right.AsSpan(start, actualLength).CopyTo(newRight);
 
-        return new StereoAudioStream(length, left, right);
+        return new StereoAudioStream(actualLength, newLeft, newRight);
     }
 
     public override AudioStream Add(AudioStream stream)
     {
-        var left = new float[Length + stream.Length];
-        Left.AsSpan().CopyTo(left);
+        var newLeft = new float[Length + stream.Length];
+        left.AsSpan().CopyTo(newLeft);
 
-        var right = new float[Length + stream.Length];
-        Right.AsSpan().CopyTo(right);
+        var newRight = new float[Length + stream.Length];
+        right.AsSpan().CopyTo(newRight);
 
-        if (stream is MonoAudioStream monoStream)
+        switch (stream)
         {
-            monoStream.Samples.AsSpan().CopyTo(left.AsSpan(Length, stream.Length));
-            monoStream.Samples.AsSpan().CopyTo(right.AsSpan(Length, stream.Length));
+            case MonoAudioStream monoStream:
+                var converted = monoStream.ConvertToStereo();
+                converted.GetLeft().CopyTo(newLeft.AsSpan(Length, stream.Length));
+                converted.GetRight().CopyTo(newRight.AsSpan(Length, stream.Length));
+                break;
+            
+            case StereoAudioStream stereoStream:
+                stereoStream.GetLeft().CopyTo(newLeft.AsSpan(Length, stream.Length));
+                stereoStream.GetRight().CopyTo(newRight.AsSpan(Length, stream.Length));
+                break;
+            
+            default:
+                throw new InvalidOperationException();
         }
-
-        if (stream is StereoAudioStream stereoStream)
-        {
-            stereoStream.Left.AsSpan().CopyTo(left.AsSpan(Length, stream.Length));
-            stereoStream.Right.AsSpan().CopyTo(right.AsSpan(Length, stream.Length));
-        }
-
-        return new StereoAudioStream(left.Length, left, right);
+        
+        return new StereoAudioStream(newLeft.Length, newLeft, newRight);
     }
 
     public override AudioStream Copy()
     {
-        var samplesLeft = new float[Length];
-        Left.AsSpan().CopyTo(samplesLeft);
+        var newLeft = new float[Length];
+        left.AsSpan().CopyTo(newLeft);
         
-        var samplesRight = new float[Length];
-        Right.AsSpan().CopyTo(samplesRight);
+        var newRight = new float[Length];
+        right.AsSpan().CopyTo(newRight);
         
-        return new StereoAudioStream(Length, samplesLeft, samplesRight);
+        return new StereoAudioStream(Length, newLeft, newRight);
     }
 
     public MonoAudioStream ConvertToMono()
@@ -167,7 +221,7 @@ public sealed record class StereoAudioStream(int Length, float[] Left, float[] R
         var samples = new float[Length];
         for (var i = 0; i < Length; i++)
         {
-            samples[i] = (Left[i] + Right[i]) * 0.5f;
+            samples[i] = (left[i] + right[i]) * 0.5f;
         }
         
         return new MonoAudioStream(samples.Length, samples);

@@ -7,8 +7,10 @@ public interface IAudioBuffer
     public float Read();
 
     public float[] Read(int sampleCount);
+
+    public void Read(Span<float> outBuffer);
     
     public void Write(float sample);
     
-    public void Write(float[] samples);
+    public void Write(ReadOnlySpan<float> samples);
 }

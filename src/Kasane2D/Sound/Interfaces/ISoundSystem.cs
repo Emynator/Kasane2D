@@ -8,6 +8,8 @@ public interface ISoundSystem
     
     public ISfxManager SfxManager { get; }
     
+    public IMusicPlayer MusicPlayer { get; }
+    
     public void Process(int sampleCount);
 
     public void AddSubSystem(ISoundSubSystem system);

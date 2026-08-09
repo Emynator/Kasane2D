@@ -64,18 +64,18 @@ public class Sampler : Generator
         if (sample.Length == 0)
         {
             Step(frequency);
-            
+
             return 0.0f;
         }
-        
+
         var index = Phase + 1.0f * sample.Length / 2.0f;
         var indexLower = (int)Math.Floor(index);
         indexLower = indexLower < sample.Length ? indexLower : sample.Length - 1;
         var indexUpper = (int)Math.Ceiling(index);
         indexUpper = indexUpper < sample.Length ? indexUpper : sample.Length - 1;
 
-        var sampleLower = sample.Samples[indexLower];
-        var sampleUpper = sample.Samples[indexUpper];
+        var sampleLower = sample.GetSamples()[indexLower];
+        var sampleUpper = sample.GetSamples()[indexUpper];
         var t = Math.Min(1.0d, Math.Max(0.0d, index - indexLower));
         var result = float.Lerp(sampleLower, sampleUpper, (float)t);
 

@@ -1,3 +1,4 @@
+using System.Buffers;
 using Kasane2D.Sound.Interfaces;
 using Kasane2D.Sound.Types;
 
@@ -5,15 +6,18 @@ namespace Kasane2D.Sound.Sfx;
 
 internal class SfxChannel
 {
+    private static readonly ArrayPool<float> bufferPool = ArrayPool<float>.Shared;
+    
     private readonly IMixBus bus;
     private int position = 0;
 
     public SfxChannel(IMixBus bus)
     {
         this.bus = bus;
+        bus.Level = -3;
     }
 
-    public AudioFileStream? CurrentFile
+    public StereoAudioStream? CurrentFile
     {
         get;
         set
@@ -27,31 +31,25 @@ internal class SfxChannel
     {
         if (CurrentFile is null)
         {
-            var samples = new float[sampleCount];
-            for (var i = 0; i < sampleCount; i++)
-            {
-                samples[i] = 0.0f;
-            }
-
-            bus.InLeft.Write(samples);
-            bus.InRight.Write(samples);
+            var buffer = bufferPool.Rent(sampleCount);
+            var samples = buffer.AsSpan().Slice(0, sampleCount);
+            samples.Clear();
+            
+            bus.WriteLeft(samples);
+            bus.WriteRight(samples);
+            
+            bufferPool.Return(buffer);
 
             return;
         }
-        
-        var stream = CurrentFile.Read(position, sampleCount);
-        switch (stream)
-        {
-            case MonoAudioStream monoStream:
-                bus.InLeft.Write(monoStream.Samples);
-                bus.InRight.Write(monoStream.Samples);
-                break;
 
-            case StereoAudioStream stereoStream:
-                bus.InLeft.Write(stereoStream.Left);
-                bus.InRight.Write(stereoStream.Right);
-                break;
+        if (CurrentFile.Slice(position, sampleCount) is not StereoAudioStream stream)
+        {
+            throw new InvalidOperationException();
         }
+
+        bus.WriteLeft(stream.GetLeft());
+        bus.WriteRight(stream.GetRight());
 
         if (stream.Length >= sampleCount)
         {
@@ -61,13 +59,15 @@ internal class SfxChannel
         }
 
         CurrentFile = null;
-        var fillSamples = new float[sampleCount - stream.Length];
-        for (var i = 0; i < fillSamples.Length; i++)
-        {
-            fillSamples[i] = 0.0f;
-        }
-
-        bus.InLeft.Write(fillSamples);
-        bus.InRight.Write(fillSamples);
+        
+        var fillLength = sampleCount - stream.Length;
+        var fillBuffer = bufferPool.Rent(fillLength);
+        var fillSamples = fillBuffer.AsSpan().Slice(0, fillLength);
+        fillSamples.Clear();
+        
+        bus.WriteLeft(fillSamples);
+        bus.WriteRight(fillSamples);
+        
+        bufferPool.Return(fillBuffer);
     }
 }

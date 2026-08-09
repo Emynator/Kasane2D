@@ -28,8 +28,8 @@ internal class SynthVoice
         generator.Generate(generatorOut, frequency);
         envelope.Apply(generatorOut, result);
         
-        bus.InLeft.Write(result);
-        bus.InRight.Write(result);
+        bus.WriteLeft(result);
+        bus.WriteRight(result);
     }
 
     public void Play(Note note)

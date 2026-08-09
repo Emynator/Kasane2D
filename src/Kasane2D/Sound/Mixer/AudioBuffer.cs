@@ -4,6 +4,7 @@ namespace Kasane2D.Sound.Mixer;
 
 internal class AudioBuffer : IAudioBuffer
 {
+    private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly float[] data;
     private int writeIndex = 0;
     private int readIndex = 0;
@@ -17,6 +18,8 @@ internal class AudioBuffer : IAudioBuffer
     
     public float Read()
     {
+        tlock.Wait();
+        
         var result = data[readIndex];
         readIndex++;
         if (readIndex >= data.Length)
@@ -24,57 +27,78 @@ internal class AudioBuffer : IAudioBuffer
             readIndex = 0;
         }
         
+        tlock.Release();
+        
         return result;
     }
 
     public float[] Read(int sampleCount)
     {
         var result = new float[sampleCount];
-        if (readIndex + sampleCount >= data.Length)
-        {
-            var toEnd = data.Length - readIndex;
-            data.AsSpan(readIndex, toEnd).CopyTo(result);
-            
-            var fromStart = sampleCount - toEnd;
-            data.AsSpan(0, fromStart).CopyTo(result.AsSpan(toEnd, fromStart));
-            
-            readIndex = fromStart;
-
-            return result;
-        }
-
-        data.AsSpan(readIndex, sampleCount).CopyTo(result);
-        readIndex += sampleCount;
+        Read(result);
         
         return result;
     }
 
+    public void Read(Span<float> outBuffer)
+    {
+        tlock.Wait();
+        
+        if (readIndex + outBuffer.Length >= data.Length)
+        {
+            var toEnd = data.Length - readIndex;
+            data.AsSpan(readIndex, toEnd).CopyTo(outBuffer);
+            
+            var fromStart = data.Length - toEnd;
+            data.AsSpan(0, fromStart).CopyTo(outBuffer.Slice(toEnd, fromStart));
+            
+            readIndex = fromStart;
+            tlock.Release();
+
+            return;
+        }
+
+        data.AsSpan(readIndex, data.Length).CopyTo(outBuffer);
+        readIndex += data.Length;
+        
+        tlock.Release();
+    }
+
     public void Write(float sample)
     {
+        tlock.Wait();
+        
         data[writeIndex] = sample;
         writeIndex++;
         if (writeIndex >= data.Length)
         {
             writeIndex = 0;
         }
+        
+        tlock.Release();
     }
 
-    public void Write(float[] samples)
+    public void Write(ReadOnlySpan<float> samples)
     {
+        tlock.Wait();
+        
         if (writeIndex + samples.Length >= data.Length)
         {
             var toEnd = data.Length - writeIndex;
-            samples.AsSpan(0, toEnd).CopyTo(data.AsSpan(writeIndex, toEnd));
+            samples.Slice(0, toEnd).CopyTo(data.AsSpan(writeIndex, toEnd));
             
             var fromStart = samples.Length - toEnd;
-            samples.AsSpan(toEnd, fromStart).CopyTo(data);
+            samples.Slice(toEnd, fromStart).CopyTo(data);
             
             writeIndex = fromStart;
+            tlock.Release();
 
             return;
         }
         
-        samples.AsSpan(0, samples.Length).CopyTo(data.AsSpan(writeIndex, samples.Length));
+        samples.Slice(0, samples.Length).CopyTo(data.AsSpan(writeIndex, samples.Length));
         writeIndex += samples.Length;
+        
+        tlock.Release();
     }
 }

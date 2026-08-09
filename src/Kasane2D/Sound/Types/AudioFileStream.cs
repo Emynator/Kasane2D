@@ -101,8 +101,8 @@ public abstract class AudioFileStream : IDisposable
         if (readMode == AudioFileReadMode.CachedStream && CurrentPosition + length > data.Length)
         {
             var toReadIn = length - (data.Length - CurrentPosition);
-            var rawData = ReadRawSamples(sampleCount);// 
-            var streamResult = Convert(length, rawData);
+            var rawData = ReadRawSamples(toReadIn);
+            var streamResult = Convert(rawData.Length, rawData);
             data.Add
             (
                 sampleRate == targetSampleRate
@@ -119,6 +119,8 @@ public abstract class AudioFileStream : IDisposable
 
     public virtual void SetPosition(int value)
     {
+        tlock.Wait();
+        
         var newPos = value;
         if (value < 0)
         {
@@ -130,11 +132,17 @@ public abstract class AudioFileStream : IDisposable
         }
 
         CurrentPosition = newPos;
+        
+        tlock.Release();
     }
 
     public void Reset()
     {
+        tlock.Wait();
+        
         SetPosition(0);
+        
+        tlock.Release();
     }
     
     protected abstract byte[] ReadRawSamples(int sampleCount);
