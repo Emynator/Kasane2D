@@ -4,7 +4,7 @@ using Kasane2D.Sound.Types;
 
 namespace Kasane2D.Music.Synthesis.Generators;
 
-public class Sampler : Generator
+internal class Sampler : Generator
 {
     private Dictionary<Note, MonoAudioStream> samples = new();
 

@@ -1,4 +1,3 @@
-using Kasane2D.Music.Types.SequenceEvents;
 using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
 namespace Kasane2D.Music.Synthesis.Generators;

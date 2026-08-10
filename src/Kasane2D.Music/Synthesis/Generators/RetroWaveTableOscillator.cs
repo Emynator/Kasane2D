@@ -2,7 +2,7 @@ using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
 namespace Kasane2D.Music.Synthesis.Generators;
 
-public class RetroWaveTableOscillator : Generator
+internal class RetroWaveTableOscillator : Generator
 {
     private float[] wavetable = new float[32];
     
