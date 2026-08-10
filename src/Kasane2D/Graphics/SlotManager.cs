@@ -50,6 +50,7 @@ internal class SlotManager : ISlotManager
         tlock.Wait();
         
         slots[slot.Index] = null;
+        slot.IsActive = false;
         slot.Freed = true;
         
         tlock.Release();

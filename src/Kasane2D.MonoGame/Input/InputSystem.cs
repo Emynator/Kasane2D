@@ -10,7 +10,7 @@ using MouseState = Microsoft.Xna.Framework.Input.MouseState;
 
 namespace Kasane2D.MonoGame.Input;
 
-public class InputSystem : IInputSystem
+internal class InputSystem : IInputSystem
 {
     private static readonly KeyKind[] keyKinds =
     [

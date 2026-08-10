@@ -4,6 +4,11 @@ using Kasane2D.Types;
 
 namespace Kasane2D.Graphics.RenderObjects;
 
+/// <summary>
+/// Abstract base class for ISurface implementations that implements common surface functionality.
+/// </summary>
+/// <remarks>This class is intended for backends to derive from for their various surface implementations. It should
+/// not be used in user code.</remarks>
 public abstract class Surface : ISurface
 {
     private Viewport viewport;
@@ -49,7 +54,7 @@ public abstract class Surface : ISurface
 
     public void ScrollTo(Vec2I value)
     {
-        var dest = value.Copy();
+        var dest = new Vec2I(value.X > 0 ? value.X : -value.X, value.Y > 0 ? value.Y : -value.Y);
         dest.X %= SurfaceSize.X;
         dest.Y %= SurfaceSize.Y;
         

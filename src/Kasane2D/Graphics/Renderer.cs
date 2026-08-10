@@ -130,14 +130,14 @@ internal class Renderer : IRenderer
         rasterizer.EndDraw();
     }
 
-    public void Draw(ITexture src, Rect? dstReg = null, Rect? srcRect = null)
+    public void Draw(ITexture src, Rect? dstRect = null, Rect? srcRect = null)
     {
-        rasterizer.Draw(src, dstReg, srcRect);
+        rasterizer.Draw(src, dstRect, srcRect);
     }
 
-    public void Draw(ISurface src, Rect? dstReg = null, Rect? srcRect = null)
+    public void Draw(ISurface src, Rect? dstRect = null, Rect? srcRect = null)
     {
-        rasterizer.Draw(src, dstReg, srcRect);
+        rasterizer.Draw(src, dstRect, srcRect);
     }
 
     public void Draw(Rect rect, Color color)

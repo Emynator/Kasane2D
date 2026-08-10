@@ -11,7 +11,7 @@ using KasaneColor = Kasane2D.Graphics.Types.Color;
 
 namespace Kasane2D.MonoGame.Graphics;
 
-public class Rasterizer : IRasterizer, IDisposable
+internal class Rasterizer : IRasterizer, IDisposable
 {
     private readonly GraphicsConfiguration config;
     private readonly GraphicsDevice device;

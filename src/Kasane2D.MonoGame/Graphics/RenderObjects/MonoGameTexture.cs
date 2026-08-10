@@ -7,7 +7,7 @@ using KasaneColor = Kasane2D.Graphics.Types.Color;
 
 namespace Kasane2D.MonoGame.Graphics.RenderObjects;
 
-public class MonoGameTexture : ITexture
+internal class MonoGameTexture : ITexture
 {
     public MonoGameTexture(Texture2D texture)
     {

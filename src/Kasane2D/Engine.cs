@@ -1,4 +1,3 @@
-using Kasane2D.Config;
 using Kasane2D.Interfaces;
 
 namespace Kasane2D;

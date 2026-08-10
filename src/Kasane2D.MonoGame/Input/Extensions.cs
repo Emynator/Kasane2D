@@ -1,10 +1,9 @@
 using Kasane2D.Input.Enums;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Kasane2D.MonoGame.Input;
 
-public static class Extensions
+internal static class Extensions
 {
     public static KeyKind ToKeyKind(this Keys key)
     {

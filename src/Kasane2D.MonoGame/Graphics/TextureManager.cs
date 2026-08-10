@@ -1,4 +1,5 @@
 using Kasane2D.Config;
+using Kasane2D.Exceptions.Engine;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.MonoGame.Graphics.Extensions;
 using Kasane2D.MonoGame.Graphics.RenderObjects;
@@ -7,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Kasane2D.MonoGame.Graphics;
 
-public class TextureManager : ITextureManager
+internal class TextureManager : ITextureManager
 {
     private readonly GraphicsConfiguration config;
     private readonly GraphicsDevice device;
@@ -72,7 +73,7 @@ public class TextureManager : ITextureManager
         var minY = dimensions.Y * spriteSize.Y;
         if (texture.Size.X < minX || texture.Size.Y < minY)
         {
-            throw new InvalidOperationException();
+            throw new DataConsistencyException("Texture is not large enough for requested dimensions.");
         }
 
         return new SpriteAtlas(dimensions, spriteSize, texture);

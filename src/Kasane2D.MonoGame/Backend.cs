@@ -6,7 +6,7 @@ using Kasane2D.MonoGame.Graphics;
 
 namespace Kasane2D.MonoGame;
 
-public class Backend : IBackend
+internal class Backend : IBackend
 {
     public IEngineRunner CreateRunner
         (
