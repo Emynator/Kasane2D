@@ -5,8 +5,15 @@ using Kasane2D.Interfaces;
 
 namespace Kasane2D;
 
+/// <summary>
+/// Configures and builds the core engine before usage.
+/// </summary>
 public sealed class EngineBuilder
 {
+    /// <summary>
+    /// Backend implementations attach here.
+    /// </summary>
+    /// <remarks>Intended for custom backend implementations. Not intended to be accessed by user code.</remarks>
     public IBackend? Backend { get; set; }
 
     internal GraphicsConfiguration? GraphicsConfig { get; set; }
@@ -18,8 +25,17 @@ public sealed class EngineBuilder
     internal EngineMain? Main { get; set; }
 }
 
+/// <summary>
+/// Extension methods for the Engine Builder
+/// </summary>
 public static class EngineBuilderExtensions
 {
+    /// <summary>
+    /// Required: Configures the engine's graphics system.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <param name="config">The config.</param>
+    /// <returns>The engine builder.</returns>
     public static EngineBuilder ConfigureGraphics(this EngineBuilder builder, GraphicsConfiguration config)
     {
         builder.GraphicsConfig = config;
@@ -27,6 +43,12 @@ public static class EngineBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Required: Configures the rendering layers.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <param name="config">The config.</param>
+    /// <returns>The engine builder.</returns>
     public static EngineBuilder ConfigureRenderer(this EngineBuilder builder, ICollection<RenderLayerConfig> config)
     {
         builder.RendererConfig = config;
@@ -34,6 +56,12 @@ public static class EngineBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Optional: Configures the sound system.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <param name="config">Optional: The config. Default config is used when null.</param>
+    /// <returns>The engine builder.</returns>
     public static EngineBuilder ConfigureAudio(this EngineBuilder builder, AudioConfiguration? config = null)
     {
         builder.AudioConfig = config ?? new();
@@ -41,6 +69,12 @@ public static class EngineBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Required: Configures the user code main.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <typeparam name="T">User code implementation of <see cref="EngineMain"/>.</typeparam>
+    /// <returns>The engine builder.</returns>
     public static EngineBuilder WithMain<T>(this EngineBuilder builder) where T : EngineMain
     {
         builder.Main = Activator.CreateInstance<T>();
@@ -48,6 +82,12 @@ public static class EngineBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Builds the engine core.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <returns>The configured engine object.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the configuration is not valid.</exception>
     public static Engine Build(this EngineBuilder builder)
     {
         if (builder.Backend is null)

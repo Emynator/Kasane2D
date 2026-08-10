@@ -2,6 +2,9 @@ using Kasane2D.Interfaces;
 
 namespace Kasane2D;
 
+/// <summary>
+/// The core engine class managing the execution.
+/// </summary>
 public sealed class Engine
 {
     private readonly IEngineRunner runner;
@@ -14,6 +17,9 @@ public sealed class Engine
         this.initRenderer = initRenderer;
     }
     
+    /// <summary>
+    /// Starts execution.
+    /// </summary>
     public void Run()
     {
         if (isDisposed)
