@@ -16,12 +16,15 @@ internal class SoundSystem : ISoundSystem
     public SoundSystem(AudioConfiguration config)
     {
         SampleRate = config.SampleRate;
-        mixer = new(config);
-        sfxManager = new(config, mixer);
-        musicPlayer = new(mixer);
+        BufferSize = (int)(SampleRate / 1000.0f * config.BufferSizeInMs);
+        mixer = new(config, BufferSize);
+        sfxManager = new(config, BufferSize, mixer);
+        musicPlayer = new(BufferSize, mixer);
     }
 
     public int SampleRate { get; }
+    
+    public int BufferSize { get; }
 
     public IAudioMixer AudioMixer => mixer;
 
@@ -29,14 +32,14 @@ internal class SoundSystem : ISoundSystem
     
     public IMusicPlayer MusicPlayer => musicPlayer;
 
-    public void Process(int sampleCount)
+    public void Process()
     {
-        var tasks = subSystems.Select(system => Task.Run(() => system.Process(sampleCount))).ToList();
-        tasks.Add(Task.Run(() => sfxManager.Update(sampleCount)));
-        tasks.Add(Task.Run(() => musicPlayer.Update(sampleCount)));
+        var tasks = subSystems.Select(system => Task.Run(system.Process)).ToList();
+        tasks.Add(Task.Run(() => sfxManager.Update()));
+        tasks.Add(Task.Run(() => musicPlayer.Update()));
         Task.WaitAll(tasks);
         
-        mixer.InternalMaster.Mix(sampleCount);
+        mixer.InternalMaster.Mix();
     }
 
     public void AddSubSystem(ISoundSubSystem system)
@@ -47,5 +50,10 @@ internal class SoundSystem : ISoundSystem
     public void RemoveSubSystem(Guid id)
     {
         subSystems.RemoveAll(system => system.Id == id);
+    }
+
+    public IAudioBuffer CreateBuffer(int bufferSize)
+    {
+        return new AudioBuffer(BufferSize);
     }
 }

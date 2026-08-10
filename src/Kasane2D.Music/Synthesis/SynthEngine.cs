@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
@@ -8,18 +9,20 @@ namespace Kasane2D.Music.Synthesis;
 
 internal class SynthEngine : ISynthEngine
 {
-    private readonly int samplerate;
-    private readonly Dictionary<string, Sequencer> tracks;
     private readonly SemaphoreSlim tlock = new(1, 1);
+    private readonly int samplerate;
+    private readonly int bufferSize;
+    private readonly Dictionary<string, Sequencer> tracks;
     private bool isPlaying = false;
     private int currentStep = 0;
     private int carryOverSamples = 0;
     private ProcessedPattern? currentPattern = null;
     private ProcessedPattern? nextPattern = null;
 
-    public SynthEngine(int samplerate, Dictionary<string, Sequencer> tracks)
+    public SynthEngine(int samplerate, int bufferSize, Dictionary<string, Sequencer> tracks)
     {
         this.samplerate = samplerate;
+        this.bufferSize = bufferSize;
         this.tracks = tracks;
     }
 
@@ -27,25 +30,25 @@ internal class SynthEngine : ISynthEngine
     
     public Conductor? Conductor { get; set; }
 
-    public void Process(int sampleCount)
+    public void Process()
     {
         tlock.Wait();
 
         if (currentPattern is null || !isPlaying)
         {
-            ProcessTracks(sampleCount);
+            ProcessTracks(bufferSize);
             tlock.Release();
 
             return;
         }
 
-        var samplesToProcess = sampleCount;
+        var samplesToProcess = bufferSize;
         if (carryOverSamples > 0)
         {
-            if (carryOverSamples > sampleCount)
+            if (carryOverSamples > bufferSize)
             {
-                ProcessTracks(sampleCount);
-                carryOverSamples -= sampleCount;
+                ProcessTracks(bufferSize);
+                carryOverSamples -= bufferSize;
                 tlock.Release();
 
                 return;
@@ -58,10 +61,11 @@ internal class SynthEngine : ISynthEngine
 
         var steps = samplesToProcess / currentPattern.Value.SamplesPerStep;
         var remainingSamples = samplesToProcess - steps * currentPattern.Value.SamplesPerStep;
+        var samplesPerStep = currentPattern.Value.SamplesPerStep;
         for (var i = 0; i < steps; i++)
         {
             Step();
-            ProcessTracks(currentPattern.Value.SamplesPerStep);
+            ProcessTracks(samplesPerStep);
         }
 
         if (remainingSamples == 0)
@@ -73,7 +77,7 @@ internal class SynthEngine : ISynthEngine
 
         Step();
         ProcessTracks(remainingSamples);
-        carryOverSamples = currentPattern.Value.SamplesPerStep - remainingSamples;
+        carryOverSamples = samplesPerStep - remainingSamples;
 
         tlock.Release();
     }

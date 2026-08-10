@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Collections.Concurrent;
 using Kasane2D.Sound.Extensions;
 using Kasane2D.Sound.Interfaces;
@@ -8,18 +7,23 @@ namespace Kasane2D.Sound.MusicPlayback;
 
 internal class MusicPlayer : IMusicPlayer
 {
-    private static readonly ArrayPool<float> bufferPool = ArrayPool<float>.Shared;
-    
     private readonly SemaphoreSlim tlock = new(1, 1);
+    private readonly int bufferSize;
     private readonly IMixBus bus;
+    private readonly float[] scratchBuffer0;
+    private readonly float[] scratchBuffer1;
     private readonly ConcurrentQueue<StereoAudioStream> musicQueue = new();
     private StereoAudioStream? currentStream = null;
     private int currentPosition = 0;
 
-    public MusicPlayer(IAudioMixer mixer)
+    public MusicPlayer(int bufferSize, IAudioMixer mixer)
     {
+        this.bufferSize = bufferSize;
         bus = mixer.CreateMixBus("Music Player");
         bus.Level = -3;
+        
+        scratchBuffer0 = new float[bufferSize];
+        scratchBuffer1 = new float[bufferSize];
     }
 
     public bool IsPlaying { get; private set; }
@@ -80,26 +84,22 @@ internal class MusicPlayer : IMusicPlayer
         musicQueue.Clear();
     }
 
-    public void Update(int sampleCount)
+    public void Update()
     {
         tlock.Wait();
 
-        var bufferLeft = bufferPool.Rent(sampleCount);
-        var left = bufferLeft.AsSpan().Slice(0, sampleCount);
-        left.Clear();
-        var bufferRight = bufferPool.Rent(sampleCount);
-        var right = bufferRight.AsSpan().Slice(0, sampleCount);
+        var left = scratchBuffer0.AsSpan();
         left.Clear();
 
         if (currentStream is null)
         {
             if (!musicQueue.TryDequeue(out var stream))
             {
+                IsPlaying = false;
                 bus.WriteLeft(left);
-                bus.WriteRight(right);
-                
-                bufferPool.Return(bufferLeft);
-                bufferPool.Return(bufferRight);
+                bus.WriteRight(left);
+
+                tlock.Release();
 
                 return;
             }
@@ -110,18 +110,18 @@ internal class MusicPlayer : IMusicPlayer
 
         if (!IsPlaying)
         {
-            IsPlaying = false;
             bus.WriteLeft(left);
-            bus.WriteRight(right);
-            
-            bufferPool.Return(bufferLeft);
-            bufferPool.Return(bufferRight);
+            bus.WriteRight(left);
+
+            tlock.Release();
 
             return;
         }
 
-        var count = sampleCount;
-        if (currentPosition + sampleCount >= currentStream.Length)
+        var right = scratchBuffer1.AsSpan();
+        right.Clear();
+        var count = bufferSize;
+        if (currentPosition + bufferSize >= currentStream.Length)
         {
             var remaining = currentStream.Length - currentPosition;
             currentStream.GetLeft().Slice(currentPosition, remaining).CopyTo(left);
@@ -148,11 +148,9 @@ internal class MusicPlayer : IMusicPlayer
             currentStream.GetRight().Slice(currentPosition, count).CopyTo(right);
         }
 
-        bus.WriteLeft(bufferLeft.AsSpan().Slice(0, sampleCount));
-        bus.WriteRight(bufferRight.AsSpan().Slice(0, sampleCount));
-        
-        bufferPool.Return(bufferLeft);
-        bufferPool.Return(bufferRight);
+        currentPosition += count;
+        bus.WriteLeft(left);
+        bus.WriteRight(right);
 
         tlock.Release();
     }

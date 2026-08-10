@@ -4,5 +4,5 @@ public interface ISoundSubSystem
 {
     public Guid Id { get; }
     
-    public void Process(int sampleCount);
+    public void Process();
 }

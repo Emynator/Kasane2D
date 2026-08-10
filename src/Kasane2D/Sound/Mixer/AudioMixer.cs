@@ -9,14 +9,14 @@ internal class AudioMixer : IAudioMixer
     private readonly int bufferSize;
     private readonly Dictionary<string, IMixBus> busses = new();
 
-    public AudioMixer(AudioConfiguration config)
+    public AudioMixer(AudioConfiguration config, int bufferSize)
     {
-        bufferSize = (int)(config.SampleRate / 1000.0f * config.DefaultBufferSizeInMs);
+        this.bufferSize = bufferSize;
         var outLeft = new AudioBuffer(bufferSize);
         var outRight = new AudioBuffer(bufferSize);
         var inLeft = new AudioBuffer(bufferSize);
         var inRight = new AudioBuffer(bufferSize);
-        InternalMaster = new MixBus("Master", outLeft, outRight, inLeft, inRight, null);
+        InternalMaster = new MixBus("Master", bufferSize, outLeft, outRight, inLeft, inRight, null);
         busses.Add("Master", InternalMaster);
     }
 
@@ -37,7 +37,7 @@ internal class AudioMixer : IAudioMixer
         var outRight = new AudioBuffer(bufferSize);
         var inLeft = new AudioBuffer(bufferSize);
         var inRight = new AudioBuffer(bufferSize);
-        var result = new MixBus(name, outLeft, outRight, inLeft, inRight, parentBus);
+        var result = new MixBus(name, bufferSize, outLeft, outRight, inLeft, inRight, parentBus);
         if (parent is null)
         {
             result.InternalParent = InternalMaster;

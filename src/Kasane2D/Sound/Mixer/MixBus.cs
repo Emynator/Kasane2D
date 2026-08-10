@@ -5,13 +5,16 @@ namespace Kasane2D.Sound.Mixer;
 
 internal class MixBus : IMixBus
 {
-    private static readonly ArrayPool<float> bufferPool = ArrayPool<float>.Shared;
-    
     private readonly SemaphoreSlim tlock = new(1, 1);
+    private readonly int bufferSize;
     private readonly AudioBuffer outLeft;
     private readonly AudioBuffer outRight;
     private readonly AudioBuffer inLeft;
     private readonly AudioBuffer inRight;
+    private readonly float[] scratchBuffer0;
+    private readonly float[] scratchBuffer1;
+    private readonly float[] scratchBuffer2;
+    private readonly float[] scratchBuffer3;
 
     private List<IAudioEffect> effects = [];
     private float gain = 1.0f;
@@ -21,6 +24,7 @@ internal class MixBus : IMixBus
     public MixBus
         (
         string name,
+        int bufferSize,
         AudioBuffer outLeft,
         AudioBuffer outRight,
         AudioBuffer inLeft,
@@ -29,10 +33,15 @@ internal class MixBus : IMixBus
         )
     {
         Name = name;
+        this.bufferSize = bufferSize;
         this.outLeft = outLeft;
         this.outRight = outRight;
         this.inLeft = inLeft;
         this.inRight = inRight;
+        scratchBuffer0 = new float[bufferSize];
+        scratchBuffer1 = new float[bufferSize];
+        scratchBuffer2 = new float[bufferSize];
+        scratchBuffer3 = new float[bufferSize];
         InternalParent = parent;
         parent?.InternalChildren.Add(this);
     }
@@ -130,49 +139,46 @@ internal class MixBus : IMixBus
 
     public List<MixBus> InternalChildren { get; set; } = [];
 
-    public void Mix(int sampleCount)
+    public void Mix()
     {
         tlock.Wait();
 
         if (InternalChildren.Count >= 5)
         {
-            Parallel.ForEach(InternalChildren, child => child.Mix(sampleCount));
+            Parallel.ForEach(InternalChildren, child => child.Mix());
         }
         else
         {
             foreach (var child in InternalChildren)
             {
-                child.Mix(sampleCount);
+                child.Mix();
             }
         }
         
-        var b0 = bufferPool.Rent(sampleCount);
-        var b1 = bufferPool.Rent(sampleCount);
-        var b2 = bufferPool.Rent(sampleCount);
-        var b3 = bufferPool.Rent(sampleCount);
-        
-        var left = b0.AsMemory().Slice(0, sampleCount);
-        var sumLeft = b1.AsMemory().Slice(0, sampleCount);
+        var left = scratchBuffer0.AsMemory();
+        var sumLeft = scratchBuffer1.AsMemory();
+        sumLeft.Span.Clear();
         var taskLeft = Task.Run(() =>
         {
             foreach (var child in InternalChildren)
             {
                 child.outLeft.Read(left.Span);
-                for (var i = 0; i < sampleCount; i++)
+                for (var i = 0; i < bufferSize; i++)
                 {
                     sumLeft.Span[i] += left.Span[i];
                 }
             }
         });
 
-        var right = b2.AsMemory().Slice(0, sampleCount);
-        var sumRight = b3.AsMemory().Slice(0, sampleCount);
+        var right = scratchBuffer2.AsMemory();
+        var sumRight = scratchBuffer3.AsMemory();
+        sumRight.Span.Clear();
         var taskRight = Task.Run(() =>
         {
             foreach (var child in InternalChildren)
             {
                 child.outRight.Read(right.Span);
-                for (var i = 0; i < sampleCount; i++)
+                for (var i = 0; i < bufferSize; i++)
                 {
                     sumRight.Span[i] += right.Span[i];
                 }
@@ -183,7 +189,7 @@ internal class MixBus : IMixBus
         
         inLeft.Read(left.Span);
         inRight.Read(right.Span);
-        for (var i = 0; i < sampleCount; i++)
+        for (var i = 0; i < bufferSize; i++)
         {
             sumLeft.Span[i] += left.Span[i];
             sumRight.Span[i] += right.Span[i];
@@ -197,16 +203,16 @@ internal class MixBus : IMixBus
         {
             effect.Apply(effectInLeft, effectInRight, effectOutLeft, effectOutRight);
 
-            var l = effectInLeft;
+            var t = effectInLeft;
             effectInLeft = effectOutLeft;
-            effectOutLeft = l;
-
-            var r = effectInRight;
+            effectOutLeft = t;
+            
+            t = effectInRight;
             effectInRight = effectOutRight;
-            effectOutRight = r;
+            effectOutRight = t;
         }
 
-        for (var i = 0; i < sampleCount; i++)
+        for (var i = 0; i < bufferSize; i++)
         {
             effectInLeft[i] *= gain * leftGain;
             effectInRight[i] *= gain * rightGain;
@@ -214,11 +220,6 @@ internal class MixBus : IMixBus
 
         outLeft.Write(effectInLeft);
         outRight.Write(effectInRight);
-
-        bufferPool.Return(b0);
-        bufferPool.Return(b1);
-        bufferPool.Return(b2);
-        bufferPool.Return(b3);
 
         tlock.Release();
     }

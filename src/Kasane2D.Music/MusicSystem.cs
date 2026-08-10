@@ -34,7 +34,7 @@ public static class MusicSystem
             tracks.Add(trackConfig.Name, new Sequencer(voice));
         }
 
-        var result = new SynthEngine(soundSystem.SampleRate, tracks);
+        var result = new SynthEngine(soundSystem.SampleRate, soundSystem.BufferSize, tracks);
         soundSystem.AddSubSystem(result);
 
         return result;

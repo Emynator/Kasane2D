@@ -3,7 +3,6 @@ using Kasane2D.Music;
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
-using Kasane2D.Music.Types.SequenceEvents;
 using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
 namespace EngineTest;
@@ -30,12 +29,21 @@ public class TestGame : EngineMain
             }
         );
 
+        // var steps = StepSize.ThirtyTwoth.GetSequenceSteps();
+        // var pulseWidthTable = new float[steps];
+        // for (var i = 0; i < steps; i++)
+        // {
+        //     pulseWidthTable[i] = float.Lerp(0.125f, 0.5f, (MathF.Sin(MathF.Tau * i / steps) + 1.0f) / 2.0f);
+        // }
+        
+        // var controlEvents = new ControlEvent[]
+
         var pattern = new SongPattern
         (
             "Dreamer",
             TimeSignature.FourFour,
             80,
-            1,
+            4,
             StepSize.Eighth,
             [
                 new

@@ -1,4 +1,3 @@
-using System.Buffers;
 using Kasane2D.Sound.Interfaces;
 using Kasane2D.Sound.Types;
 
@@ -6,14 +5,16 @@ namespace Kasane2D.Sound.Sfx;
 
 internal class SfxChannel
 {
-    private static readonly ArrayPool<float> bufferPool = ArrayPool<float>.Shared;
-    
     private readonly IMixBus bus;
+    private readonly float[] scratchBuffer0;
+    private readonly float[] scratchBuffer1;
     private int position = 0;
 
-    public SfxChannel(IMixBus bus)
+    public SfxChannel(IMixBus bus, int bufferSize)
     {
         this.bus = bus;
+        scratchBuffer0 = new float[bufferSize];
+        scratchBuffer1 = new float[bufferSize];
         bus.Level = -3;
     }
 
@@ -27,47 +28,37 @@ internal class SfxChannel
         }
     }
 
-    public void Update(int sampleCount)
+    public void Update()
     {
+        var left = scratchBuffer0.AsSpan();
+        left.Clear();
+
         if (CurrentFile is null)
         {
-            var buffer = bufferPool.Rent(sampleCount);
-            var samples = buffer.AsSpan().Slice(0, sampleCount);
-            samples.Clear();
-            
-            bus.WriteLeft(samples);
-            bus.WriteRight(samples);
-            
-            bufferPool.Return(buffer);
+            bus.WriteLeft(left);
+            bus.WriteRight(left);
 
             return;
         }
 
-        if (CurrentFile.Slice(position, sampleCount) is not StereoAudioStream stream)
+        if (CurrentFile.Slice(position, left.Length) is not StereoAudioStream stream)
         {
             throw new InvalidOperationException();
         }
+        
+        position += left.Length;
+        var right = scratchBuffer1.AsSpan();
+        right.Clear();
 
-        bus.WriteLeft(stream.GetLeft());
-        bus.WriteRight(stream.GetRight());
+        stream.GetLeft().CopyTo(left);
+        stream.GetRight().CopyTo(right);
+        
+        bus.WriteLeft(left);
+        bus.WriteRight(right);
 
-        if (stream.Length >= sampleCount)
+        if (stream.Length < left.Length)
         {
-            position += sampleCount;
-            
-            return;
+            CurrentFile = null;
         }
-
-        CurrentFile = null;
-        
-        var fillLength = sampleCount - stream.Length;
-        var fillBuffer = bufferPool.Rent(fillLength);
-        var fillSamples = fillBuffer.AsSpan().Slice(0, fillLength);
-        fillSamples.Clear();
-        
-        bus.WriteLeft(fillSamples);
-        bus.WriteRight(fillSamples);
-        
-        bufferPool.Return(fillBuffer);
     }
 }

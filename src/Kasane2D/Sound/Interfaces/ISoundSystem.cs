@@ -4,15 +4,19 @@ public interface ISoundSystem
 {
     public int SampleRate { get; }
     
+    public int BufferSize { get; }
+    
     public IAudioMixer AudioMixer { get; }
     
     public ISfxManager SfxManager { get; }
     
     public IMusicPlayer MusicPlayer { get; }
     
-    public void Process(int sampleCount);
+    public void Process();
 
     public void AddSubSystem(ISoundSubSystem system);
     
     public void RemoveSubSystem(Guid id);
+    
+    public IAudioBuffer CreateBuffer(int bufferSize);
 }
