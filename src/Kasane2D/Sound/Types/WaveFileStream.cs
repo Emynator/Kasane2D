@@ -4,6 +4,10 @@ using Kasane2D.Sound.Enums;
 
 namespace Kasane2D.Sound.Types;
 
+/// <summary>
+/// Implementation of an audio file stream for RIFF/WAVE files.
+/// </summary>
+/// <inheritdoc/>
 public sealed class WaveFileStream : AudioFileStream
 {
     private const float sBytePosFactor = 1.0f / sbyte.MaxValue;
@@ -21,6 +25,12 @@ public sealed class WaveFileStream : AudioFileStream
     private int bytesPerSample = 0;
     private long dataStartPosition = 0;
 
+    /// <summary>
+    /// Creates a new wave file stream.
+    /// </summary>
+    /// <param name="path">The path to the wave file.</param>
+    /// <param name="targetSampleRate">The sound system's sample rate.</param>
+    /// <param name="readMode">The read mode for the file.</param>
     public WaveFileStream(string path, int targetSampleRate, AudioFileReadMode readMode = AudioFileReadMode.Preload)
         : base(path, targetSampleRate, readMode)
     {
