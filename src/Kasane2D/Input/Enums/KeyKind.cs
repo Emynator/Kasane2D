@@ -1,5 +1,8 @@
 namespace Kasane2D.Input.Enums;
 
+/// <summary>
+/// Keyboard keys on a QWERTY keyboard (US layout).
+/// </summary>
 public enum KeyKind
 {
     Undefined,
