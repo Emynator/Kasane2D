@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         
         <IsPackable>true</IsPackable>
         <PackageId>Kasane2D.MonoGame</PackageId>
@@ -18,6 +19,7 @@
             monogame;kasane2d;backend
         </PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright © 2026 Emynator</Copyright>
         <RepositoryUrl>https://github.com/Emynator/Kasane2D</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageProjectUrl>https://github.com/Emynator/Kasane2D</PackageProjectUrl>
@@ -29,6 +31,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="Readme.md" Pack="true" PackagePath="\" />
       <ProjectReference Include="..\Kasane2D\Kasane2D.csproj" />
     </ItemGroup>
 

@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
 
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
         <IsPackable>true</IsPackable>
         <PackageId>Kasane2D</PackageId>
@@ -19,6 +20,7 @@
             game-engine;2d;gamedev;csharp;dotnet;retro;tilemap;sprites;audio
         </PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright © 2026 Emynator</Copyright>
         <RepositoryUrl>https://github.com/Emynator/Kasane2D</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageProjectUrl>https://github.com/Emynator/Kasane2D</PackageProjectUrl>
@@ -30,6 +32,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="Readme.md" Pack="true" PackagePath="\" />
       <Folder Include="Sound\AudioEffects\" />
     </ItemGroup>
 
