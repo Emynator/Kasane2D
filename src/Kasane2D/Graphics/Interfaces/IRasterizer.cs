@@ -15,6 +15,11 @@ public interface IRasterizer
     /// Gets the texture manager implementation.
     /// </summary>
     public ITextureManager TextureManager { get; }
+    
+    /// <summary>
+    /// The color used to clear the screen buffer before drawing.
+    /// </summary>
+    public Color ClearColor { get; set; }
 
     /// <summary>
     /// Create a new tilemap surface for the provided tilesize and dimensions.

@@ -30,6 +30,12 @@ internal class Renderer : IRenderer
 
     public ITextureManager TextureManager => rasterizer.TextureManager;
 
+    public Color ClearColor
+    {
+        get => rasterizer.ClearColor;
+        set => rasterizer.ClearColor = value;
+    }
+
     public void Init(ICollection<RenderLayerConfig> renderLayerConfigs)
     {
         if (initialized)
@@ -170,13 +176,13 @@ internal class Renderer : IRenderer
                 var spriteSize = config.SpriteSize ?? defaultSpriteSize;
                 var spriteCount = config.SpriteCount ?? defaultSpriteCount;
                 spriteLayers.Add(config.Name, rasterizer.CreateSpriteLayer(spriteSize, spriteCount));
-                
+
                 break;
 
             case LayerType.Texture:
                 var size = config.Dimensions ?? defaultSurfaceSize;
                 surfaces.Add(config.Name, rasterizer.CreateTextureSurface(size));
-                
+
                 break;
         }
     }

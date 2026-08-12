@@ -9,6 +9,11 @@ namespace Kasane2D.Config;
 public class GraphicsConfiguration
 {
     /// <summary>
+    /// Configures if the mouse is visible or not. Default is false.
+    /// </summary>
+    public bool IsMouseVisibible { get; set; } = false;
+    
+    /// <summary>
     /// Configures the default tile width and height used for <see cref="ITilemapSurface"/>s if no layer specific
     /// override is provided.
     /// </summary>

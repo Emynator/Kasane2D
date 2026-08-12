@@ -51,6 +51,8 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public ITextureManager TextureManager => textureManager;
 
+    public KasaneColor ClearColor { get; set; } = KasaneColor.Black;
+
     public void Dispose()
     {
     }
@@ -104,7 +106,7 @@ internal class Rasterizer : IRasterizer, IDisposable
         }
 
         device.SetRenderTarget(backBuffer);
-        device.Clear(MgColor.Black);
+        device.Clear(ClearColor.ToMgColor());
 
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (var surface in surfaces)

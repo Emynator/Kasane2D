@@ -5,6 +5,7 @@ using Kasane2D.Interfaces;
 using Kasane2D.MonoGame.Graphics;
 using Kasane2D.MonoGame.Input;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Kasane2D.MonoGame;
 
@@ -38,6 +39,8 @@ internal class MonoGameRunner : Game, IEngineRunner
         graphics = new GraphicsDeviceManager(this);
         graphics.PreferredBackBufferWidth = config.ScreenSize.X;
         graphics.PreferredBackBufferHeight = config.ScreenSize.Y;
+
+        IsMouseVisible = config.IsMouseVisibible;
     }
 
     protected override void Dispose(bool disposing)

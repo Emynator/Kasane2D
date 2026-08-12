@@ -15,6 +15,11 @@ public interface IRenderer
     public ITextureManager TextureManager { get; }
     
     /// <summary>
+    /// The color used to clear the screen buffer before drawing.
+    /// </summary>
+    public Color ClearColor { get; set; }
+    
+    /// <summary>
     /// Initializes the graphics system.
     /// </summary>
     /// <param name="renderLayerConfigs">User provided configuration of rendering layers.</param>
