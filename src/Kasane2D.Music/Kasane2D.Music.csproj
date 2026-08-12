@@ -4,6 +4,28 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <IsPackable>true</IsPackable>
+        <PackageId>Kasane2D.Music</PackageId>
+        <Version>1.0.0-rc.1</Version>
+        <Authors>Emynator</Authors>
+        <Description>
+            Optional tracker-inspired synthesis and sequencing system for Kasane2D.
+        </Description>
+        <PackageTags>
+            kasane2d;music;synthesizer;tracker;audio;gamedev;csharp
+        </PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/Emynator/Kasane2D</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/Emynator/Kasane2D</PackageProjectUrl>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
     </PropertyGroup>
 
     <ItemGroup>
