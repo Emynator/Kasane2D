@@ -25,9 +25,9 @@ public struct RenderSprite
     /// <summary>
     /// The sprite's position on the screen.
     /// </summary>
-    /// <remarks>The sprite layer extends one sprite width each to the left and right of the screen and one sprite
-    /// height each to the top and bottom of the screen. This allows for sprites to be smoothly scrolled into the
-    /// viewport.</remarks>
+    /// <remarks>Position (0, 0) is the top-left pixel on the screen. Sprites in the range of (-Size.X, -Size.Y)
+    /// up to (ViewportSize.X + Size.X, ViewportSize.Y + Size.Y) are rendered to allow for sprites to be smoothly
+    /// scrolled into and out of the screen.</remarks>
     public Vec2I Position { get; set; } = Vec2I.Zero;
 
     /// <summary>

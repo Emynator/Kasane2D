@@ -71,13 +71,24 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
                 continue;
             }
 
+            if (
+                sprite.Position.X < -SpriteSize.X
+                || sprite.Position.X > Viewport.Size.X + SpriteSize.X
+                || sprite.Position.Y < -SpriteSize.Y
+                || sprite.Position.Y > Viewport.Size.Y + SpriteSize.Y
+                )
+            {
+                continue;
+            }
+
             if (sprite.SpriteAtlas is not SpriteAtlas atlas)
             {
                 continue;
             }
 
             var src = atlas.GetSrcRect(sprite.AtlasIndex);
-            var dst = sprite.Rect.ToRectangle();
+            var spritePos = sprite.Position + SpriteSize;
+            var dst = new Rectangle(spritePos.ToPoint(), SpriteSize.ToPoint());
 
             var effects = SpriteEffects.None;
             if (sprite.HFlip)
