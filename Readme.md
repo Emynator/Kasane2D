@@ -178,8 +178,8 @@ public class MinimalGame : EngineMain
 - Direct runtime control makes procedural and gameplay-driven music possible.
 
 # Links
-Kasane2D core engine on [nuget](https://www.nuget.org/packages/Kasane2D)
-Kasane2D.MonoGame backend on [nuget](https://www.nuget.org/packages/Kasane2D.MonoGame)
-Kasane2D.Music on [nuget](https://www.nuget.org/packages/Kasane2D.Music)
+- Kasane2D core engine on [nuget](https://www.nuget.org/packages/Kasane2D)
+- Kasane2D.MonoGame backend on [nuget](https://www.nuget.org/packages/Kasane2D.MonoGame)
+- Kasane2D.Music on [nuget](https://www.nuget.org/packages/Kasane2D.Music)
 
 # Planned features
