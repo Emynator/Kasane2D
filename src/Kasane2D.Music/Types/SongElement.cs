@@ -12,5 +12,5 @@ public record class SongElement(string PatternName, int RepeatCount = 1, SongEle
     /// <summary>
     /// Gets the song element playing after this one.
     /// </summary>
-    public SongElement? Next { get; set; }
+    public SongElement? Next { get; set; } = Next;
 }

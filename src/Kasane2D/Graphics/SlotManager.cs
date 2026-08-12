@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Graphics.Types;
 
@@ -20,7 +21,7 @@ internal class SlotManager : ISlotManager
     
     public ISpriteLayer SpriteLayer { get; }
     
-    public bool GetSlot(out SpriteSlot? result)
+    public bool GetSlot([NotNullWhen(true)] out SpriteSlot? result)
     {
         tlock.Wait();
         

@@ -5,7 +5,11 @@ namespace Kasane2D.Exceptions.Backend;
 /// </summary>
 public sealed class IncompatibleBackendDataException : BackendException
 {
-    public IncompatibleBackendDataException(string name) : base($"The type of 'name' was created with a different backend.")
+    /// <summary>
+    /// Creates a new exception.
+    /// </summary>
+    /// <param name="name">The name of the incompatible type.</param>
+    public IncompatibleBackendDataException(string name) : base($"The type of '{name}' was created with a different backend.")
     {
     }
 }

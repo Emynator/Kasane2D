@@ -40,22 +40,37 @@ public abstract class Generator
     }
 
     /// <summary>
-    /// 
+    /// Applies a control update event to update the generator parameters.
     /// </summary>
-    /// <param name="ev"></param>
+    /// <param name="ev">The update event.</param>
     public abstract void ControlUpdate(GeneratorUpdate ev);
 
+    /// <summary>
+    /// Resets the generator's phase.
+    /// </summary>
     public void Reset()
     {
         Phase = 0.0d;
     }
 
+    /// <summary>
+    /// Generates a single audio sample for the given frequency.
+    /// </summary>
+    /// <param name="frequency">The frequency.</param>
+    /// <returns>The genrated sample.</returns>
     protected abstract float Generate(double frequency);
 
+    /// <summary>
+    /// Optional callback function so implementing classes can do something whenever the phase completes a full iteration.
+    /// </summary>
     protected virtual void PhaseCallback()
     {
     }
 
+    /// <summary>
+    /// Advances the phase according to the frequency.
+    /// </summary>
+    /// <param name="frequency">The frequency.</param>
     protected void Step(double frequency)
     {
         Phase += frequency / sampleRate;

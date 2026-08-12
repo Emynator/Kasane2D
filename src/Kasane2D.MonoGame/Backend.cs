@@ -31,8 +31,16 @@ internal class Backend : IBackend
     }
 }
 
+/// <summary>
+/// Extensions for the engine builder.
+/// </summary>
 public static class BuilderExtensions
 {
+    /// <summary>
+    /// Registers the backend implementation with the engine builder.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <returns>The engine builder.</returns>
     public static EngineBuilder UseMonoGame(this EngineBuilder builder)
     {
         builder.Backend ??= new Backend();

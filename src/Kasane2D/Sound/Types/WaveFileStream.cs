@@ -37,6 +37,7 @@ public sealed class WaveFileStream : AudioFileStream
         ParseHeader(path);
     }
 
+    /// <inheritdoc/>
     public override void SetPosition(int value)
     {
         base.SetPosition(value);
@@ -47,11 +48,13 @@ public sealed class WaveFileStream : AudioFileStream
         }
     }
 
+    /// <inheritdoc/>
     protected override byte[] ReadRawSamples(int sampleCount)
     {
         return file.ReadBytes(sampleCount * bytesPerSample * numChannels);
     }
 
+    /// <inheritdoc/>
     protected override AudioStream Convert(int sampleCount, Span<byte> rawData)
     {
         if (numChannels == 1)

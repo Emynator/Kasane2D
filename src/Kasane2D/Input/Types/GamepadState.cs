@@ -8,6 +8,9 @@ namespace Kasane2D.Input.Types;
 /// </summary>
 public struct GamepadState
 {
+    /// <summary>
+    /// Creates an empty gamepad state.
+    /// </summary>
     public GamepadState()
     {
     }

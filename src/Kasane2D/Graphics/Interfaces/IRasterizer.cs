@@ -76,7 +76,7 @@ public interface IRasterizer
     public void Draw(ITexture src, Rect? dstRect = null, Rect? srcRect = null);
     
     /// <summary>
-    /// Backend implementation of <see cref="IRenderer.Draw(ISurface, Rect?, Rect?"/>
+    /// Backend implementation of <see cref="IRenderer.Draw(ISurface, Rect?, Rect?)"/>
     /// </summary>
     /// <remarks>Free-form rendering functions are assumed to be called before <see cref="Rasterize"/> composes
     /// the final image.</remarks>

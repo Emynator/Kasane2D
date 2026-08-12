@@ -13,6 +13,11 @@ public abstract class Surface : ISurface
 {
     private Viewport viewport;
     
+    /// <summary>
+    /// Implementation called ctor.
+    /// </summary>
+    /// <param name="surfaceSize">The width and height of the surface.</param>
+    /// <param name="viewportSize">The width and height of the viewport.</param>
     protected Surface(Vec2I surfaceSize, Vec2I viewportSize)
     {
         SurfaceSize = surfaceSize;
@@ -20,10 +25,13 @@ public abstract class Surface : ISurface
         viewport = new(viewportSize);
     }
     
+    /// <inheritdoc/>
     public Vec2I SurfaceSize { get; }
     
+    /// <inheritdoc/>
     public Viewport Viewport => viewport;
 
+    /// <inheritdoc/>
     public void ScrollBy(Vec2I value)
     {
         var newPos = viewport.Position + value;
@@ -47,11 +55,13 @@ public abstract class Surface : ISurface
         viewport.Position = newPos;
     }
 
+    /// <inheritdoc/>
     public void ScrollBy(Vec2F value)
     {
         ScrollBy(value.ToVec2I());
     }
 
+    /// <inheritdoc/>
     public void ScrollTo(Vec2I value)
     {
         var dest = new Vec2I(value.X > 0 ? value.X : -value.X, value.Y > 0 ? value.Y : -value.Y);
@@ -61,6 +71,7 @@ public abstract class Surface : ISurface
         viewport.Position = dest;
     }
 
+    /// <inheritdoc/>
     public void ScrollTo(Vec2F value)
     {
         ScrollTo(value.ToVec2I());

@@ -17,5 +17,8 @@ public readonly record struct ControlEvent
     GeneratorUpdate? GeneratorUpdate = null
     )
 {
+    /// <summary>
+    /// Empty control event.
+    /// </summary>
     public static readonly ControlEvent Empty = new ControlEvent();
 }

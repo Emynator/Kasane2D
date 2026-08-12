@@ -5,6 +5,7 @@ namespace Kasane2D.Input.Enums;
 /// </summary>
 public enum KeyKind
 {
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     Undefined,
     A,
     B,
@@ -90,4 +91,5 @@ public enum KeyKind
     RightCtrl,
     RightAlt,
     RightShift,
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

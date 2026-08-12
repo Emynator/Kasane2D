@@ -126,6 +126,7 @@ public sealed record class MonoAudioStream : AudioStream
         return samples.AsSpan();
     }
 
+    /// <inheritdoc/>
     public override AudioStream Resample(int srcSampleRate, int dstSampleRate)
     {
         var newSamples = ResampleChannel(samples, srcSampleRate, dstSampleRate);
@@ -133,6 +134,7 @@ public sealed record class MonoAudioStream : AudioStream
         return new MonoAudioStream(newSamples.Length, newSamples);
     }
 
+    /// <inheritdoc/>
     public override AudioStream Slice(int start, int length)
     {
         var actualLength = Math.Min(length, samples.Length);
@@ -142,6 +144,7 @@ public sealed record class MonoAudioStream : AudioStream
         return new MonoAudioStream(actualLength, newSamples);
     }
 
+    /// <inheritdoc/>
     public override AudioStream Add(AudioStream stream)
     {
         var newSamples = new float[Length + stream.Length];
@@ -170,6 +173,7 @@ public sealed record class MonoAudioStream : AudioStream
         return new MonoAudioStream(newSamples.Length, newSamples);
     }
 
+    /// <inheritdoc/>
     public override AudioStream Copy()
     {
         var newSamples = new float[Length];
@@ -198,7 +202,6 @@ public sealed record class MonoAudioStream : AudioStream
 /// <summary>
 /// A stream of stereo audio data.
 /// </summary>
-/// <inheritdoc/>
 public sealed record class StereoAudioStream : AudioStream
 {
     /// <summary>
@@ -246,6 +249,7 @@ public sealed record class StereoAudioStream : AudioStream
         return right.AsSpan();
     }
 
+    /// <inheritdoc/>
     public override AudioStream Resample(int srcSampleRate, int dstSampleRate)
     {
         var newLeft = ResampleChannel(left, srcSampleRate, dstSampleRate);
@@ -254,6 +258,7 @@ public sealed record class StereoAudioStream : AudioStream
         return new StereoAudioStream(left.Length, newLeft, newRight);
     }
 
+    /// <inheritdoc/>
     public override AudioStream Slice(int start, int length)
     {
         var actualLength = Math.Min(length, Length);
@@ -266,6 +271,7 @@ public sealed record class StereoAudioStream : AudioStream
         return new StereoAudioStream(actualLength, newLeft, newRight);
     }
 
+    /// <inheritdoc/>
     public override AudioStream Add(AudioStream stream)
     {
         var newLeft = new float[Length + stream.Length];
@@ -299,6 +305,7 @@ public sealed record class StereoAudioStream : AudioStream
         return new StereoAudioStream(newLeft.Length, newLeft, newRight);
     }
 
+    /// <inheritdoc/>
     public override AudioStream Copy()
     {
         var newLeft = new float[Length];

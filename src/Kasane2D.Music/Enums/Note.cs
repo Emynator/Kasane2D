@@ -6,6 +6,7 @@ namespace Kasane2D.Music.Enums;
 /// <remarks>Middle C is C3. Concert pitch is A3.</remarks>
 public enum Note
 {
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     None,
     
     CN2,
@@ -147,6 +148,7 @@ public enum Note
     FSharp8,
     G8,
     GSharp8,
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
 
 /// <summary>

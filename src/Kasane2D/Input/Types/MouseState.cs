@@ -8,6 +8,9 @@ namespace Kasane2D.Input.Types;
 /// </summary>
 public struct MouseState
 {
+    /// <summary>
+    /// Creates an empty mouse state.
+    /// </summary>
     public MouseState()
     {
     }
