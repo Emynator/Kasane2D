@@ -5,7 +5,7 @@ namespace Kasane2D.Music.Types;
 
 internal record class Sequence
 {
-    public Sequence(SequenceControlEvent initialSettings, SequenceNoteEvent[] notes, SequenceControlEvent[] controlEvents)
+    public Sequence(ControlEvent initialSettings, SequenceNoteEvent[] notes, ControlEvent[] controlEvents)
     {
         if (notes.Length != controlEvents.Length)
         {
@@ -20,9 +20,9 @@ internal record class Sequence
 
     public int Length { get; init; }
     
-    public SequenceControlEvent InitialSettings { get; init; }
+    public ControlEvent InitialSettings { get; init; }
 
     public SequenceNoteEvent[] Notes { get; init; }
 
-    public SequenceControlEvent[] ControlEvents { get; init; }
+    public ControlEvent[] ControlEvents { get; init; }
 }

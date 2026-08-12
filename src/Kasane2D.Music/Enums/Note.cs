@@ -1,5 +1,9 @@
 namespace Kasane2D.Music.Enums;
 
+/// <summary>
+/// Note value enum covering the entire MIDI note range.
+/// </summary>
+/// <remarks>Middle C is C3. Concert pitch is A3.</remarks>
 public enum Note
 {
     None,
@@ -145,8 +149,16 @@ public enum Note
     GSharp8,
 }
 
+/// <summary>
+/// Extension methods for <see cref="Note"/>.
+/// </summary>
 public static class NoteExtensions
 {
+    /// <summary>
+    /// Creates a string representation of the note value.
+    /// </summary>
+    /// <param name="note">The note value.</param>
+    /// <returns>The string representation of the note value.</returns>
     public static string ToString(this Note note)
     {
         return note switch
@@ -295,7 +307,7 @@ public static class NoteExtensions
         };
     }
     
-    public static double Frequency(this Note note)
+    internal static double Frequency(this Note note)
     {
         return note switch
         {

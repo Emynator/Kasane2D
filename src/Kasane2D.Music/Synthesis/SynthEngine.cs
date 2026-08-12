@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Kasane2D.Exceptions.Engine;
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
@@ -28,7 +29,9 @@ internal class SynthEngine : ISynthEngine
 
     public Guid Id { get; } = Guid.NewGuid();
     
-    public Conductor? Conductor { get; set; }
+    public Conductor? InternalConductor { get; set; }
+
+    public IConductor? Conductor => InternalConductor;
 
     public void Process()
     {
@@ -188,16 +191,20 @@ internal class SynthEngine : ISynthEngine
 
     private Sequence CreateSequence(TrackPattern pattern, int length, int sequenceSteps, int barSteps)
     {
-        var sequenceNoteEvents = new SequenceNoteEvent[length * barSteps];
-        var sequenceControlEvents = new SequenceControlEvent[length * barSteps];
+        var sequenceLength = length * barSteps;
+        if (pattern.ControlEvents.Length != sequenceLength)
+        {
+            throw new DataConsistencyException
+                ($"Length of {nameof(pattern.ControlEvents)} must match the sequence length.");
+        }
+        
+        var sequenceNoteEvents = new SequenceNoteEvent[sequenceLength];
         for (var i = 0; i < length; i++)
         {
             var noteEventsSlice = sequenceNoteEvents.AsSpan().Slice(i * barSteps, barSteps);
-            var controlEventsSlice = sequenceControlEvents.AsSpan().Slice(i * barSteps, barSteps);
             var noteEvents = pattern.NoteEvents.Where(ev => ev.Bar == i).ToList();
-            var controlEvents = pattern.ControlEvents.Where(ev => ev.Bar == i).ToList();
 
-            ProcessBar(noteEventsSlice, controlEventsSlice, noteEvents, controlEvents, sequenceSteps, barSteps);
+            ProcessBar(noteEventsSlice, noteEvents, sequenceSteps, barSteps);
         }
 
         return new
@@ -210,16 +217,14 @@ internal class SynthEngine : ISynthEngine
                 pattern.InitialSettings.GeneratorUpdate
             ),
             sequenceNoteEvents,
-            sequenceControlEvents
+            pattern.ControlEvents
         );
     }
 
     private void ProcessBar
         (
         Span<SequenceNoteEvent> sequenceNoteEvents,
-        Span<SequenceControlEvent> sequenceControlEvents,
         List<NoteEvent> noteEvents,
-        List<ControlEvent> controlEvents,
         int sequenceSteps,
         int barSteps
         )
@@ -227,19 +232,9 @@ internal class SynthEngine : ISynthEngine
         var patternStep = 0;
         var sequenceStep = 0;
         var noteFill = new SequenceNoteEvent();
-        var controlFill = new SequenceControlEvent();
         var processNext = true;
         for (var i = 0; i < barSteps; i++)
         {
-            var control = controlEvents.FirstOrDefault(ev => ev.Step == i);
-            sequenceControlEvents[i] = new
-            (
-                control.VolumeUpdate,
-                control.PanUpdate,
-                control.EnvelopeUpdate,
-                control.GeneratorUpdate
-            );
-
             if (i == barSteps - 1 && noteFill.Kind is SequenceNoteEventKind.Hold)
             {
                 sequenceNoteEvents[i] = new(Kind: SequenceNoteEventKind.Release);
@@ -275,7 +270,6 @@ internal class SynthEngine : ISynthEngine
             else
             {
                 sequenceNoteEvents[i] = noteFill;
-                sequenceControlEvents[i] = controlFill;
             }
 
             sequenceStep++;
@@ -310,9 +304,9 @@ internal class SynthEngine : ISynthEngine
         currentPattern = nextPattern;
         nextPattern = null;
         
-        if (Conductor is not null)
+        if (InternalConductor is not null)
         {
-            Task.Run(() => Conductor.UpdateSynthEngine());
+            Task.Run(() => InternalConductor.UpdateSynthEngine());
         }
     }
 

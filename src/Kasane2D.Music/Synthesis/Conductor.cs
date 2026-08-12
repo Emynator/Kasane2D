@@ -15,12 +15,31 @@ internal class Conductor : IConductor
     private SongPattern? currentPattern = null;
     private int repeats = 0;
     private int maxRepeats = 0;
+    private string? sectionNameToSet = null;
 
     public Conductor(SynthEngine synthEngine)
     {
         this.synthEngine = synthEngine;
-        synthEngine.Conductor = this;
+        synthEngine.InternalConductor = this;
     }
+
+    public ISynthEngine SynthEngine => synthEngine;
+    
+    public bool IsPlaying { get; private set; } = false;
+    
+    public string CurrentSong => currentSong?.Name ?? "";
+
+    public string CurrentSection { get; private set; } = "";
+    
+    public string CurrentPattern => currentPattern?.Name ?? "";
+
+    public string NextPattern => nextElement?.PatternName ?? "";
+
+    public string NextSong => nextSong?.Name ?? "";
+
+    public string NextSongSection => nextSongElement?.PatternName ?? "";
+
+    public string TransitionSection => transitionElement?.PatternName ?? "";
 
     public void AddSong(Song song)
     {
@@ -44,7 +63,7 @@ internal class Conductor : IConductor
     {
         foreach (var name in names)
         {
-            this.songs.Remove(name);
+            songs.Remove(name);
         }
     }
 
@@ -73,6 +92,8 @@ internal class Conductor : IConductor
         currentSong = song;
         nextElement = section.Next;
         synthEngine.Play(pattern);
+        IsPlaying = true;
+        CurrentSection = sectionName;
 
         if (!currentSong.Patterns.TryGetValue(nextElement?.PatternName ?? "", out var nextPattern))
         {
@@ -86,16 +107,19 @@ internal class Conductor : IConductor
     public void Pause()
     {
         synthEngine.Pause();
+        IsPlaying = false;
     }
 
     public void Resume()
     {
         synthEngine.Resume();
+        IsPlaying = true;
     }
 
     public void Stop()
     {
         synthEngine.Stop();
+        IsPlaying = false;
     }
 
     public void Queue(string songName, string sectionName)
@@ -121,10 +145,13 @@ internal class Conductor : IConductor
             return;
         }
 
-        if (currentSong.Sections.TryGetValue(sectionName, out var section))
+        if (!currentSong.Sections.TryGetValue(sectionName, out var section))
         {
-            nextElement = section;
+            return;
         }
+        
+        nextElement = section;
+        sectionNameToSet = sectionName;
     }
 
     public void Transition
@@ -250,6 +277,12 @@ internal class Conductor : IConductor
 
         if (currentSong.Patterns.TryGetValue(nextElement.PatternName, out var nextPattern))
         {
+            if (sectionNameToSet is not null)
+            {
+                CurrentSection = sectionNameToSet;
+                sectionNameToSet = null;
+            }
+            
             currentPattern = nextPattern;
             maxRepeats = nextElement.RepeatCount;
             synthEngine.Queue(nextPattern);

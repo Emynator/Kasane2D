@@ -53,7 +53,7 @@ public class TestGame : EngineMain
                     (
                         VolumeUpdate: new(-3),
                         EnvelopeUpdate: new(50.0f, 150.0f, 0.0f, 10.0f),
-                        GeneratorUpdate: new BasicOscillatorUpdate(BasicWave.Saw)
+                        GeneratorUpdate: new BasicOscillatorUpdate(BasicWaveType.Saw)
                     ),
                     [
                         new(0, 0, NoteEventKind.Begin, Note.A2),

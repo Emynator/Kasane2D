@@ -5,7 +5,7 @@ namespace Kasane2D.Music.Synthesis.Generators;
 
 internal class BasicOscillator : Generator
 {
-    private BasicWave shape = BasicWave.Sine;
+    private BasicWaveType shape = BasicWaveType.Sine;
     
     public BasicOscillator(int sampleRate) : base(sampleRate)
     {
@@ -53,10 +53,10 @@ internal class BasicOscillator : Generator
     {
         var result = shape switch
         {
-            BasicWave.Sine => (float)Math.Sin(Math.Tau * Phase),
-            BasicWave.Triangle => (float)(1.0d - 4.0d * Math.Abs(Phase - 0.5d)),
-            BasicWave.Saw => (float)(Phase * 2.0d - 1.0d),
-            BasicWave.Square => Square(frequency),
+            BasicWaveType.Sine => (float)Math.Sin(Math.Tau * Phase),
+            BasicWaveType.Triangle => (float)(1.0d - 4.0d * Math.Abs(Phase - 0.5d)),
+            BasicWaveType.Saw => (float)(Phase * 2.0d - 1.0d),
+            BasicWaveType.Square => Square(frequency),
             _ => throw new InvalidOperationException(),
         };
 

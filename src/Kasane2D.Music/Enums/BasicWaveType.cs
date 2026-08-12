@@ -1,6 +1,6 @@
 namespace Kasane2D.Music.Enums;
 
-public enum BasicWave
+public enum BasicWaveType
 {
     Sine,
     Triangle,

@@ -6,8 +6,17 @@ using Kasane2D.Sound.Interfaces;
 
 namespace Kasane2D.Music;
 
+/// <summary>
+/// Static factory functions for integrating the music system with the Kasane2D audio system.
+/// </summary>
 public static class MusicSystem
 {
+    /// <summary>
+    /// Creates a new synthesizer engine for the given config.
+    /// </summary>
+    /// <param name="soundSystem">The Kasane2D sound system.</param>
+    /// <param name="config">The config for the synthesizer engine.</param>
+    /// <returns>The created synthesizer engine.</returns>
     public static ISynthEngine CreateSynthEngine(this ISoundSystem soundSystem, SynthConfig config)
     {
         var mainBus = soundSystem.AudioMixer.CreateMixBus(config.Name);
@@ -40,6 +49,13 @@ public static class MusicSystem
         return result;
     }
 
+    /// <summary>
+    /// Creates a conductor to manage a synthesizer engine.
+    /// </summary>
+    /// <param name="engine">The synthesizer engine the conductor will manage.</param>
+    /// <returns>The created conductor.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the synth engine is not a synth engine of the music
+    /// system</exception>
     public static IConductor CreateConductor(this ISynthEngine engine)
     {
         return engine is SynthEngine actual

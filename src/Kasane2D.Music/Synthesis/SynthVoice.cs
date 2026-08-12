@@ -44,7 +44,7 @@ internal class SynthVoice
         envelope.EnterRelease();
     }
 
-    public void ControlUpdate(SequenceControlEvent ev)
+    public void ControlUpdate(ControlEvent ev)
     {
         if (ev.VolumeUpdate.DoUpdate)
         {
