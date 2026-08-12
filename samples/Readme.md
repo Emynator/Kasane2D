@@ -1,0 +1,2 @@
+# Kasane2D samples
+This is a small collection of sample projects to demonstrate features and usage of the engine. All code of the samples is covered under the same MIT license as the rest of the repository. For the license of the asset files, please refer to the respective `Readme.md` file of each project.

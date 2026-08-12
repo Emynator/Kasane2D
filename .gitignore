@@ -435,6 +435,6 @@ FodyWeavers.xsd
 .idea/
 .DS_Store
 NativeLibs/
-Assets/
+assets/
 docs/docfx/_site/
 docs/docfx/api/

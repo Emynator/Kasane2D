@@ -15,7 +15,121 @@ All of this is exposed through a low-boilerplate, code-first programming model b
 - **Start simple, opt into complexity when you want it.**
   The core engine stays deliberately lightweight. Straightforward games can use ordinary sprite rendering, sound effects, and prerecorded music without touching anything more advanced. Optional packages such as `Kasane2D.Music` add tracker-inspired sequencing, synthesis, procedural music, and deep runtime control without making those features mandatory for everyone else.
 
-# TODO: installation/quick start
+# Installation and quick start
+- Create a new .NET 10 console application
+- Add the required dependencies:
+```shell
+dotnet add package Kasane2D
+dotnet add package Kasane2D.MonoGame
+```
+- Configure the engine with the engine builder, build the engine application and execute it
+
+Here is a minimal example of how to get a white square to move over the screen:
+```C#
+public static class Program
+{
+    public static void Main(string[] args)
+    {
+        var engine = new EngineBuilder()
+            .UseMonoGame()
+            .ConfigureGraphics(new()
+            {
+                DefaultTileSize = new(16, 16),
+                DefaultSpriteSize = new(16, 16),
+                DefaultTilemapDimensions = new(32, 32),
+                ViewportSize = new(256, 240),
+                ScreenSize = new(768, 720),
+            })
+            .ConfigureRenderer
+            (
+                [
+                    new()
+                    {
+                        Name = "Parallax",
+                        Type = LayerType.Tilemap,
+                        Dimensions = new(48, 15),
+                    },
+                    new()
+                    {
+                        Name = "BG",
+                        Type = LayerType.Tilemap,
+                        Dimensions = new(224, 15),
+                    },
+                    new()
+                    {
+                        Name = "Sprites",
+                        Type = LayerType.Sprite,
+                        SpriteCount = 64,
+                    },
+                ]
+            )
+            .ConfigureAudio()
+            .WithMain<JumpAndRunGame>()
+            .Build();
+        
+        engine.Run();
+    }
+}
+
+public class MinimalGame : EngineMain
+{
+    private const float speed = 100.0f;
+    private ISpriteLayer spriteLayer = null!;
+    private Vec2F position = new(160.0f, 120.0f);
+    
+    public override void Init()
+    {
+        spriteLayer = Renderer.GetSpriteLayer("Sprites");
+        var atlas = Renderer.TextureManager.CreateSpriteAtlas(spriteLayer.SpriteSize, "assets/square.png");
+        spriteLayer.Sprites[0].SpriteAtlas = atlas;
+        spriteLayer.Sprites[0].Position = position.ToVec2I();
+        spriteLayer.Sprites[0].IsActive = true;
+    }
+    
+    protected override void Tick(float dt)
+    {
+        var movement = Vec2F.Zero;
+        if (InputSystem.IsKeyDown(KeyKind.Up))
+        {
+            movement += Vec2F.Up;
+        }
+        if (InputSystem.IsKeyDown(KeyKind.Down))
+        {
+            movement += Vec2F.Down;
+        }
+        if (InputSystem.IsKeyDown(KeyKind.Left))
+        {
+            movement += Vec2F.Left;
+        }
+        if (InputSystem.IsKeyDown(KeyKind.Right))
+        {
+            movement += Vec2F.Right;
+        }
+        
+        movement *= speed * dt;
+        position += movement;
+
+        if (position.Y < -spriteLayer.SpriteSize.Y)
+        {
+            position.Y = 240.0f + spriteLayer.SpriteSize.Y;
+        }
+        if (position.Y > 240.0f + spriteLayer.SpriteSize.Y)
+        {
+            position.Y = -spriteLayer.SpriteSize.Y;
+        }
+        if (position.X < -spriteLayer.SpriteSize.X)
+        {
+            position.X = 320.0f + spriteLayer.SpriteSize.X;
+        }
+        if (position.X > 320.0f + spriteLayer.SpriteSize.X)
+        {
+            position.X = -spriteLayer.SpriteSize.X;
+        }
+        
+        spriteLayer.Sprites[0].Position = position.ToVec2I();
+    }
+}
+```
 
 # Core features
 - Graphics and rendering system inspired by hardware sprite engines of retro consoles.
@@ -63,6 +177,9 @@ All of this is exposed through a low-boilerplate, code-first programming model b
   - Dedicated transition patterns.
 - Direct runtime control makes procedural and gameplay-driven music possible.
 
-# TODO: links and stuff
+# Links
+Kasane2D core engine on [nuget](https://www.nuget.org/packages/Kasane2D)
+Kasane2D.MonoGame backend on [nuget](https://www.nuget.org/packages/Kasane2D.MonoGame)
+Kasane2D.Music on [nuget](https://www.nuget.org/packages/Kasane2D.Music)
 
 # Planned features
