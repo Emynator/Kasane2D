@@ -105,6 +105,12 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         tilesToUpdate.Add(tilePosition);
     }
 
+    public void UpdateAtlasIndex(Vec2I tilePosition, int atlasX, int atlasY)
+    {
+        tiles[tilePosition.X, tilePosition.Y].AtlasIndex = new(atlasX, atlasY);
+        tilesToUpdate.Add(tilePosition);
+    }
+
     public void UpdateAtlasIndex(Vec2I tilePosition, int value)
     {
         if (Atlas is null)
@@ -116,6 +122,12 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         var y = value / Atlas.Dimensions.X;
         tiles[tilePosition.X, tilePosition.Y].AtlasIndex = new(x, y);
         tilesToUpdate.Add(tilePosition);
+    }
+
+    public void UpdateAtlasIndex(int positionX, int positionY, Vec2I value)
+    {
+        tiles[positionX, positionY].AtlasIndex = value;
+        tilesToUpdate.Add(new(positionX, positionY));
     }
 
     public void UpdateAtlasIndex(int positionX, int positionY, int atlasX, int atlasY)

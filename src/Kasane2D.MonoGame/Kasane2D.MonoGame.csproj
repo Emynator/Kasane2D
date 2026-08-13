@@ -10,7 +10,7 @@
         
         <IsPackable>true</IsPackable>
         <PackageId>Kasane2D.MonoGame</PackageId>
-        <Version>1.0.0-rc.4</Version>
+        <Version>1.0.0-rc.5</Version>
         <Authors>Emynator</Authors>
         <Description>
             MonoGame backend for the Kasane2D game engine.
