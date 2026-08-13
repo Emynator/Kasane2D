@@ -10,7 +10,7 @@
 
         <IsPackable>true</IsPackable>
         <PackageId>Kasane2D</PackageId>
-        <Version>1.0.0-rc.2</Version>
+        <Version>1.0.0-rc.4</Version>
         <Authors>Emynator</Authors>
         <Description>
             Code-first 2D game engine for .NET with retro-inspired rendering,

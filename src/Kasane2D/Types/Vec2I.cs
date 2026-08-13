@@ -163,6 +163,26 @@ public record struct Vec2I
         return ToVec2F().Lerp(other.ToVec2F(), t).ToVec2I(RoundingMode.Nearest);
     }
 
+    /// <summary>
+    /// Calculates the signed angle between this and other in degrees.
+    /// </summary>
+    /// <param name="other">The other vector.</param>
+    /// <returns>The angle in degree from -180 to 180.</returns>
+    public int Angle(Vec2I other)
+    {
+        return (int)MathF.Round(ToVec2F().Angle(other.ToVec2F()));
+    }
+
+    /// <summary>
+    /// Rotates this vector by the specified angle.
+    /// </summary>
+    /// <param name="angle">The angle in degrees.</param>
+    /// <returns>The rotated vector.</returns>
+    public Vec2I Rotate(int angle)
+    {
+        return ToVec2F().Rotate(angle).ToVec2I();
+    }
+
     public void operator += (Vec2I rhs)
     {
         X += rhs.X;

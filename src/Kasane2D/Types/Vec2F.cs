@@ -211,6 +211,39 @@ public record struct Vec2F
         return new Vec2F(float.Lerp(X, other.X, t), float.Lerp(Y, other.Y, t));
     }
 
+    /// <summary>
+    /// Calculates the signed angle between this and other in degrees.
+    /// </summary>
+    /// <param name="other">The other vector.</param>
+    /// <returns>The angle in degree from -180 to 180.</returns>
+    public float Angle(Vec2F other)
+    {
+        if (this == Vec2F.Zero || other == Vec2F.Zero)
+        {
+            return 0.0f;
+        }
+        
+        return MathF.Atan2(Cross(other), Dot(other));
+    }
+
+    /// <summary>
+    /// Rotates this vector by the specified angle.
+    /// </summary>
+    /// <param name="angle">The angle in degrees.</param>
+    /// <returns>The rotated vector.</returns>
+    public Vec2F Rotate(float angle)
+    {
+        var rad = angle * MathF.PI / 180.0f;
+        var cos = MathF.Cos(rad);
+        var sin = MathF.Sin(rad);
+
+        return new
+        (
+            X * cos - Y * sin,
+            X * sin + Y * cos
+        );
+    }
+
     public void operator += (Vec2F rhs)
     {
         X += rhs.X;
