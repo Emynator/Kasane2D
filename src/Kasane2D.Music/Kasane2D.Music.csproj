@@ -10,7 +10,7 @@
 
         <IsPackable>true</IsPackable>
         <PackageId>Kasane2D.Music</PackageId>
-        <Version>1.0.0-rc.1</Version>
+        <Version>1.0.0-rc.2</Version>
         <Authors>Emynator</Authors>
         <Description>
             Optional tracker-inspired synthesis and sequencing system for Kasane2D.

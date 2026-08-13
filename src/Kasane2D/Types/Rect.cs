@@ -28,32 +28,32 @@ public readonly record struct Rect
         Position = new Vec2I(x, y);
         Size = new Vec2I(width, height);
     }
-    
+
     /// <summary>
     /// Gets the position of the rectangle.
     /// </summary>
     public Vec2I Position { get; }
-    
+
     /// <summary>
     /// Gets the width and height of the rectangle.
     /// </summary>
     public Vec2I Size { get; }
-    
+
     /// <summary>
     /// Gets the X-coordinate of the rectangle.
     /// </summary>
     public int X => Position.X;
-    
+
     /// <summary>
     /// Gets the Y-coordinate of the rectangle.
     /// </summary>
     public int Y => Position.Y;
-    
+
     /// <summary>
     /// Gets the width of the rectangle.
     /// </summary>
     public int Width => Size.X;
-    
+
     /// <summary>
     /// Gets the height of the rectangle.
     /// </summary>
@@ -63,7 +63,7 @@ public readonly record struct Rect
     /// Gets the top-left corner of the rectangle.
     /// </summary>
     public Vec2I TopLeft => Position;
-    
+
     /// <summary>
     /// Gets the bottom-right corner of the rectangle.
     /// </summary>
@@ -81,6 +81,9 @@ public readonly record struct Rect
         var otherTl = other.TopLeft;
         var otherBr = other.BottomRight;
 
-        return (otherTl.X <= br.X || otherTl.Y <= br.Y) && (otherBr.X >= tl.X || otherBr.Y >= tl.Y);
+        return otherTl.X <= br.X
+            && otherTl.Y <= br.Y
+            && otherBr.X >= tl.X
+            && otherBr.Y >= tl.Y;
     }
 }
