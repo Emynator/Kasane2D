@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="JumpAndRun/JumpAndRun.csproj" />
+  <Project Path="KasanePong/KasanePong.csproj" />
   <Project Path="MinimalSample/MinimalSample.csproj" />
 </Solution>
