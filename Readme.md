@@ -3,8 +3,6 @@ Kasane2D is a 2D game engine inspired by the programming model of retro graphics
 An optional real-time synthesis engine adds tracker-inspired music sequencing and procedural music generation.
 All of this is exposed through a low-boilerplate, code-first programming model built around modern, idiomatic C# and .NET 10.
 
-# TODO: small code sample
-
 # Why Kasane2D?
 - **Retro-inspired rendering without retro hardware limitations.**
   Kasane2D borrows the programming model of classic sprite and tile-based hardware: configurable render layers, tilemaps, sprite layers, independently scrollable viewports, and explicit control over how the screen is composed. You get the simplicity and predictability of that model without palette restrictions, scanline sprite limits, bitplanes, or fixed hardware layouts. No magic control-register addresses, cryptic bit flags, DMA routines, or HBlank/VBlank timing gymnastics required.
