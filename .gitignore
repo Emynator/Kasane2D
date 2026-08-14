@@ -436,5 +436,5 @@ FodyWeavers.xsd
 .DS_Store
 NativeLibs/
 assets/
-docs/docfx/_site/
-docs/docfx/api/
+docs/_site/
+docs/api/
