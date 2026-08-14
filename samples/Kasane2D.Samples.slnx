@@ -2,4 +2,5 @@
   <Project Path="JumpAndRun/JumpAndRun.csproj" />
   <Project Path="KasanePong/KasanePong.csproj" />
   <Project Path="MinimalSample/MinimalSample.csproj" />
+  <Project Path="ParallaxDemo/ParallaxDemo.csproj" />
 </Solution>
