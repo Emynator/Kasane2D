@@ -1,5 +1,6 @@
 using Kasane2D.Config;
 using Kasane2D.Graphics.Interfaces;
+using Kasane2D.MonoGame.Exceptions;
 using Kasane2D.MonoGame.Extensions;
 using Kasane2D.MonoGame.Graphics.Extensions;
 using Kasane2D.MonoGame.Graphics.RenderObjects;
@@ -24,6 +25,8 @@ internal class Rasterizer : IRasterizer, IDisposable
     private readonly Rectangle upscaleRect;
     private readonly Rectangle deviceRect;
     private readonly Texture2D pixel;
+
+    private bool isDrawing = false;
 
     public Rasterizer(GraphicsConfiguration config, GraphicsDevice device)
     {
@@ -100,6 +103,11 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public void Rasterize()
     {
+        if (isDrawing)
+        {
+            throw new DrawStillInProgressException();
+        }
+        
         foreach (var surface in surfaces)
         {
             surface.Rasterize();
@@ -133,16 +141,27 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public void BeginDraw(ITextureSurface target)
     {
+        var actual = target.AsTextureSurface();
+        device.SetRenderTarget(actual.RenderTarget);
+        
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        
+        isDrawing = true;
     }
 
     public void EndDraw()
     {
         spriteBatch.End();
+        isDrawing = false;
     }
 
     public void Draw(ITexture src, Rect? dstRect = null, Rect? srcRect = null)
     {
+        if (!isDrawing)
+        {
+            throw new DrawingNotStartedException();
+        }
+        
         var tex = src.AsTexture();
         var destRect = dstRect?.ToRectangle() ?? new(Point.Zero, tex.Size.ToPoint());
         var sourceRect = srcRect?.ToRectangle();
@@ -152,6 +171,11 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public void Draw(ISurface src, Rect? dstRect = null, Rect? srcRect = null)
     {
+        if (!isDrawing)
+        {
+            throw new DrawingNotStartedException();
+        }
+        
         var surface = src.AsSurface();
         var destRect = dstRect?.ToRectangle() ?? new(Point.Zero, surface.SurfaceSize.ToPoint());
         var sourceRect = srcRect?.ToRectangle();
@@ -161,16 +185,31 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public void Draw(Rect rect, KasaneColor color)
     {
+        if (!isDrawing)
+        {
+            throw new DrawingNotStartedException();
+        }
+        
         spriteBatch.Draw(pixel, rect.ToRectangle(), null, color.ToMgColor());
     }
 
     public void Draw(Line line, int thickness, KasaneColor color)
     {
+        if (!isDrawing)
+        {
+            throw new DrawingNotStartedException();
+        }
+        
         RenderLine(line.Start.ToVector2(), line.End.ToVector2(), thickness, color.ToMgColor());
     }
 
     public void Draw(Bezier bezier, int thickness, KasaneColor color, int precision)
     {
+        if (!isDrawing)
+        {
+            throw new DrawingNotStartedException();
+        }
+        
         var prev = bezier.Start;
         for (var i = 0; i < precision; i++)
         {
@@ -184,6 +223,11 @@ internal class Rasterizer : IRasterizer, IDisposable
     
     private void RenderLine(Vector2 start, Vector2 end, int thickness, MgColor color)
     {
+        if (!isDrawing)
+        {
+            throw new DrawingNotStartedException();
+        }
+        
         var length = (end - start).Length();
         var rectSize = new Vector2(length, thickness);
         var rotation = MathF.Atan2(end.Y - start.Y, end.X - start.X);

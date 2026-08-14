@@ -54,6 +54,6 @@ internal class SoundSystem : ISoundSystem
 
     public IAudioBuffer CreateBuffer(int bufferSize)
     {
-        return new AudioBuffer(BufferSize);
+        return new AudioBuffer(bufferSize);
     }
 }

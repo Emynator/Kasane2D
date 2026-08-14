@@ -77,7 +77,7 @@ internal class SfxManager : ISfxManager
         Parallel.ForEach(channels, c => c.Update());
         while (soundQueue.Count > 0)
         {
-            var availableChannel = channels.FirstOrDefault(c => c.CurrentFile is not null);
+            var availableChannel = channels.FirstOrDefault(c => c.CurrentFile is null);
             if (availableChannel is null)
             {
                 break;

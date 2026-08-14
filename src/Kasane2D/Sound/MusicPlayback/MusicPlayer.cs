@@ -38,6 +38,7 @@ internal class MusicPlayer : IMusicPlayer
 
         currentPosition = 0;
         IsPlaying = true;
+        IsLooping = loop;
         currentStream = song.ReadIn();
 
         tlock.Release();

@@ -28,13 +28,13 @@ public struct GamepadState
     /// <summary>
     /// Vector representing the current position of the left thumb stick.
     /// </summary>
-    /// <remarks>Position values are in the range of 0.0f to 1.0f.</remarks>
+    /// <remarks>Position values are in the range of -1.0f to 1.0f.</remarks>
     public Vec2F LeftStick { get; set; } = Vec2F.Zero;
     
     /// <summary>
     /// Vector representing the current position of the right thumb stick.
     /// </summary>
-    /// <remarks>Position values are in the range of 0.0f to 1.0f.</remarks>
+    /// <remarks>Position values are in the range of -1.0f to 1.0f.</remarks>
     public Vec2F RightStick { get; set; }  = Vec2F.Zero;
 
     /// <summary>
