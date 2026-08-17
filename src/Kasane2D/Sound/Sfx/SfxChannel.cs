@@ -1,3 +1,4 @@
+using Kasane2D.Sound.Extensions;
 using Kasane2D.Sound.Interfaces;
 using Kasane2D.Sound.Types;
 
@@ -6,19 +7,19 @@ namespace Kasane2D.Sound.Sfx;
 internal class SfxChannel
 {
     private readonly IMixBus bus;
-    private readonly float[] scratchBuffer0;
-    private readonly float[] scratchBuffer1;
+    private readonly int bufferSize;
+    private readonly float[] scratchBuffer;
     private int position = 0;
 
     public SfxChannel(IMixBus bus, int bufferSize)
     {
         this.bus = bus;
-        scratchBuffer0 = new float[bufferSize];
-        scratchBuffer1 = new float[bufferSize];
+        this.bufferSize = bufferSize;
+        scratchBuffer = new float[bufferSize];
         bus.Level = -3;
     }
 
-    public StereoAudioStream? CurrentFile
+    public AudioStream? CurrentFile
     {
         get;
         set
@@ -30,35 +31,32 @@ internal class SfxChannel
 
     public void Update()
     {
-        var left = scratchBuffer0.AsSpan();
-        left.Clear();
+        var zeroBuffer = scratchBuffer.AsSpan();
+        zeroBuffer.Clear();
 
         if (CurrentFile is null)
         {
-            bus.WriteLeft(left);
-            bus.WriteRight(left);
+            bus.WriteLeft(zeroBuffer);
+            bus.WriteRight(zeroBuffer);
 
             return;
         }
 
-        if (CurrentFile.Slice(position, left.Length) is not StereoAudioStream stream)
-        {
-            throw new InvalidOperationException();
-        }
-        
-        position += left.Length;
-        var right = scratchBuffer1.AsSpan();
-        right.Clear();
+        var stream = CurrentFile.Slice(position, bufferSize).AsStereoStream();
+        bus.WriteLeft(stream.GetLeft());
+        bus.WriteRight(stream.GetRight());
+        position += stream.Length;
 
-        stream.GetLeft().CopyTo(left);
-        stream.GetRight().CopyTo(right);
-        
-        bus.WriteLeft(left);
-        bus.WriteRight(right);
-
-        if (stream.Length < left.Length)
+        if (position < CurrentFile.Length)
         {
-            CurrentFile = null;
+            return;
         }
+
+        position = 0;
+        CurrentFile = null;
+        
+        var remaining = zeroBuffer.Slice(0, bufferSize - stream.Length);
+        bus.WriteLeft(remaining);
+        bus.WriteRight(remaining);
     }
 }

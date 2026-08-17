@@ -210,7 +210,7 @@ public abstract class AudioFileStream : IDisposable
             var toReadIn = length - (data.Length - CurrentPosition);
             var rawData = ReadRawSamples(toReadIn);
             var streamResult = Convert(rawData.Length, rawData);
-            data.Add
+            data.Append
             (
                 sampleRate == targetSampleRate
                     ? streamResult

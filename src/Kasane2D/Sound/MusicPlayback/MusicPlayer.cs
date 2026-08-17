@@ -10,10 +10,9 @@ internal class MusicPlayer : IMusicPlayer
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly int bufferSize;
     private readonly IMixBus bus;
-    private readonly float[] scratchBuffer0;
-    private readonly float[] scratchBuffer1;
-    private readonly ConcurrentQueue<StereoAudioStream> musicQueue = new();
-    private StereoAudioStream? currentStream = null;
+    private readonly float[] scratchBuffer;
+    private readonly ConcurrentQueue<AudioFileStream> songQueue = new();
+    private AudioFileStream? currentSong = null;
     private int currentPosition = 0;
 
     public MusicPlayer(int bufferSize, IAudioMixer mixer)
@@ -22,15 +21,14 @@ internal class MusicPlayer : IMusicPlayer
         bus = mixer.CreateMixBus("Music Player");
         bus.Level = -3;
         
-        scratchBuffer0 = new float[bufferSize];
-        scratchBuffer1 = new float[bufferSize];
+        scratchBuffer = new float[bufferSize];
     }
 
     public bool IsPlaying { get; private set; }
 
     public bool IsLooping { get; private set; }
 
-    public int QueueLength => musicQueue.Count;
+    public int QueueLength => songQueue.Count;
 
     public void Play(AudioFileStream song, bool loop = false)
     {
@@ -39,7 +37,7 @@ internal class MusicPlayer : IMusicPlayer
         currentPosition = 0;
         IsPlaying = true;
         IsLooping = loop;
-        currentStream = song.ReadIn();
+        currentSong = song;
 
         tlock.Release();
     }
@@ -77,28 +75,28 @@ internal class MusicPlayer : IMusicPlayer
 
     public void Queue(AudioFileStream song)
     {
-        musicQueue.Enqueue(song.ReadIn());
+        songQueue.Enqueue(song);
     }
 
     public void ClearQueue()
     {
-        musicQueue.Clear();
+        songQueue.Clear();
     }
 
     public void Update()
     {
         tlock.Wait();
 
-        var left = scratchBuffer0.AsSpan();
-        left.Clear();
+        var zeroBuffer = scratchBuffer.AsSpan();
+        zeroBuffer.Clear();
 
-        if (currentStream is null)
+        if (currentSong is null)
         {
-            if (!musicQueue.TryDequeue(out var stream))
+            if (!songQueue.TryDequeue(out var song))
             {
                 IsPlaying = false;
-                bus.WriteLeft(left);
-                bus.WriteRight(left);
+                bus.WriteLeft(zeroBuffer);
+                bus.WriteRight(zeroBuffer);
 
                 tlock.Release();
 
@@ -106,52 +104,54 @@ internal class MusicPlayer : IMusicPlayer
             }
 
             currentPosition = 0;
-            currentStream = stream;
+            currentSong = song;
         }
 
         if (!IsPlaying)
         {
-            bus.WriteLeft(left);
-            bus.WriteRight(left);
+            bus.WriteLeft(zeroBuffer);
+            bus.WriteRight(zeroBuffer);
 
             tlock.Release();
 
             return;
         }
 
-        var right = scratchBuffer1.AsSpan();
-        right.Clear();
         var count = bufferSize;
-        if (currentPosition + bufferSize >= currentStream.Length)
+        if (currentPosition + bufferSize >= currentSong.Length)
         {
-            var remaining = currentStream.Length - currentPosition;
-            currentStream.GetLeft().Slice(currentPosition, remaining).CopyTo(left);
-            currentStream.GetRight().Slice(currentPosition, remaining).CopyTo(right);
+            var remaining = currentSong.Length - currentPosition;
+            var remainingStream = currentSong.Read(currentPosition, remaining).AsStereoStream();
+            
+            bus.WriteLeft(remainingStream.GetLeft());
+            bus.WriteRight(remainingStream.GetRight());
+            count -= remaining;
 
-            count = currentStream.Length - currentPosition;
-            left = left.Slice(remaining, count);
-            right = right.Slice(remaining, count);
             currentPosition = 0;
-
             if (!IsLooping)
             {
-                currentStream = null;
-                if (musicQueue.TryDequeue(out var stream))
+                currentSong = null;
+                if (songQueue.TryDequeue(out var song))
                 {
-                    currentStream = stream;
+                    currentSong = song;
                 }
             }
         }
 
-        if (currentStream is not null)
+        if (currentSong is null)
         {
-            currentStream.GetLeft().Slice(currentPosition, count).CopyTo(left);
-            currentStream.GetRight().Slice(currentPosition, count).CopyTo(right);
+            var rest = zeroBuffer.Slice(0, count);
+            bus.WriteLeft(rest);
+            bus.WriteRight(rest);
+            
+            tlock.Release();
+            return;
         }
 
+        var stream = currentSong.Read(currentPosition, count).AsStereoStream();
+        bus.WriteLeft(stream.GetLeft());
+        bus.WriteRight(stream.GetRight());
         currentPosition += count;
-        bus.WriteLeft(left);
-        bus.WriteRight(right);
 
         tlock.Release();
     }

@@ -10,7 +10,7 @@ internal class SfxManager : ISfxManager
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly int bufferSize;
     private readonly List<SfxChannel> channels = [];
-    private readonly Queue<StereoAudioStream> soundQueue = new();
+    private readonly Queue<AudioStream> soundQueue = new();
     
     public SfxManager(AudioConfiguration config, int bufferSize, IAudioMixer mixer)
     {
@@ -36,17 +36,17 @@ internal class SfxManager : ISfxManager
     {
         tlock.Wait();
 
-        var stream = sound.ReadIn();
+        var stream = sound.Read(sound.Length);
         var availableChannel = channels.FirstOrDefault(c => c.CurrentFile is null);
-        if (availableChannel is null)
+        if (availableChannel is not null)
         {
-            soundQueue.Enqueue(stream);
-            tlock.Release();
+            availableChannel.CurrentFile = stream;
 
+            tlock.Release();
             return;
         }
         
-        availableChannel.CurrentFile = stream;
+        soundQueue.Enqueue(stream);
         
         tlock.Release();
     }
