@@ -13,7 +13,8 @@ All of this is exposed through a low-boilerplate, code-first programming model b
 - **Start simple, opt into complexity when you want it.**
   The core engine stays deliberately lightweight. Straightforward games can use ordinary sprite rendering, sound effects, and prerecorded music without touching anything more advanced. Optional packages such as `Kasane2D.Music` add tracker-inspired sequencing, synthesis, procedural music, and deep runtime control without making those features mandatory for everyone else.
 
-# Installation and quick start
+# Installation and Quick Start
+Check out the [Documentation](https://emynator.github.io/Kasane2D) for more in depth guidance.
 - Create a new .NET 10 console application
 - Add the required dependencies:
 ```shell
@@ -129,7 +130,7 @@ public class MinimalGame : EngineMain
 }
 ```
 
-# Core features
+# Core Features
 - Graphics and rendering system inspired by hardware sprite engines of retro consoles.
   - Screens are composed from a set of configurable layers:
     - Tilemap layers with dynamically adjustable tile sheets and freely configurable tile dimensions.
@@ -153,7 +154,7 @@ public class MinimalGame : EngineMain
   - Extension interface for integrating custom audio systems directly into the existing mixer graph.
 - The core engine stays lightweight and explicit: little boilerplate, no opaque scene machinery, and direct access to the systems you configure. Additional complexity lives in optional modules when you need it.
 
-# Kasane2D.Music features
+# Kasane2D.Music Features
 `Kasane2D.Music` is an optional tracker-inspired real-time synthesis and sequencing system. Musical structure and synthesis parameters remain fully programmable at runtime, allowing music to react directly to gameplay.
 - Configurable synth engines with any number of tracks and freely selectable generator types.
 - Built-in generators include:
@@ -176,8 +177,36 @@ public class MinimalGame : EngineMain
 - Direct runtime control makes procedural and gameplay-driven music possible.
 
 # Links
-- Kasane2D core engine on [nuget](https://www.nuget.org/packages/Kasane2D)
-- Kasane2D.MonoGame backend on [nuget](https://www.nuget.org/packages/Kasane2D.MonoGame)
-- Kasane2D.Music on [nuget](https://www.nuget.org/packages/Kasane2D.Music)
+- [Documentation](https://emynator.github.io/Kasane2D)
+- Kasane2D core engine on [NuGet](https://www.nuget.org/packages/Kasane2D)
+- Kasane2D.MonoGame backend on [NuGet](https://www.nuget.org/packages/Kasane2D.MonoGame)
+- Kasane2D.Music on [NuGet](https://www.nuget.org/packages/Kasane2D.Music)
 
-# Planned features
+# Contributing
+Contributions and feedback are always more than welcome! Also feel free to reach out for any sort of feedback!
+- If you encounter any bugs or have a feature request, feel free to open an issue.
+- If you want to contribute code, please get in touch with me before opening any large pull request so we can coordinate with each other :)
+
+There's currently no Discord server or anything like that. If enough people want to have one, I could make one, though.
+
+# Planned Features
+This list is less a concrete roadmap and more a collection of features and ideas I already have in mind for adding. Feel free to open an issue for any additional requests!
+
+- Core Engine
+  - A system for gathering performance and diagnostic data.
+  - Graphics System
+    - Support for a fullscreen mode.
+    - Support for dynamic window resizing.
+  - Sound System
+    - Support for loading a selection of various common sound files in addition to RIFF/WAVE.
+    - A selection of ready-to-use audio effects:
+      - Filters and EQ8
+      - Delay and Ping-Pong-Delay
+      - Compressor and Limiter
+      - Utility for gain and pan adjustment
+    - Dispatch system for audio automation curves
+- Music System
+  - Integration of audio effects into the synthesis engine with control events.
+  - Event callback to allow sequencer events to influence gameplay.
+  - Polyphonic voices.
+- Optional package for an entity component system.

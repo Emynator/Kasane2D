@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Kasane2D" Version="1.0.0-rc.5" />
-      <PackageReference Include="Kasane2D.MonoGame" Version="1.0.0-rc.5" />
+      <PackageReference Include="Kasane2D" Version="1.0.0" />
+      <PackageReference Include="Kasane2D.MonoGame" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>
