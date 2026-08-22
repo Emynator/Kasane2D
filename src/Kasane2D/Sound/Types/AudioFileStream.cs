@@ -11,29 +11,26 @@ public abstract class AudioFileStream : IDisposable
     private readonly Task preLoadTask;
     private readonly int targetSampleRate;
     private bool isDisposed = false;
+    private AudioStream? data = null;
 
     /// <summary>
     /// Mode of how the file will be read in.
     /// </summary>
     protected readonly AudioFileReadMode readMode;
     /// <summary>
-    /// Binary reader wrapping the actual file stream.
-    /// </summary>
-    protected readonly BinaryReader file;
-    /// <summary>
     /// The sample rate of the audio file. If it differs from the sound system's sample rate, the file will be resampled.
     /// </summary>
     protected int sampleRate = 0;
-    /// <summary>
-    /// The actual audio data.
-    /// </summary>
-    protected AudioStream? data = null;
     /// <summary>
     /// Signals that the initialization is done and audio data can be streamed now.
     /// </summary>
     /// <remarks>Deriving classes should signal this only when they have parsed the file header and are ready to
     /// actually stream audio data.</remarks>
     protected readonly EventWaitHandle initDone = new(false, EventResetMode.AutoReset);
+    /// <summary>
+    /// Binary reader wrapping the actual file stream.
+    /// </summary>
+    protected BinaryReader? file;
 
     /// <summary>
     /// Base constructor.
@@ -79,7 +76,8 @@ public abstract class AudioFileStream : IDisposable
             return;
         }
 
-        file.Dispose();
+        file?.Dispose();
+        file = null;
         isDisposed = true;
     }
     

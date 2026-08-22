@@ -1,4 +1,3 @@
-using System.Buffers;
 using Kasane2D.Sound.Interfaces;
 
 namespace Kasane2D.Sound.Mixer;
@@ -48,7 +47,7 @@ internal class MixBus : IMixBus
 
     public string Name { get; }
 
-    public int Level
+    public int Gain
     {
         get => (int)(20.0f * MathF.Log10(gain));
         set
@@ -100,28 +99,10 @@ internal class MixBus : IMixBus
     }
 
     public IReadOnlyCollection<IMixBus> Children => InternalChildren;
+    
+    public List<MixBus> InternalChildren { get; set; } = [];
 
     public IReadOnlyCollection<IAudioEffect> Effects => effects;
-
-    public void WriteLeft(ReadOnlySpan<float> samples)
-    {
-        inLeft.Write(samples);
-    }
-
-    public void WriteRight(ReadOnlySpan<float> samples)
-    {
-        inRight.Write(samples);
-    }
-
-    public float[] ReadLeft(int sampleCount)
-    {
-        return outLeft.Read(sampleCount);
-    }
-
-    public float[] ReadRight(int sampleCount)
-    {
-        return outRight.Read(sampleCount);
-    }
 
     public void AddEffect(IAudioEffect effect)
     {
@@ -137,7 +118,47 @@ internal class MixBus : IMixBus
         tlock.Release();
     }
 
-    public List<MixBus> InternalChildren { get; set; } = [];
+    public void SetEffects(IReadOnlyCollection<IAudioEffect> effects)
+    {
+        tlock.Wait();
+        this.effects = effects.ToList();
+        tlock.Release();
+    }
+
+    public void ClearEffects()
+    {
+        tlock.Wait();
+        effects.Clear();
+        tlock.Release();
+    }
+
+    public void WriteLeft(ReadOnlySpan<float> samples)
+    {
+        tlock.Wait();
+        inLeft.Write(samples);
+        tlock.Release();
+    }
+
+    public void WriteRight(ReadOnlySpan<float> samples)
+    {
+        tlock.Wait();
+        inRight.Write(samples);
+        tlock.Release();
+    }
+
+    public void ReadLeft(Span<float> outBuffer)
+    {
+        tlock.Wait();
+        outLeft.Read(outBuffer);
+        tlock.Release();
+    }
+
+    public void ReadRight(Span<float> outBuffer)
+    {
+        tlock.Wait();
+        outRight.Read(outBuffer);
+        tlock.Release();
+    }
 
     public void Mix()
     {

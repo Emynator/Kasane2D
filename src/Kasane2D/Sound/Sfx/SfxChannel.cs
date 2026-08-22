@@ -16,7 +16,7 @@ internal class SfxChannel
         this.bus = bus;
         this.bufferSize = bufferSize;
         scratchBuffer = new float[bufferSize];
-        bus.Level = -3;
+        bus.Gain = -3;
     }
 
     public AudioStream? CurrentFile

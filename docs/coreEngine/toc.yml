@@ -1,56 +1,48 @@
 - name: Overview
   href: Overview.md
-- name: Getting Started
+- name: 1 - Getting Started
   items:
-  - name: Installation and Quickstart
+  - name: 1.1 - Installation and Quickstart
     href: gettingStarted/Installation.md
-  - name: Engine Configuration
+  - name: 1.2 - Engine Configuration
     href: gettingStarted/EngineConfiguration.md
-  - name: The EngineMain
+  - name: 1.3 - The EngineMain
     href: gettingStarted/EngineMain.md
-- name: Graphics system
+- name: 2 - Graphics system
   items:
-  - name: What are Layers and Surfaces
-    href: graphicsSystem/LayersAndSurfaces.md
-  - name: The Types of Layers and Surfaces
-    items:
-    - name: Sprite Layer
-      href: graphicsSystem/SpriteLayer.md
-    - name: Tilemap Surface
-      href: graphicsSystem/TilemapSurface.md
-    - name: Texture Surface
-      href: graphicsSystem/TextureSurface.md
-  - name: Free-form Rendering
+  - name: 2.1 - Overview
+    href: graphicsSystem/Overview.md
+  - name: 2.2 - Layer Types
+    href: graphicsSystem/LayerTypes.md
+  - name: 2.3 - Accessing the Graphics System
+    href: graphicsSystem/Interfaces.md
+  - name: 2.4 - Managing sprite slots with ISlotManager
+    href: graphicsSystem/SlotManager.md
+  - name: 2.5 - Free-Form Rendering
     href: graphicsSystem/FreeFormRendering.md
-- name: Input system
+- name: 3 - Input System
+  href: inputSystem/Overview.md
+- name: 4 - Sound System
   items:
-  - name: Handling Keyboard Input
-    href: inputSystem/Keyboard.md
-  - name: Handling Mouse Input
-    href: inputSystem/Mouse.md
-  - name: Handling Controller Input
-    href: inputSystem/Controller.md
-- name: Sound system
-  items:
-  - name: Introduction
-    href: soundSystem/Introduction.md
-  - name: What is a Mix Bus?
+  - name: 4.1 - Overview and ISoundSystem
+    href: soundSystem/Overview.md
+  - name: 4.2 - IAudioMixer
+    href: soundSystem/AudioMixer.md
+  - name: 4.3 - What is a Mix Bus?
     href: soundSystem/MixBus.md
-  - name: Loading Audio Files
+  - name: 4.4 - Loading Audio Files
     href: soundSystem/LoadingAudioFiles.md
-  - name: Sfx Manager
+  - name: 4.5 - Sfx Manager
     href: soundSystem/SfxManager.md
-  - name: Music Player
+  - name: 4.6 - Music Player
     href: soundSystem/MusicPlayer.md
-  - name: Advanced Topics
+  - name: 4.7 - Audio Effects
+    href: soundSystem/AudioEffects.md
+  - name: 4.8 - Advanced Topics
     items:
-    - name: Audio Buffers
-      href: soundSystem/AudioBuffers.md
-    - name: Audio Streams
-      href: soundSystem/AudioStreams.md
-    - name: Implementing custom Audio File Streams
-      href: soundSystem/CustomAudioFileStream.md
-    - name: Audio Effects
-      href: soundSystem/AudioEffects.md
-    - name: Sound Subsystems
+    - name: 4.8.1 - Low-Level Audio Types
+      href: soundSystem/AudioTypes.md
+    - name: 4.8.2 - Sound Sub-Systems
       href: soundSystem/SoundSubSystem.md
+    - name: 4.8.3 - Implementing custom Audio File Streams
+      href: soundSystem/CustomAudioFileStream.md

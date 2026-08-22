@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Kasane2D.Sound.Interfaces;
 
 /// <summary>
@@ -19,8 +21,16 @@ public interface IAudioMixer
     public IMixBus CreateMixBus(string name, IMixBus? parent = null);
     
     /// <summary>
-    /// Free a mix bus and remove it from the mixer.
+    /// Frees a mix bus and remove it from the mixer.
     /// </summary>
     /// <param name="bus">The mix bus to be freed.</param>
     public void ReleaseMixBus(IMixBus bus);
+
+    /// <summary>
+    /// Tries to get the mix bus of the specified name.
+    /// </summary>
+    /// <param name="name">The name of the mix bus to get.</param>
+    /// <param name="bus">The resulting mix bus if it was found.</param>
+    /// <returns>Returns true if the mix bus of the specified name was found, otherwise false.</returns>
+    public bool TryGetMixBus(string name, [NotNullWhen(true)] out IMixBus? bus);
 }

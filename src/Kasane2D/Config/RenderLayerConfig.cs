@@ -48,7 +48,7 @@ public class RenderLayerConfig
     /// the third layer with -1 is inserted as layer 1. If multiple layers share the same sort order, they are once
     /// again sorted in first come, first served manner. Meaning if two layers are configured as layer 1, the first
     /// actually becomes layer 1 and the second one becomes layer 2.</remarks>
-    public int Layer { get; init; } = -1;
+    public int SortingOrder { get; init; } = -1;
     
     /// <summary>
     /// Optional: width and height in pixels of the tiles in this layer. Uses global default value if not provided.

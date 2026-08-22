@@ -48,7 +48,7 @@ internal class SynthVoice
     {
         if (ev.VolumeUpdate.DoUpdate)
         {
-            bus.Level = ev.VolumeUpdate.Value;
+            bus.Gain = ev.VolumeUpdate.Value;
         }
 
         if (ev.PanUpdate.DoUpdate)

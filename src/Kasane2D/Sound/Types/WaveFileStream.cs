@@ -41,17 +41,17 @@ public sealed class WaveFileStream : AudioFileStream
     public override void SetPosition(int value)
     {
         base.SetPosition(value);
-        
+
         if (readMode == AudioFileReadMode.Stream)
         {
-            file.BaseStream.Seek(dataStartPosition + CurrentPosition, SeekOrigin.Begin);
+            file?.BaseStream.Seek(dataStartPosition + CurrentPosition, SeekOrigin.Begin);
         }
     }
 
     /// <inheritdoc/>
     protected override byte[] ReadRawSamples(int sampleCount)
     {
-        return file.ReadBytes(sampleCount * bytesPerSample * numChannels);
+        return file?.ReadBytes(sampleCount * bytesPerSample * numChannels) ?? [];
     }
 
     /// <inheritdoc/>
@@ -89,6 +89,11 @@ public sealed class WaveFileStream : AudioFileStream
 
     private void ParseHeader(string path)
     {
+        if (file is null)
+        {
+            return;
+        }
+
         var notWave = $"File '{path}' is not a wave file.";
         var fileFormat = ReadFourCC();
         if (fileFormat != "RIFF")
@@ -111,12 +116,12 @@ public sealed class WaveFileStream : AudioFileStream
                 case "fmt ":
                     ParseFmtBlock(path);
                     break;
-                
+
                 default:
                     SkipChunk();
                     break;
             }
-            
+
             fourCC = ReadFourCC();
         }
 
@@ -140,6 +145,11 @@ public sealed class WaveFileStream : AudioFileStream
 
     private void ParseFmtBlock(string path)
     {
+        if (file is null)
+        {
+            return;
+        }
+
         var formatSize = BinaryPrimitives.ReadInt32LittleEndian(file.ReadBytes(4));
         var waveFormat = BinaryPrimitives.ReadInt16LittleEndian(file.ReadBytes(2));
         if (waveFormat != 0x1 && waveFormat != 0x3)
@@ -148,15 +158,6 @@ public sealed class WaveFileStream : AudioFileStream
         }
 
         numChannels = BinaryPrimitives.ReadInt16LittleEndian(file.ReadBytes(2));
-        if (numChannels == 1)
-        {
-            data = new MonoAudioStream(0, []);
-        }
-        else
-        {
-            data = new StereoAudioStream(0, [], []);
-        }
-
         sampleRate = BinaryPrimitives.ReadInt32LittleEndian(file.ReadBytes(4));
         SkipBytes(6);
         var bitDepth = BinaryPrimitives.ReadInt16LittleEndian(file.ReadBytes(2));
@@ -186,18 +187,23 @@ public sealed class WaveFileStream : AudioFileStream
         {
             return;
         }
-        
+
         var extraSize = BinaryPrimitives.ReadInt16LittleEndian(file.ReadBytes(2));
         SkipBytes(extraSize);
     }
 
     private void SkipBytes(int count)
     {
-        file.ReadBytes(count);
+        file?.ReadBytes(count);
     }
 
     private void SkipChunk()
     {
+        if (file is null)
+        {
+            return;
+        }
+        
         var size = BinaryPrimitives.ReadInt32LittleEndian(file.ReadBytes(4));
         size = (size & 1) != 0 ? size + 1 : size;
         SkipBytes(size);
@@ -205,7 +211,9 @@ public sealed class WaveFileStream : AudioFileStream
 
     private string ReadFourCC()
     {
-        return Encoding.UTF8.GetString(file.ReadBytes(4));
+        return file is not null
+            ? Encoding.UTF8.GetString(file.ReadBytes(4))
+            : "";
     }
 
     private float ConvertSample(Span<byte> rawData)

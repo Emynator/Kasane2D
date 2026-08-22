@@ -36,7 +36,7 @@ public static class EngineBuilderExtensions
     /// <param name="builder">The engine builder.</param>
     /// <param name="config">The config.</param>
     /// <returns>The engine builder.</returns>
-    public static EngineBuilder ConfigureGraphics(this EngineBuilder builder, GraphicsConfiguration config)
+    public static EngineBuilder ConfigureGraphics(this EngineBuilder builder, GraphicsConfiguration? config)
     {
         builder.GraphicsConfig = config;
 

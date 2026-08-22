@@ -17,10 +17,10 @@ internal class SfxManager : ISfxManager
         this.bufferSize = bufferSize;
         ChannelCount = config.SfxChannelCount;
         var sfxBus = mixer.CreateMixBus("SFX");
-        sfxBus.Level = -3;
+        sfxBus.Gain = -3;
         for (var i = 0; i < ChannelCount; i++)
         {
-            channels.Add(new(mixer.CreateMixBus($"SFX Channel {i}", sfxBus), bufferSize));
+            channels.Add(new(mixer.CreateMixBus($"SFX_Channel_{i}", sfxBus), bufferSize));
         }
     }
 

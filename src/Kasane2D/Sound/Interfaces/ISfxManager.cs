@@ -34,12 +34,12 @@ public interface ISfxManager
     public void Play(AudioFileStream sound);
 
     /// <summary>
-    /// Stop playback of all currently playing sound effects and removes them from the channel.
+    /// Stops playback of all currently playing sound effects and removes them from the channel.
     /// </summary>
     public void StopAll();
 
     /// <summary>
-    /// Drop all sound effects currently waiting for a free channel from the playback queue.
+    /// Drops all sound effects currently waiting for a free channel from the playback queue.
     /// </summary>
     public void DropQueue();
 }

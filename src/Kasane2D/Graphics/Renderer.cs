@@ -52,24 +52,24 @@ internal class Renderer : IRenderer
         }
 
         var idc = new Queue<RenderLayerConfig>();
-        foreach (var config in renderLayerConfigs.Where(l => l.Layer < 0))
+        foreach (var config in renderLayerConfigs.Where(l => l.SortingOrder < 0))
         {
             idc.Enqueue(config);
         }
 
         var configs = renderLayerConfigs
-            .Where(l => l.Layer >= 0)
-            .OrderBy(l => l.Layer);
+            .Where(l => l.SortingOrder >= 0)
+            .OrderBy(l => l.SortingOrder);
         var lastLayer = 0;
         foreach (var config in configs)
         {
-            if (config.Layer == lastLayer)
+            if (config.SortingOrder == lastLayer)
             {
                 ConfigureLayer(config);
                 continue;
             }
 
-            while (lastLayer + 1 < config.Layer)
+            while (lastLayer + 1 < config.SortingOrder)
             {
                 if (idc.TryDequeue(out var fill))
                 {
@@ -80,7 +80,7 @@ internal class Renderer : IRenderer
             }
 
             ConfigureLayer(config);
-            lastLayer = config.Layer;
+            lastLayer = config.SortingOrder;
         }
 
         while (idc.TryDequeue(out var remaining))

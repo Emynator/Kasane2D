@@ -3,9 +3,13 @@ _layout: landing
 ---
 
 # Kasane2D
+Welcome to the documentation hub for Kasane2D!
+
 Kasane2D is a 2D game engine inspired by the programming model of retro graphics hardware. It provides the same kinds of tools as the sprite and tile engines of the 8- and 16-bit eras, without reproducing their hardware limitations, quirks, or compromise-driven constraints.
 An optional real-time synthesis engine adds tracker-inspired music sequencing and procedural music generation.
 All of this is exposed through a low-boilerplate, code-first programming model built around modern, idiomatic C# and .NET 10.
+
+Kasane2D is available under the MIT license. The source code is available [on GitHub](https://github.com/Emynator/Kasane2D).
 
 # Why Kasane2D?
 - **Retro-inspired rendering without retro hardware limitations.**

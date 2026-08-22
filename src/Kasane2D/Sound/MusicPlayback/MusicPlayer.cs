@@ -19,7 +19,7 @@ internal class MusicPlayer : IMusicPlayer
     {
         this.bufferSize = bufferSize;
         bus = mixer.CreateMixBus("Music Player");
-        bus.Level = -3;
+        bus.Gain = -3;
         
         scratchBuffer = new float[bufferSize];
     }

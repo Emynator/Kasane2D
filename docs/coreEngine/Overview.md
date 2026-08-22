@@ -1,5 +1,5 @@
 # Kasane2D Core Engine
-The core engine provides all of the engine's core functionalities. It contains Kasane's graphics system, input system, and sound system. In addition, the core engine is responsible for the application lifecycle mangement and integrating the backend into a single, unified API surface for all user code targeting the engine. Finally, the core engine is also the common denominator where all optional modules hook up with the low-level APIs.
+The core engine provides all of the engine's core functionalities. It contains Kasane's graphics system, input system, and sound system. In addition, the core engine is responsible for the application lifecycle mangement and integrating the backend into a single, unified API surface for all user code targeting the engine. Finally, the core engine is also the common denominator where all optional modules hook up with the respective APIs.
 
 # Brief overview of Kasane's core systems
 
@@ -14,31 +14,27 @@ Kasane's sound system features a full fledged software mixer architecture famili
 
 In addition to the mixer system, the core engine also provides a sound effect manager for playing sound effects, a music player for playing music files, and the architecture for loading audio files, handling audio streams, and resampling audio streams to a common sample rate.
 
-# Table of content
-1. Getting Started
-    1. [Installation and Quickstart](gettingStarted/Installation.md)
-    2. [Engine Configuration](gettingStarted/EngineConfiguration.md)
-    3. [The EngineMain](gettingStarted/EngineMain.md)
-2. Graphics system
-    1. [What are Layers and Surfaces](graphicsSystem/LayersAndSurfaces.md)
-    2. The Types of Layers and Surfaces
-        1. [Sprite Layer](graphicsSystem/SpriteLayer.md)
-        2. [Tilemap Surface](graphicsSystem/TilemapSurface.md)
-        3. [Texture Surface](graphicsSystem/TextureSurface.md)
-    3. [Free-form Rendering](graphicsSystem/FreeFormRendering.md)
-3. Input system
-    1. [Handling Keyboard Input](inputSystem/Keyboard.md)
-    2. [Handling Mouse Input](inputSystem/Mouse.md)
-    3. [Handling Controller Input](inputSystem/Controller.md)
-4. Sound system
-    1. [Introduction](soundSystem/Introduction.md)
-    2. [What is a Mix Bus?](soundSystem/MixBus.md)
-    3. [Loading Audio Files](soundSystem/LoadingAudioFiles.md)
-    4. [Sfx Manager](soundSystem/SfxManager.md)
-    5. [Music Player](soundSystem/MusicPlayer.md)
-    6. Advanced Topics
-        1. [Audio Buffers](soundSystem/AudioBuffers.md)
-        2. [Audio Streams](soundSystem/AudioStreams.md)
-        3. [Implementing custom Audio File Streams](soundSystem/CustomAudioFileStream.md)
-        4. [Audio Effects](soundSystem/AudioEffects.md)
-        5. [Sound Subsystems](soundSystem/SoundSubSystem.md)
+# Table of Content
+- 1 Getting Started
+  - [1.1 Installation and Quickstart](gettingStarted/Installation.md)
+  - [1.2 Engine Configuration](gettingStarted/EngineConfiguration.md)
+  - [1.3 The EngineMain](gettingStarted/EngineMain.md)
+- 2 Graphics system
+  - [2.1 Overview](graphicsSystem/Overview.md)
+  - [2.2 Layer Types](graphicsSystem/LayerTypes.md)
+  - [2.3 Accessing the Graphics System](graphicsSystem/Interfaces.md)
+  - [2.4 Managing sprite slots with ISlotManager](graphicsSystem/SlotManager.md)
+  - [2.5 Free-Form Rendering](graphicsSystem/FreeFormRendering.md)
+- [3 Input System](inputSystem/Overview.md)
+- 4 Sound System
+  - [4.1 Overview and ISoundSystem](soundSystem/Overview.md)
+  - [4.2 IAudioMixer](soundSystem/AudioMixer.md)
+  - [4.3 What is a Mix Bus?](soundSystem/MixBus.md)
+  - [4.4 Loading Audio Files](soundSystem/LoadingAudioFiles.md)
+  - [4.5 Sfx Manager](soundSystem/SfxManager.md)
+  - [4.6 Music Player](soundSystem/MusicPlayer.md)
+  - [4.7 Audio Effects](soundSystem/AudioEffects.md)
+  - 4.8 Advanced Topics
+    - [4.8.1 Low-Level Audio Types](soundSystem/AudioTypes.md)
+    - [4.8.2 Sound Sub-Systems](soundSystem/SoundSubSystem.md)
+    - [4.8.3 Implementing custom Audio File Streams](soundSystem/CustomAudioFileStream.md)

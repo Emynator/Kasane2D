@@ -114,7 +114,7 @@ internal class Rasterizer : IRasterizer, IDisposable
         }
 
         device.SetRenderTarget(backBuffer);
-        device.Clear(ClearColor.ToMgColor());
+        device.Clear(MgColor.Transparent);
 
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         foreach (var surface in surfaces)
@@ -132,7 +132,7 @@ internal class Rasterizer : IRasterizer, IDisposable
         spriteBatch.End();
 
         device.SetRenderTarget(null);
-        device.Clear(MgColor.Black);
+        device.Clear(ClearColor.ToMgColor());
 
         spriteBatch.Begin(samplerState: SamplerState.LinearClamp);
         spriteBatch.Draw(upscaleBuffer, deviceRect, upscaleRect, MgColor.White);
