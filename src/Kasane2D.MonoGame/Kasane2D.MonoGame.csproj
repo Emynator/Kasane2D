@@ -6,7 +6,6 @@
         <Nullable>enable</Nullable>
         
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         
         <IsPackable>true</IsPackable>
         <PackageId>Kasane2D.MonoGame</PackageId>
