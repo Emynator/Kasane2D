@@ -63,7 +63,7 @@ public static class Program
                 ]
             )
             .ConfigureAudio()
-            .WithMain<JumpAndRunGame>()
+            .WithMain<MinimalGame>()
             .Build();
         
         engine.Run();
