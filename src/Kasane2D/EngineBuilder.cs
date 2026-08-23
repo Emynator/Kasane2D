@@ -22,6 +22,8 @@ public sealed class EngineBuilder
 
     internal AudioConfiguration? AudioConfig { get; set; }
 
+    internal PerformanceMonitorConfiguration? PerformanceMonitorConfig { get; set; }
+
     internal EngineMain? Main { get; set; }
 }
 
@@ -65,6 +67,17 @@ public static class EngineBuilderExtensions
     public static EngineBuilder ConfigureAudio(this EngineBuilder builder, AudioConfiguration? config = null)
     {
         builder.AudioConfig = config ?? new();
+
+        return builder;
+    }
+
+    public static EngineBuilder ConfigurePerformanceMonitoring
+        (
+        this EngineBuilder builder,
+        PerformanceMonitorConfiguration? config = null
+        )
+    {
+        builder.PerformanceMonitorConfig = config ?? new();
 
         return builder;
     }
@@ -142,10 +155,15 @@ public static class EngineBuilderExtensions
                     }"
                 );
             }
-            
+
             builder.Main.InternalSoundSystem = new(builder.AudioConfig);
         }
 
-        return new(runner, () => builder.Main.InternalRenderer?.Init(builder.RendererConfig));
+        return new
+        (
+            runner,
+            () => builder.Main.InternalRenderer?.Init(builder.RendererConfig),
+            builder.PerformanceMonitorConfig
+        );
     }
 }

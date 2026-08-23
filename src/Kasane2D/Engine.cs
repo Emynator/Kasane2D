@@ -1,3 +1,4 @@
+using Kasane2D.Config;
 using Kasane2D.Interfaces;
 
 namespace Kasane2D;
@@ -7,16 +8,31 @@ namespace Kasane2D;
 /// </summary>
 public sealed class Engine
 {
+    private static readonly PerformanceMonitor monitor = new();
+
+    public static IPerformanceMonitor Monitor => monitor;
+
     private readonly IEngineRunner runner;
     private readonly Action initRenderer;
     private bool isDisposed = false;
 
-    internal Engine(IEngineRunner runner, Action initRenderer)
+    internal Engine(IEngineRunner runner, Action initRenderer, PerformanceMonitorConfiguration? perfConfig)
     {
         this.runner = runner;
         this.initRenderer = initRenderer;
+        
+        if (perfConfig is null)
+        {
+            return;
+        }
+        
+        monitor.IsActive = true;
+        monitor.CycleLength = perfConfig.ShortTermCycleLength;
+        monitor.CycleCount = perfConfig.MediumTermCycles;
+        monitor.CliLogging = perfConfig.CliLogging;
+        monitor.LogInterval = perfConfig.LogInterval;
     }
-    
+
     /// <summary>
     /// Starts execution.
     /// </summary>
@@ -26,7 +42,7 @@ public sealed class Engine
         {
             return;
         }
-        
+
         runner.Init(initRenderer);
         runner.Run();
         runner.Dispose();
