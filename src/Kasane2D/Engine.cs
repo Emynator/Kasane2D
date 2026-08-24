@@ -10,6 +10,9 @@ public sealed class Engine
 {
     private static readonly PerformanceMonitor monitor = new();
 
+    /// <summary>
+    /// A performance monitor to log performance metrics across the engine.
+    /// </summary>
     public static IPerformanceMonitor Monitor => monitor;
 
     private readonly IEngineRunner runner;
@@ -27,7 +30,7 @@ public sealed class Engine
         }
         
         monitor.IsActive = true;
-        monitor.CycleLength = perfConfig.ShortTermCycleLength;
+        monitor.CycleLength = perfConfig.MediumTermCycleLength;
         monitor.CycleCount = perfConfig.MediumTermCycles;
         monitor.CliLogging = perfConfig.CliLogging;
         monitor.LogInterval = perfConfig.LogInterval;

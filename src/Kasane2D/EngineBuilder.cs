@@ -71,6 +71,12 @@ public static class EngineBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Optional: Configures the performance monitoring system.
+    /// </summary>
+    /// <param name="builder">The engine builder.</param>
+    /// <param name="config">Optional: The config. Default config is used when null.</param>
+    /// <returns>The engine builder.</returns>
     public static EngineBuilder ConfigurePerformanceMonitoring
         (
         this EngineBuilder builder,
