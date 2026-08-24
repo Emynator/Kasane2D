@@ -61,7 +61,7 @@ public class KasaneEq8 : IAudioEffect
             field = value;
             tlock.Release();
         }
-    }
+    } = false;
 
     /// <summary>
     /// Gets the parameter's filter type.

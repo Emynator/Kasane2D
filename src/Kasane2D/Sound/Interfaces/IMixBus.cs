@@ -11,10 +11,10 @@ public interface IMixBus
     string Name { get; }
     
     /// <summary>
-    /// Gain in db that will be applied to the mix bus.
+    /// Gain in db that will be applied to the mix bus. Ranges from -60dB to +20dB.
     /// </summary>
     /// <remarks><seealso href="https://en.wikipedia.org/wiki/Decibel#Acoustics"/></remarks>
-    public int Gain { get; set; }
+    public float Gain { get; set; }
     
     /// <summary>
     /// Current pan of the bus.

@@ -36,7 +36,7 @@ public static class AudioEffectFactories
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
     /// <param name="name">Optional: the eq's name. Default is a GUID.</param>
-    /// <returns>The created Eq8.</returns>
+    /// <returns>The created eq8.</returns>
     public static KasaneEq8 CreateEq8(this ISoundSystem soundSystem, string? name = null)
     {
         return new(soundSystem.SampleRate, name);
@@ -50,7 +50,7 @@ public static class AudioEffectFactories
     /// <param name="decayGain">The decay gain in dB.</param>
     /// <param name="feedback">The feedback amount in % from 0.0 to 1.0.</param>
     /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
-    /// <returns></returns>
+    /// <returns>The created delay.</returns>
     public static KasaneDelay CreateDelay
         (
         this ISoundSystem soundSystem,
@@ -61,5 +61,39 @@ public static class AudioEffectFactories
         )
     {
         return new(soundSystem, delay, decayGain, feedback, name);
+    }
+
+    /// <summary>
+    /// Creates a KasaneDelay.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="delay">The delay time in seconds.</param>
+    /// <param name="decayGain">The decay gain in dB.</param>
+    /// <param name="feedback">The feedback amount in % from 0.0 to 1.0.</param>
+    /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
+    /// <returns>The created delay.</returns>
+    public static KasanePingPongDelay CreatePingPongDelay
+        (
+        this ISoundSystem soundSystem,
+        float delay,
+        float decayGain,
+        float feedback,
+        string? name = null
+        )
+    {
+        return new(soundSystem, delay, decayGain, feedback, name);
+    }
+
+    /// <summary>
+    /// Create a KasaneUtility.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="gain">The gain in dB.</param>
+    /// <param name="pan">The pan from -100 to 100.</param>
+    /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
+    /// <returns>The created utility.</returns>
+    public static KasaneUtility CreateUtility(this ISoundSystem soundSystem, float gain, int pan, string? name = null)
+    {
+        return new(gain, pan, name);
     }
 }

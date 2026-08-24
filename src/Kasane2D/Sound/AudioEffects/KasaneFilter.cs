@@ -47,7 +47,7 @@ public class KasaneFilter : IAudioEffect
             field = value;
             tlock.Release();
         }
-    }
+    } = false;
 
     /// <summary>
     /// The type of the filter.

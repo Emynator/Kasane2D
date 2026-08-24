@@ -17,7 +17,7 @@ internal class MixBus : IMixBus
     private readonly float[] scratchBuffer3;
 
     private List<IAudioEffect> effects = [];
-    private float gain = 1.0f;
+    private float gain;
     private float leftGain = 1.0f;
     private float rightGain = 1.0f;
 
@@ -49,13 +49,14 @@ internal class MixBus : IMixBus
 
     public string Name { get; }
 
-    public int Gain
+    public float Gain
     {
-        get => (int)(20.0f * MathF.Log10(gain));
+        get => 20.0f * MathF.Log10(gain);
         set
         {
             tlock.Wait();
-            gain = MathF.Pow(10.0f, value / 20.0f);
+            var actual = MathF.Max(-60.0f, MathF.Min(20.0f, value));
+            gain = MathF.Pow(10.0f, actual / 20.0f);
             tlock.Release();
         }
     }
@@ -225,6 +226,11 @@ internal class MixBus : IMixBus
         var effectOutRight = right.Span;
         foreach (var effect in Effects)
         {
+            if (effect.Bypass)
+            {
+                continue;
+            }
+            
             effect.Apply(effectInLeft, effectInRight, effectOutLeft, effectOutRight);
 
             var t = effectInLeft;
