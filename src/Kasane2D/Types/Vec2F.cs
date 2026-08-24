@@ -244,42 +244,72 @@ public record struct Vec2F
         );
     }
 
+    /// <summary>
+    /// Performs a vector addition.
+    /// </summary>
+    /// <param name="rhs">Right hand side of the operator.</param>
     public void operator += (Vec2F rhs)
     {
         X += rhs.X;
         Y += rhs.Y;
     }
 
+    /// <summary>
+    /// Performs a scalar addition.
+    /// </summary>
+    /// <param name="rhs">Right hand side of the operator.</param>
     public void operator += (float rhs)
     {
         X += rhs;
         Y += rhs;
     }
 
+    /// <summary>
+    /// Performs a vector subtraction.
+    /// </summary>
+    /// <param name="rhs">Right hand side of the operator.</param>
     public void operator -= (Vec2F rhs)
     {
         X -= rhs.X;
         Y -= rhs.Y;
     }
 
+    /// <summary>
+    /// Performs a scalar subtraction.
+    /// </summary>
+    /// <param name="rhs">Right hand side of the operator.</param>
     public void operator -= (float rhs)
     {
         X -= rhs;
         Y -= rhs;
     }
 
+    /// <summary>
+    /// Performs a scalar multiplication.
+    /// </summary>
+    /// <param name="rhs">Right hand side of the operator.</param>
     public void operator *= (float rhs)
     {
         X *= rhs;
         Y *= rhs;
     }
     
+    /// <summary>
+    /// Performs a scalar division.
+    /// </summary>
+    /// <param name="rhs">Right hand side of the operator.</param>
     public void operator /= (float rhs)
     {
         X /= rhs;
         Y /= rhs;
     }
 
+    /// <summary>
+    /// Performs a vector addition.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static Vec2F operator +(Vec2F lhs, Vec2F rhs)
     {
         var result = lhs.Copy();
@@ -288,6 +318,12 @@ public record struct Vec2F
         return result;
     }
 
+    /// <summary>
+    /// Performs a scalar addition.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static Vec2F operator +(Vec2F lhs, float rhs)
     {
         var result = lhs.Copy();
@@ -296,6 +332,12 @@ public record struct Vec2F
         return result;
     }
     
+    /// <summary>
+    /// Performs a vector subtraction.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static Vec2F operator -(Vec2F lhs, Vec2F rhs)
     {
         var result = lhs.Copy();
@@ -304,6 +346,12 @@ public record struct Vec2F
         return result;
     }
     
+    /// <summary>
+    /// Performs a scalar subtraction.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static Vec2F operator -(Vec2F lhs, float rhs)
     {
         var result = lhs.Copy();
@@ -312,6 +360,12 @@ public record struct Vec2F
         return result;
     }
     
+    /// <summary>
+    /// Performs a scalar multiplication.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static Vec2F operator *(Vec2F lhs, float rhs)
     {
         var result = lhs.Copy();
@@ -320,6 +374,12 @@ public record struct Vec2F
         return result;
     }
     
+    /// <summary>
+    /// Performs a scalar division.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static Vec2F operator /(Vec2F lhs, float rhs)
     {
         var result = lhs.Copy();
@@ -328,21 +388,45 @@ public record struct Vec2F
         return result;
     }
 
+    /// <summary>
+    /// Performs a component wise less-than comparison.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static bool operator <(Vec2F lhs, Vec2F rhs)
     {
         return lhs.X < rhs.X && lhs.Y < rhs.Y;
     }
 
+    /// <summary>
+    /// Performs a component wise more-than comparison.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static bool operator >(Vec2F lhs, Vec2F rhs)
     {
         return lhs.X > rhs.X && lhs.Y > rhs.Y;
     }
     
+    /// <summary>
+    /// Performs a component wise less-or-equal-than comparison.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static bool operator <= (Vec2F lhs, Vec2F rhs)
     {
         return lhs.X <= rhs.X && lhs.Y <= rhs.Y;
     }
 
+    /// <summary>
+    /// Performs a component wise more-or-equal-than comparison.
+    /// </summary>
+    /// <param name="lhs">Left hand side of the operator.</param>
+    /// <param name="rhs">Right hand side of the operator.</param>
+    /// <returns>The result.</returns>
     public static bool operator >=(Vec2F lhs, Vec2F rhs)
     {
         return lhs.X >= rhs.X && lhs.Y >= rhs.Y;
