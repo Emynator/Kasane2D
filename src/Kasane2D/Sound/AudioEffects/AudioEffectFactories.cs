@@ -64,7 +64,7 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
-    /// Creates a KasaneDelay.
+    /// Creates a KasanePingPongDelay.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
     /// <param name="delay">The delay time in seconds.</param>
@@ -85,7 +85,7 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
-    /// Create a KasaneUtility.
+    /// Creates a KasaneUtility.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
     /// <param name="gain">The gain in dB.</param>
@@ -95,5 +95,57 @@ public static class AudioEffectFactories
     public static KasaneUtility CreateUtility(this ISoundSystem soundSystem, float gain, int pan, string? name = null)
     {
         return new(gain, pan, name);
+    }
+
+    /// <summary>
+    /// Creates a KasaneCompressor.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="drive">The drive in dB.</param>
+    /// <param name="attack">The attack time in seconds.</param>
+    /// <param name="release">The release time in seconds.</param>
+    /// <param name="threshold">The threshold in dBFS.</param>
+    /// <param name="ratio">The compression ratio.</param>
+    /// <param name="makeupGain">The makeup gain in dB.</param>
+    /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
+    /// <returns>The created compressor.</returns>
+    public static KasaneCompressor CreateCompressor
+        (
+        this ISoundSystem soundSystem,
+        float drive,
+        float attack,
+        float release,
+        float threshold,
+        int ratio,
+        float makeupGain,
+        string? name = null
+        )
+    {
+        return new(soundSystem.SampleRate, drive, attack, release, threshold, ratio, makeupGain, name);
+    }
+    
+    /// <summary>
+    /// Creates a KasaneCompressor.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="drive">The drive in dB.</param>
+    /// <param name="attack">The attack time in seconds.</param>
+    /// <param name="release">The release time in seconds.</param>
+    /// <param name="ceiling">The ceiling in dBFS.</param>
+    /// <param name="gain">The gain in dB.</param>
+    /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
+    /// <returns>The created compressor.</returns>
+    public static KasaneLimiter CreateLimiter
+        (
+        this ISoundSystem soundSystem,
+        float drive,
+        float attack,
+        float release,
+        float ceiling,
+        float gain,
+        string? name = null
+        )
+    {
+        return new(soundSystem.SampleRate, drive, attack, release, ceiling, gain, name);
     }
 }
