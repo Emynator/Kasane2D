@@ -35,10 +35,31 @@ public static class AudioEffectFactories
     /// Creates a KasaneEq8.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
-    /// <param name="name">Optional: the filter's name. Default is a GUID.</param>
+    /// <param name="name">Optional: the eq's name. Default is a GUID.</param>
     /// <returns>The created Eq8.</returns>
     public static KasaneEq8 CreateEq8(this ISoundSystem soundSystem, string? name = null)
     {
         return new(soundSystem.SampleRate, name);
+    }
+
+    /// <summary>
+    /// Creates a KasaneDelay.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="delay">The delay time in seconds.</param>
+    /// <param name="decayGain">The decay gain in dB.</param>
+    /// <param name="feedback">The feedback amount in % from 0.0 to 1.0.</param>
+    /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
+    /// <returns></returns>
+    public static KasaneDelay CreateDelay
+        (
+        this ISoundSystem soundSystem,
+        float delay,
+        float decayGain,
+        float feedback,
+        string? name = null
+        )
+    {
+        return new(soundSystem, delay, decayGain, feedback, name);
     }
 }
