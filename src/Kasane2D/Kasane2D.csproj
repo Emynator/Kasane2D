@@ -32,7 +32,6 @@
 
     <ItemGroup>
       <None Include="Readme.md" Pack="true" PackagePath="\" />
-      <Folder Include="Sound\AudioEffects\" />
     </ItemGroup>
 
 </Project>

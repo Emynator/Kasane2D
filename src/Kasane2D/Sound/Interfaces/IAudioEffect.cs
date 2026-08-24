@@ -9,6 +9,11 @@ public interface IAudioEffect
     /// Name of the audio effect.
     /// </summary>
     public string Name { get; }
+    
+    /// <summary>
+    /// Toggles if the audio effect should be applied or bypassed.
+    /// </summary>
+    public bool Bypass { get; set; }
 
     /// <summary>
     /// Called to apply the audio effect.
