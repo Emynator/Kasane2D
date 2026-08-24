@@ -7,6 +7,8 @@ namespace Kasane2D.Sound.MusicPlayback;
 
 internal class MusicPlayer : IMusicPlayer
 {
+    private const string systemKey = "Engine::SoundSystem::MusicPlayer::Update";
+    
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly int bufferSize;
     private readonly IMixBus bus;
@@ -86,6 +88,7 @@ internal class MusicPlayer : IMusicPlayer
     public void Update()
     {
         tlock.Wait();
+        Engine.Monitor.StartMeasurement(systemKey);
 
         var zeroBuffer = scratchBuffer.AsSpan();
         zeroBuffer.Clear();
@@ -153,6 +156,7 @@ internal class MusicPlayer : IMusicPlayer
         bus.WriteRight(stream.GetRight());
         currentPosition += count;
 
+        Engine.Monitor.FinishMeasurement(systemKey);
         tlock.Release();
     }
 }

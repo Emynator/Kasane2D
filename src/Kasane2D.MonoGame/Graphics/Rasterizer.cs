@@ -14,6 +14,8 @@ namespace Kasane2D.MonoGame.Graphics;
 
 internal class Rasterizer : IRasterizer, IDisposable
 {
+    private const string systemKey = "Backend::GraphicsSystem::Rasterizer::Rasterize";
+    
     private readonly GraphicsConfiguration config;
     private readonly GraphicsDevice device;
     private readonly SpriteBatch spriteBatch;
@@ -60,10 +62,11 @@ internal class Rasterizer : IRasterizer, IDisposable
     {
     }
 
-    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize, Vec2I dimensions)
+    public ITilemapSurface CreateTilemapSurface(string name, Vec2I tileSize, Vec2I dimensions)
     {
         var result = new TilemapSurface
         (
+            name,
             device,
             spriteBatch,
             dimensions,
@@ -76,18 +79,19 @@ internal class Rasterizer : IRasterizer, IDisposable
         return result;
     }
 
-    public ITextureSurface CreateTextureSurface(Vec2I dimensions)
+    public ITextureSurface CreateTextureSurface(string name, Vec2I dimensions)
     {
-        var result = new TextureSurface(device, spriteBatch, dimensions, config.ViewportSize);
+        var result = new TextureSurface(name, device, spriteBatch, dimensions, config.ViewportSize);
         surfaces.Add(result);
         
         return result;
     }
 
-    public ISpriteLayer CreateSpriteLayer(Vec2I spriteSize, int spriteCount)
+    public ISpriteLayer CreateSpriteLayer(string name, Vec2I spriteSize, int spriteCount)
     {
         var result = new SpriteSurface
         (
+            name,
             device,
             spriteBatch,
             config.ViewportSize + spriteSize * 2,
@@ -107,6 +111,8 @@ internal class Rasterizer : IRasterizer, IDisposable
         {
             throw new DrawStillInProgressException();
         }
+        
+        Engine.Monitor.StartMeasurement(systemKey);
         
         foreach (var surface in surfaces)
         {
@@ -137,6 +143,8 @@ internal class Rasterizer : IRasterizer, IDisposable
         spriteBatch.Begin(samplerState: SamplerState.LinearClamp);
         spriteBatch.Draw(upscaleBuffer, deviceRect, upscaleRect, MgColor.White);
         spriteBatch.End();
+        
+        Engine.Monitor.FinishMeasurement(systemKey);
     }
 
     public void BeginDraw(ITextureSurface target)

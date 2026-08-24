@@ -9,4 +9,6 @@ public interface IPerformanceMonitor
     public void FinishMeasurement(string systemKey);
 
     public void Tick(float dt);
+
+    public void FinalPrint();
 }

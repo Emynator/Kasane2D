@@ -4,6 +4,7 @@ namespace Kasane2D.Sound.Mixer;
 
 internal class MixBus : IMixBus
 {
+    private readonly string systemKey;
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly int bufferSize;
     private readonly AudioBuffer outLeft;
@@ -31,6 +32,7 @@ internal class MixBus : IMixBus
         MixBus? parent
         )
     {
+        systemKey = $"Engine::SoundSystem::MixBus::{name}::Mix";
         Name = name;
         this.bufferSize = bufferSize;
         this.outLeft = outLeft;
@@ -163,6 +165,7 @@ internal class MixBus : IMixBus
     public void Mix()
     {
         tlock.Wait();
+        Engine.Monitor.StartMeasurement(systemKey);
 
         if (InternalChildren.Count >= 5)
         {
@@ -242,6 +245,7 @@ internal class MixBus : IMixBus
         outLeft.Write(effectInLeft);
         outRight.Write(effectInRight);
 
+        Engine.Monitor.FinishMeasurement(systemKey);
         tlock.Release();
     }
 }

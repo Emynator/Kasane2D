@@ -11,6 +11,7 @@ namespace Kasane2D.Music.Synthesis;
 internal class SynthEngine : ISynthEngine
 {
     private readonly SemaphoreSlim tlock = new(1, 1);
+    private readonly string systemKey;
     private readonly int samplerate;
     private readonly int bufferSize;
     private readonly Dictionary<string, Sequencer> tracks;
@@ -20,15 +21,16 @@ internal class SynthEngine : ISynthEngine
     private ProcessedPattern? currentPattern = null;
     private ProcessedPattern? nextPattern = null;
 
-    public SynthEngine(int samplerate, int bufferSize, Dictionary<string, Sequencer> tracks)
+    public SynthEngine(string name, int samplerate, int bufferSize, Dictionary<string, Sequencer> tracks)
     {
+        systemKey = $"MusicSystem::SynthEngine::{name}::Process";
         this.samplerate = samplerate;
         this.bufferSize = bufferSize;
         this.tracks = tracks;
     }
 
     public Guid Id { get; } = Guid.NewGuid();
-    
+
     public Conductor? InternalConductor { get; set; }
 
     public IConductor? Conductor => InternalConductor;
@@ -36,10 +38,13 @@ internal class SynthEngine : ISynthEngine
     public void Process()
     {
         tlock.Wait();
+        Engine.Monitor.StartMeasurement(systemKey);
 
         if (currentPattern is null || !isPlaying)
         {
             ProcessTracks(bufferSize);
+            
+            Engine.Monitor.FinishMeasurement(systemKey);
             tlock.Release();
 
             return;
@@ -52,6 +57,8 @@ internal class SynthEngine : ISynthEngine
             {
                 ProcessTracks(bufferSize);
                 carryOverSamples -= bufferSize;
+                
+                Engine.Monitor.FinishMeasurement(systemKey);
                 tlock.Release();
 
                 return;
@@ -73,6 +80,7 @@ internal class SynthEngine : ISynthEngine
 
         if (remainingSamples == 0)
         {
+            Engine.Monitor.FinishMeasurement(systemKey);
             tlock.Release();
 
             return;
@@ -82,6 +90,7 @@ internal class SynthEngine : ISynthEngine
         ProcessTracks(remainingSamples);
         carryOverSamples = samplesPerStep - remainingSamples;
 
+        Engine.Monitor.FinishMeasurement(systemKey);
         tlock.Release();
     }
 
@@ -197,7 +206,7 @@ internal class SynthEngine : ISynthEngine
             throw new DataConsistencyException
                 ($"Length of {nameof(pattern.ControlEvents)} must match the sequence length.");
         }
-        
+
         var sequenceNoteEvents = new SequenceNoteEvent[sequenceLength];
         for (var i = 0; i < length; i++)
         {
@@ -303,7 +312,7 @@ internal class SynthEngine : ISynthEngine
         Parallel.ForEach(tracks.Values, track => track.Next());
         currentPattern = nextPattern;
         nextPattern = null;
-        
+
         if (InternalConductor is not null)
         {
             Task.Run(() => InternalConductor.UpdateSynthEngine());

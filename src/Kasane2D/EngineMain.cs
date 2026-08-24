@@ -12,6 +12,8 @@ namespace Kasane2D;
 /// </summary>
 public abstract class EngineMain
 {
+    private const string systemKey = "UserCode::EngineMain::";
+    
     /// <summary>
     /// Gets the engine's sound system if it is initialized.
     /// </summary>
@@ -61,7 +63,10 @@ public abstract class EngineMain
     /// <remarks>To be called by the backend's engine runner. User code should not override this function.</remarks>
     public void MainTick(float dt)
     {
+        Engine.Monitor.StartMeasurement($"{systemKey}Tick");
         Tick(dt);
+        Engine.Monitor.FinishMeasurement($"{systemKey}Tick");
+        Engine.Monitor.Tick(dt);
     }
 
     /// <summary>
@@ -70,7 +75,9 @@ public abstract class EngineMain
     /// <remarks>To be called by the backend's engine runner. User code should not override this function.</remarks>
     public void MainDraw()
     {
+        Engine.Monitor.StartMeasurement($"{systemKey}Draw");
         Draw();
+        Engine.Monitor.FinishMeasurement($"{systemKey}Draw");
         Rasterizer?.Rasterize();
     }
 
@@ -94,6 +101,7 @@ public abstract class EngineMain
     /// </summary>
     protected void Quit()
     {
+        Engine.Monitor.FinalPrint();
         EngineRunner?.Stop();
     }
 }

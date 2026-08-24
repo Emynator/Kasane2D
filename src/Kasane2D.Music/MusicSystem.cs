@@ -38,12 +38,12 @@ public static class MusicSystem
             };
 
             var voiceBus = soundSystem.AudioMixer.CreateMixBus(trackConfig.Name, mainBus);
-            var voice = new SynthVoice(soundSystem.SampleRate, voiceBus, generator);
+            var voice = new SynthVoice(config.Name, trackConfig.Name, soundSystem.SampleRate, voiceBus, generator);
 
             tracks.Add(trackConfig.Name, new Sequencer(voice));
         }
 
-        var result = new SynthEngine(soundSystem.SampleRate, soundSystem.BufferSize, tracks);
+        var result = new SynthEngine(config.Name, soundSystem.SampleRate, soundSystem.BufferSize, tracks);
         soundSystem.AddSubSystem(result);
 
         return result;

@@ -8,6 +8,8 @@ namespace Kasane2D.Sound;
 
 internal class SoundSystem : ISoundSystem
 {
+    private const string systemKey = "Engine::SoundSystem::Process";
+    
     private readonly AudioMixer mixer;
     private readonly SfxManager sfxManager;
     private readonly MusicPlayer musicPlayer;
@@ -34,12 +36,16 @@ internal class SoundSystem : ISoundSystem
 
     public void Process()
     {
+        Engine.Monitor.StartMeasurement(systemKey);
+        
         var tasks = subSystems.Select(system => Task.Run(system.Process)).ToList();
         tasks.Add(Task.Run(() => sfxManager.Update()));
         tasks.Add(Task.Run(() => musicPlayer.Update()));
         Task.WaitAll(tasks);
         
         mixer.InternalMaster.Mix();
+        
+        Engine.Monitor.FinishMeasurement(systemKey);
     }
 
     public void AddSubSystem(ISoundSubSystem system)

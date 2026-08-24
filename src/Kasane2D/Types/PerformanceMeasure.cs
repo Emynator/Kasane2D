@@ -5,25 +5,29 @@ internal class PerformanceMeasure
     public List<double> Measurements { get; set; } = [];
 
     public List<double> MediumTermAverages { get; set; } = [];
+    
+    public List<double> LongTermAverages { get; set; } = [];
 
-    public double Best { get; set; } = -1.0f;
+    public double Best { get; set; } = float.NaN;
 
-    public double Worst { get; set; } = -1.0f;
-
-    public double LongTermAverage { get; set; } = -1.0f;
+    public double Worst { get; set; } = float.NaN;
 
     public override string ToString()
     {
+        var currentAverage = Measurements.Count > 0 ? Measurements.Average() : float.NaN;
+        var mediumTermAverage = MediumTermAverages.Count > 0 ? MediumTermAverages.Average() : float.NaN;
+        var longTermAverage = LongTermAverages.Count > 0 ? LongTermAverages.Average() : float.NaN;
+        
         return $"BEST: {
             Best
             :N2} - WORST: {
             Worst
             :N2} - CURRENT AVERAGE: {
-            Measurements.Average()
+            currentAverage
             :N2} - MEDIUM TERM AVERAGE: {
-            MediumTermAverages.Average()
+            mediumTermAverage
             :N2} - LongTermAverage: {
-            LongTermAverage
+            longTermAverage
             :N2}";
     }
 }

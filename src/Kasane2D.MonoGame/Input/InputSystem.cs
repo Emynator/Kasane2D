@@ -12,6 +12,7 @@ namespace Kasane2D.MonoGame.Input;
 
 internal class InputSystem : IInputSystem
 {
+    private const string systemKey = "Engine::InputSystem::Update";
     private static readonly KeyKind[] keyKinds =
     [
         KeyKind.A,
@@ -180,6 +181,8 @@ internal class InputSystem : IInputSystem
 
     public void Update()
     {
+        Engine.Monitor.StartMeasurement(systemKey);
+        
         var newKbState = Keyboard.GetState();
         foreach (var key in keyKinds)
         {
@@ -463,5 +466,7 @@ internal class InputSystem : IInputSystem
                     : InputButtonState.Released;
             }
         }
+        
+        Engine.Monitor.FinishMeasurement(systemKey);
     }
 }

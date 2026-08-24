@@ -11,6 +11,7 @@ namespace Kasane2D.MonoGame.Graphics.RenderObjects;
 
 internal class TilemapSurface : MonoGameSurface, ITilemapSurface
 {
+    private readonly string systemKey;
     private readonly GraphicsDevice device;
     private readonly SpriteBatch spriteBatch;
     private readonly RenderTarget2D viewportSurface;
@@ -21,6 +22,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
 
     public TilemapSurface
         (
+        string name,
         GraphicsDevice device,
         SpriteBatch spriteBatch,
         Vec2I dimensions,
@@ -28,6 +30,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         Vec2I viewportSize
         ) : base(new(dimensions.X * tileSize.X, dimensions.Y * tileSize.Y), viewportSize)
     {
+        systemKey = $"Backend::GraphicsSystem::Surface::{name}::";
         this.device = device;
         this.spriteBatch = spriteBatch;
         Dimensions = dimensions;
@@ -182,6 +185,8 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
     {
         UpdateSurface();
 
+        Engine.Monitor.StartMeasurement($"{systemKey}Rasterize");
+        
         device.SetRenderTarget(viewportSurface);
         device.Clear(Color.Transparent);
 
@@ -194,6 +199,8 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
             Color.White
         );
         spriteBatch.End();
+        
+        Engine.Monitor.FinishMeasurement($"{systemKey}Rasterize");
     }
 
     private void UpdateSurface()
@@ -215,6 +222,8 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         {
             return;
         }
+        
+        Engine.Monitor.StartMeasurement($"{systemKey}UpdateSurface");
 
         var updates = tilesToUpdate.Distinct().ToList();
 
@@ -250,10 +259,14 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
 
         spriteBatch.End();
         tilesToUpdate = [];
+        
+        Engine.Monitor.FinishMeasurement($"{systemKey}UpdateSurface");
     }
 
     private void RenderSurface()
     {
+        Engine.Monitor.StartMeasurement($"{systemKey}RenderSurface");
+        
         device.SetRenderTarget(surface);
         device.Clear(Color.Transparent);
 
@@ -296,5 +309,7 @@ internal class TilemapSurface : MonoGameSurface, ITilemapSurface
         }
 
         spriteBatch.End();
+        
+        Engine.Monitor.FinishMeasurement($"{systemKey}RenderSurface");
     }
 }

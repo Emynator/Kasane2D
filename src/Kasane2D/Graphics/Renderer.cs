@@ -168,20 +168,20 @@ internal class Renderer : IRenderer
             case LayerType.Tilemap:
                 var tileSize = config.TileSize ?? defaultTileSize;
                 var dimensions = config.Dimensions ?? defaultTilemapDimensions;
-                surfaces.Add(config.Name, rasterizer.CreateTilemapSurface(tileSize, dimensions));
+                surfaces.Add(config.Name, rasterizer.CreateTilemapSurface(config.Name, tileSize, dimensions));
 
                 break;
 
             case LayerType.Sprite:
                 var spriteSize = config.SpriteSize ?? defaultSpriteSize;
                 var spriteCount = config.SpriteCount ?? defaultSpriteCount;
-                spriteLayers.Add(config.Name, rasterizer.CreateSpriteLayer(spriteSize, spriteCount));
+                spriteLayers.Add(config.Name, rasterizer.CreateSpriteLayer(config.Name, spriteSize, spriteCount));
 
                 break;
 
             case LayerType.Texture:
                 var size = config.Dimensions ?? defaultSurfaceSize;
-                surfaces.Add(config.Name, rasterizer.CreateTextureSurface(size));
+                surfaces.Add(config.Name, rasterizer.CreateTextureSurface(config.Name, size));
 
                 break;
         }

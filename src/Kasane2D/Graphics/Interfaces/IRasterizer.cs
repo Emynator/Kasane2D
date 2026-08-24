@@ -27,7 +27,7 @@ public interface IRasterizer
     /// <param name="tileSize">With and height of a single tile in pixels.</param>
     /// <param name="dimensions">Number of tile rows and columns the surface should contain.</param>
     /// <returns>The created tilemap surface.</returns>
-    public ITilemapSurface CreateTilemapSurface(Vec2I tileSize, Vec2I dimensions);
+    public ITilemapSurface CreateTilemapSurface(string name, Vec2I tileSize, Vec2I dimensions);
     
     /// <summary>
     /// Create a new texture surface with the provided size.
@@ -36,7 +36,7 @@ public interface IRasterizer
     /// <returns>The created texture surface.</returns>
     /// <remarks>The engine's renderer calls the layer creation functions in order of lowest to highest layer. Higher
     /// surfaces are assumed to be drawn on top of lower surfaces.</remarks>
-    public ITextureSurface CreateTextureSurface(Vec2I dimensions);
+    public ITextureSurface CreateTextureSurface(string name, Vec2I dimensions);
 
     /// <summary>
     /// Create a new sprite layer with the provided spriteSize and sprite count.
@@ -46,7 +46,7 @@ public interface IRasterizer
     /// <returns>The created sprite layer.</returns>
     /// <remarks>The engine's renderer calls the layer creation functions in order of lowest to highest layer. Higher
     /// surfaces are assumed to be drawn on top of lower surfaces.</remarks>
-    public ISpriteLayer CreateSpriteLayer(Vec2I spriteSize, int spriteCount);
+    public ISpriteLayer CreateSpriteLayer(string name, Vec2I spriteSize, int spriteCount);
 
     /// <summary>
     /// Rasterize all surfaces to their viewports and draw them bottom to top to the final screen buffer.

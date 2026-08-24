@@ -7,6 +7,8 @@ namespace Kasane2D.Sound.Sfx;
 
 internal class SfxManager : ISfxManager
 {
+    private const string systemKey = "Engine::SoundSystem::SfxManager::Update";
+    
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly int bufferSize;
     private readonly List<SfxChannel> channels = [];
@@ -73,6 +75,7 @@ internal class SfxManager : ISfxManager
     public void Update()
     {
         tlock.Wait();
+        Engine.Monitor.StartMeasurement(systemKey);
 
         Parallel.ForEach(channels, c => c.Update());
         while (soundQueue.Count > 0)
@@ -86,6 +89,7 @@ internal class SfxManager : ISfxManager
             availableChannel.CurrentFile = soundQueue.Dequeue();
         }
         
+        Engine.Monitor.FinishMeasurement(systemKey);
         tlock.Release();
     }
 }

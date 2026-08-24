@@ -31,6 +31,7 @@ public sealed class Engine
         monitor.CycleCount = perfConfig.MediumTermCycles;
         monitor.CliLogging = perfConfig.CliLogging;
         monitor.LogInterval = perfConfig.LogInterval;
+        monitor.FileLogging = perfConfig.FileLogging;
     }
 
     /// <summary>

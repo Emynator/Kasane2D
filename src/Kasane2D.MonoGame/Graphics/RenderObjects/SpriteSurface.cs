@@ -11,6 +11,7 @@ namespace Kasane2D.MonoGame.Graphics.RenderObjects;
 
 internal class SpriteSurface : MonoGameSurface, ISpriteLayer
 {
+    private readonly string systemKey;
     private readonly GraphicsDevice device;
     private readonly SpriteBatch spriteBatch;
     private readonly RenderTarget2D surface;
@@ -19,6 +20,7 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
 
     public SpriteSurface
         (
+        string name,
         GraphicsDevice device,
         SpriteBatch spriteBatch,
         Vec2I surfaceSize,
@@ -27,6 +29,7 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
         int count
         ) : base(surfaceSize, viewportSize)
     {
+        systemKey = $"Backend::GraphicsSystem::SpriteLayer::{name}::Rasterize";
         this.device = device;
         this.spriteBatch = spriteBatch;
         SpriteSize = spriteSize;
@@ -60,6 +63,8 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
 
     public override void Rasterize()
     {
+        Engine.Monitor.StartMeasurement(systemKey);
+        
         device.SetRenderTarget(surface);
         device.Clear(Color.Transparent);
 
@@ -120,5 +125,7 @@ internal class SpriteSurface : MonoGameSurface, ISpriteLayer
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         spriteBatch.Draw(surface, Viewport.ViewRect.ToRectangle(), clipRect, Color.White);
         spriteBatch.End();
+        
+        Engine.Monitor.FinishMeasurement(systemKey);
     }
 }
