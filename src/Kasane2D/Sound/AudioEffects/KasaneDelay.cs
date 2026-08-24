@@ -127,6 +127,15 @@ public class KasaneDelay : IAudioEffect
     {
         tlock.Wait();
         
+        if (Bypass)
+        {
+            inLeft.CopyTo(outLeft);
+            inRight.CopyTo(outRight);
+            tlock.Release();
+            
+            return;
+        }
+        
         for (var i = 0; i < inLeft.Length; i++)
         {
             var left = delayBufferL.Read();

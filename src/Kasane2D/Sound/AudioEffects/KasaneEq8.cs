@@ -9,6 +9,7 @@ namespace Kasane2D.Sound.AudioEffects;
 /// </summary>
 public class KasaneEq8 : IAudioEffect
 {
+    private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly DspFilter[] filtersL = new DspFilter[8];
     private readonly DspFilter[] filtersR = new DspFilter[8];
 
@@ -23,16 +24,16 @@ public class KasaneEq8 : IAudioEffect
         EqFilterType.Peak,
         EqFilterType.HighShelf,
     ];
-    
+
     internal KasaneEq8(int sampleRate, string? name)
     {
         var actual = name ?? Guid.NewGuid().ToString();
         Name = $"KasaneEq8_{actual}";
-        
+
         for (var i = 0; i < filtersL.Length; i++)
         {
             var frequency = 50.0f * MathF.Pow(2.0f, i);
-            
+
             filtersL[i].Frequency = frequency;
             filtersL[i] = new(sampleRate)
             {
@@ -46,12 +47,21 @@ public class KasaneEq8 : IAudioEffect
             };
         }
     }
-    
+
     /// <inheritdoc/>
     public string Name { get; }
 
     /// <inheritdoc/>
-    public bool Bypass { get; set; }
+    public bool Bypass
+    {
+        get;
+        set
+        {
+            tlock.Wait();
+            field = value;
+            tlock.Release();
+        }
+    }
 
     /// <summary>
     /// Gets the parameter's filter type.
@@ -70,8 +80,10 @@ public class KasaneEq8 : IAudioEffect
     /// <param name="type">The value to set.</param>
     public void SetType(int index, EqFilterType type)
     {
+        tlock.Wait();
         types[index] = type;
         SetType(index);
+        tlock.Release();
     }
 
     /// <summary>
@@ -91,14 +103,20 @@ public class KasaneEq8 : IAudioEffect
     /// <param name="isActive">The value to set.</param>
     public void SetIsActive(int index, bool isActive)
     {
+        tlock.Wait();
+
         if (isActive)
         {
             SetType(index, true);
+            tlock.Release();
+
             return;
         }
-        
+
         filtersL[index].Type = DspFilterType.None;
         filtersR[index].Type = DspFilterType.None;
+
+        tlock.Release();
     }
 
     /// <summary>
@@ -118,8 +136,10 @@ public class KasaneEq8 : IAudioEffect
     /// <param name="frequency">The value to set.</param>
     public void SetFrequency(int index, float frequency)
     {
+        tlock.Wait();
         filtersL[index].Frequency = frequency;
         filtersR[index].Frequency = frequency;
+        tlock.Release();
     }
 
     /// <summary>
@@ -139,8 +159,10 @@ public class KasaneEq8 : IAudioEffect
     /// <param name="q">The value to set.</param>
     public void SetQ(int index, float q)
     {
+        tlock.Wait();
         filtersL[index].Q = q;
         filtersR[index].Q = q;
+        tlock.Release();
     }
 
     /// <summary>
@@ -160,14 +182,33 @@ public class KasaneEq8 : IAudioEffect
     /// <param name="gain">The value to set.</param>
     public void SetGain(int index, float gain)
     {
+        tlock.Wait();
         var actualGain = MathF.Pow(10.0f, gain / 20.0f);
         filtersL[index].Gain = actualGain;
         filtersR[index].Gain = actualGain;
+        tlock.Release();
     }
-    
+
     /// <inheritdoc/>
-    public void Apply(ReadOnlySpan<float> inLeft, ReadOnlySpan<float> inRight, Span<float> outLeft, Span<float> outRight)
+    public void Apply
+        (
+        ReadOnlySpan<float> inLeft,
+        ReadOnlySpan<float> inRight,
+        Span<float> outLeft,
+        Span<float> outRight
+        )
     {
+        tlock.Wait();
+        
+        if (Bypass)
+        {
+            inLeft.CopyTo(outLeft);
+            inRight.CopyTo(outRight);
+            tlock.Release();
+            
+            return;
+        }
+
         for (var i = 0; i < filtersL.Length; i++)
         {
             var sampleL = inLeft[i];
@@ -177,64 +218,66 @@ public class KasaneEq8 : IAudioEffect
                 sampleL = filtersL[j].Apply(sampleL);
                 sampleR = filtersR[j].Apply(sampleR);
             }
-            
+
             outLeft[i] = sampleL;
             outRight[i] = sampleR;
         }
+
+        tlock.Release();
     }
-    
+
     private void SetType(int index, bool setActive = false)
     {
         if (!setActive && filtersL[index].Type == DspFilterType.None)
         {
             return;
         }
-        
+
         switch (types[index])
         {
             case EqFilterType.LowPass4X:
                 filtersL[index].Type = DspFilterType.LowPass;
                 filtersL[index].Slope = 4;
-                
+
                 filtersR[index].Type = DspFilterType.LowPass;
                 filtersR[index].Slope = 4;
                 return;
-            
+
             case EqFilterType.LowPass:
                 filtersL[index].Type = DspFilterType.LowPass;
                 filtersL[index].Slope = 2;
-                
+
                 filtersR[index].Type = DspFilterType.LowPass;
                 filtersR[index].Slope = 2;
                 return;
-            
+
             case EqFilterType.LowShelf:
                 filtersL[index].Type = DspFilterType.LowShelf;
                 filtersR[index].Type = DspFilterType.LowShelf;
                 return;
-            
+
             case EqFilterType.Peak:
                 filtersL[index].Type = DspFilterType.Peak;
                 filtersR[index].Type = DspFilterType.Peak;
                 return;
-            
+
             case EqFilterType.HighShelf:
                 filtersL[index].Type = DspFilterType.HighShelf;
                 filtersR[index].Type = DspFilterType.HighShelf;
                 return;
-            
+
             case EqFilterType.HighPass:
                 filtersL[index].Type = DspFilterType.HighPass;
                 filtersL[index].Slope = 2;
-                
+
                 filtersR[index].Type = DspFilterType.HighPass;
                 filtersR[index].Slope = 2;
                 return;
-            
+
             case EqFilterType.HighPass4X:
                 filtersL[index].Type = DspFilterType.HighPass;
                 filtersL[index].Slope = 4;
-                
+
                 filtersR[index].Type = DspFilterType.HighPass;
                 filtersR[index].Slope = 4;
                 return;

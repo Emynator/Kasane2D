@@ -9,6 +9,7 @@ namespace Kasane2D.Sound.AudioEffects;
 /// </summary>
 public class KasaneFilter : IAudioEffect
 {
+    private readonly SemaphoreSlim tlock = new(1, 1);
     private DspFilter dspFilterL;
     private DspFilter dspFilterR;
 
@@ -33,6 +34,21 @@ public class KasaneFilter : IAudioEffect
         Resonance = resonance;
     }
 
+    /// <inheritdoc/>
+    public string Name { get; }
+
+    /// <inheritdoc/>
+    public bool Bypass
+    {
+        get;
+        set
+        {
+            tlock.Wait();
+            field = value;
+            tlock.Release();
+        }
+    }
+
     /// <summary>
     /// The type of the filter.
     /// </summary>
@@ -41,6 +57,8 @@ public class KasaneFilter : IAudioEffect
         get;
         set
         {
+            tlock.Wait();
+
             field = value;
             var t = Type switch
             {
@@ -52,9 +70,11 @@ public class KasaneFilter : IAudioEffect
 
             dspFilterL.Type = t;
             dspFilterR.Type = t;
+
+            tlock.Release();
         }
     }
-    
+
     /// <summary>
     /// The slope of the filter from 1 to 4, representing a 6dB to 24dB per octave.
     /// </summary>
@@ -63,8 +83,12 @@ public class KasaneFilter : IAudioEffect
         get => dspFilterL.Slope;
         set
         {
+            tlock.Wait();
+
             dspFilterL.Slope = value;
             dspFilterR.Slope = value;
+
+            tlock.Release();
         }
     }
 
@@ -76,8 +100,12 @@ public class KasaneFilter : IAudioEffect
         get => dspFilterL.Frequency;
         set
         {
+            tlock.Wait();
+
             dspFilterL.Frequency = value;
             dspFilterR.Frequency = value;
+
+            tlock.Release();
         }
     }
 
@@ -89,25 +117,41 @@ public class KasaneFilter : IAudioEffect
         get => dspFilterL.Resonance;
         set
         {
+            tlock.Wait();
+
             dspFilterL.Resonance = value;
             dspFilterR.Resonance = value;
+
+            tlock.Release();
         }
     }
 
     /// <inheritdoc/>
-    public string Name { get; }
-
-    /// <inheritdoc/>
-    public bool Bypass { get; set; }
-
-    /// <inheritdoc/>
     public void Apply
-        (ReadOnlySpan<float> inLeft, ReadOnlySpan<float> inRight, Span<float> outLeft, Span<float> outRight)
+        (
+        ReadOnlySpan<float> inLeft,
+        ReadOnlySpan<float> inRight,
+        Span<float> outLeft,
+        Span<float> outRight
+        )
     {
+        tlock.Wait();
+        
+        if (Bypass)
+        {
+            inLeft.CopyTo(outLeft);
+            inRight.CopyTo(outRight);
+            tlock.Release();
+            
+            return;
+        }
+
         for (var i = 0; i < inLeft.Length; i++)
         {
             outLeft[i] = dspFilterL.Apply(inLeft[i]);
             outRight[i] = dspFilterR.Apply(inRight[i]);
         }
+
+        tlock.Release();
     }
 }
