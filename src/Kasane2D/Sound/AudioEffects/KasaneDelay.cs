@@ -16,15 +16,24 @@ public class KasaneDelay : IAudioEffect
     private int delaySamples = 0;
     private float decay;
 
-    internal KasaneDelay(ISoundSystem soundSystem, float delay, float decayGain, float feedback, string? name)
+    internal KasaneDelay
+        (
+        ISoundSystem soundSystem,
+        float delay,
+        float decayGain,
+        float feedback,
+        float wet,
+        string? name
+        )
     {
         this.soundSystem = soundSystem;
-        
+
         var actual = name ?? Guid.NewGuid().ToString();
         Name = $"KasaneDelay_{actual}";
         Delay = delay;
         DecayGain = decayGain;
         Feedback = feedback;
+        Wet = wet;
     }
 
     /// <inheritdoc/>
@@ -51,17 +60,17 @@ public class KasaneDelay : IAudioEffect
         set
         {
             tlock.Wait();
-            
+
             field = MathF.Max(0.0f, value);
             var newDelaySamples = (int)(field * soundSystem.SampleRate);
             if (newDelaySamples < 1)
             {
                 newDelaySamples = 1;
             }
-            
+
             var newBufferL = soundSystem.CreateBuffer(newDelaySamples);
             var newBufferR = soundSystem.CreateBuffer(newDelaySamples);
-            
+
             if (delaySamples == 1 || newDelaySamples == 1)
             {
                 delaySamples = newDelaySamples;
@@ -73,7 +82,7 @@ public class KasaneDelay : IAudioEffect
                 delayBufferR.Write(tmp);
 
                 tlock.Release();
-                
+
                 return;
             }
 
@@ -85,11 +94,11 @@ public class KasaneDelay : IAudioEffect
 
             newBufferL.Write(stream.GetLeft());
             newBufferR.Write(stream.GetRight());
-            
+
             delaySamples = newDelaySamples;
             delayBufferL = newBufferL;
             delayBufferR = newBufferR;
-            
+
             tlock.Release();
         }
     }
@@ -103,10 +112,10 @@ public class KasaneDelay : IAudioEffect
         set
         {
             tlock.Wait();
-            
+
             var actualValue = MathF.Max(-60.0f, MathF.Min(-1.0f, value));
             decay = MathF.Pow(10.0f, actualValue / 20.0f);
-            
+
             tlock.Release();
         }
     }
@@ -115,6 +124,20 @@ public class KasaneDelay : IAudioEffect
     /// Feedback amount from 0.0f to 1.0f.
     /// </summary>
     public float Feedback
+    {
+        get;
+        set
+        {
+            tlock.Wait();
+            field = MathF.Max(0.0f, MathF.Min(1.0f, value));
+            tlock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Dry/Wet from 0.0f for full dry to 1.0f for full wet.
+    /// </summary>
+    public float Wet
     {
         get;
         set
@@ -135,27 +158,28 @@ public class KasaneDelay : IAudioEffect
         )
     {
         tlock.Wait();
-        
+
         if (Bypass)
         {
             inLeft.CopyTo(outLeft);
             inRight.CopyTo(outRight);
             tlock.Release();
-            
+
             return;
         }
-        
+
+        var dry = 1.0f - Wet;
         for (var i = 0; i < inLeft.Length; i++)
         {
             var left = delayBufferL.Read();
-            outLeft[i] = inLeft[i] + left;
+            outLeft[i] = (inLeft[i] + left) * Wet + inLeft[i] * dry;
             delayBufferL.Write(inLeft[i] * decay + left * Feedback);
-            
+
             var right = delayBufferR.Read();
-            outRight[i] = inRight[i] + right;
+            outRight[i] = (inRight[i] + right) * Wet + inRight[i] * dry;
             delayBufferR.Write(inRight[i] * decay + right * Feedback);
         }
-        
+
         tlock.Release();
     }
 }

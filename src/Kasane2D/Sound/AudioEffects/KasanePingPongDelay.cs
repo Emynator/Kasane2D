@@ -16,7 +16,15 @@ public class KasanePingPongDelay : IAudioEffect
     private int delaySamples = 0;
     private float decay;
 
-    internal KasanePingPongDelay(ISoundSystem soundSystem, float delay, float decayGain, float feedback, string? name)
+    internal KasanePingPongDelay
+        (
+        ISoundSystem soundSystem,
+        float delay,
+        float decayGain,
+        float feedback,
+        float wet,
+        string? name
+        )
     {
         this.soundSystem = soundSystem;
 
@@ -25,6 +33,7 @@ public class KasanePingPongDelay : IAudioEffect
         Delay = delay;
         DecayGain = decayGain;
         Feedback = feedback;
+        Wet = wet;
     }
 
     /// <inheritdoc/>
@@ -125,6 +134,20 @@ public class KasanePingPongDelay : IAudioEffect
         }
     }
 
+    /// <summary>
+    /// Dry/Wet from 0.0f for full dry to 1.0f for full wet.
+    /// </summary>
+    public float Wet
+    {
+        get;
+        set
+        {
+            tlock.Wait();
+            field = MathF.Max(0.0f, MathF.Min(1.0f, value));
+            tlock.Release();
+        }
+    }
+
     /// <inheritdoc/>
     public void Apply
         (
@@ -145,12 +168,13 @@ public class KasanePingPongDelay : IAudioEffect
             return;
         }
 
+        var dry = 1.0f - Wet;
         for (var i = 0; i < inLeft.Length; i++)
         {
             var left = delayBufferL.Read();
             var right = delayBufferR.Read();
-            outLeft[i] = inLeft[i] + left;
-            outRight[i] = inRight[i] + right;
+            outLeft[i] = (inLeft[i] + left) * Wet + inLeft[i] * dry;
+            outRight[i] = (inRight[i] + right) * Wet + inRight[i] * dry;
 
             var delay = (inLeft[i] + inRight[i]) / 2.0f * decay + right * Feedback;
             delayBufferL.Write(delay);

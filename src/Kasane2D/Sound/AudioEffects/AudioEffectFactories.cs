@@ -49,6 +49,7 @@ public static class AudioEffectFactories
     /// <param name="delay">The delay time in seconds.</param>
     /// <param name="decayGain">The decay gain in dB.</param>
     /// <param name="feedback">The feedback amount in % from 0.0 to 1.0.</param>
+    /// <param name="wet">The wet percentage.</param>
     /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
     /// <returns>The created delay.</returns>
     public static KasaneDelay CreateDelay
@@ -57,10 +58,11 @@ public static class AudioEffectFactories
         float delay,
         float decayGain,
         float feedback,
+        float wet,
         string? name = null
         )
     {
-        return new(soundSystem, delay, decayGain, feedback, name);
+        return new(soundSystem, delay, decayGain, feedback, wet, name);
     }
 
     /// <summary>
@@ -70,6 +72,7 @@ public static class AudioEffectFactories
     /// <param name="delay">The delay time in seconds.</param>
     /// <param name="decayGain">The decay gain in dB.</param>
     /// <param name="feedback">The feedback amount in % from 0.0 to 1.0.</param>
+    /// <param name="wet">The wet percentage.</param>
     /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
     /// <returns>The created delay.</returns>
     public static KasanePingPongDelay CreatePingPongDelay
@@ -78,10 +81,11 @@ public static class AudioEffectFactories
         float delay,
         float decayGain,
         float feedback,
+        float wet,
         string? name = null
         )
     {
-        return new(soundSystem, delay, decayGain, feedback, name);
+        return new(soundSystem, delay, decayGain, feedback, wet, name);
     }
 
     /// <summary>
@@ -107,6 +111,7 @@ public static class AudioEffectFactories
     /// <param name="threshold">The threshold in dBFS.</param>
     /// <param name="ratio">The compression ratio.</param>
     /// <param name="makeupGain">The makeup gain in dB.</param>
+    /// <param name="wet">The wet percentage.</param>
     /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
     /// <returns>The created compressor.</returns>
     public static KasaneCompressor CreateCompressor
@@ -118,12 +123,13 @@ public static class AudioEffectFactories
         float threshold,
         int ratio,
         float makeupGain,
+        float wet,
         string? name = null
         )
     {
-        return new(soundSystem.SampleRate, drive, attack, release, threshold, ratio, makeupGain, name);
+        return new(soundSystem.SampleRate, drive, attack, release, threshold, ratio, makeupGain, wet, name);
     }
-    
+
     /// <summary>
     /// Creates a KasaneCompressor.
     /// </summary>
@@ -147,5 +153,26 @@ public static class AudioEffectFactories
         )
     {
         return new(soundSystem.SampleRate, drive, attack, release, ceiling, gain, name);
+    }
+
+    /// <summary>
+    /// Creates a KasaneOverdrive.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="drive">The drive in dB.</param>
+    /// <param name="type">The distortion type.</param>
+    /// <param name="wet">The wet percentage.</param>
+    /// <param name="name">Optional: the overdrive's name. Default is a GUID.</param>
+    /// <returns>The created overdrive.</returns>
+    public static KasaneOverdrive CreateOverdrive
+        (
+        this ISoundSystem soundSystem,
+        float drive,
+        DistortionType type,
+        float wet,
+        string? name = null
+        )
+    {
+        return new(drive, type, wet, name);
     }
 }

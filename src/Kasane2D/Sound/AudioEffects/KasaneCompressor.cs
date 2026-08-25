@@ -25,6 +25,7 @@ public class KasaneCompressor : IAudioEffect
         float threshold,
         int ratio,
         float makeupGain,
+        float wet,
         string? name
         )
     {
@@ -39,6 +40,7 @@ public class KasaneCompressor : IAudioEffect
         Threshold = threshold;
         Ratio = ratio;
         MakeupGain = makeupGain;
+        Wet = wet;
     }
 
     /// <inheritdoc/>
@@ -145,6 +147,20 @@ public class KasaneCompressor : IAudioEffect
             tlock.Release();
         }
     }
+    
+    /// <summary>
+    /// Dry/Wet from 0.0f for full dry to 1.0f for full wet.
+    /// </summary>
+    public float Wet
+    {
+        get;
+        set
+        {
+            tlock.Wait();
+            field = MathF.Max(0.0f, MathF.Min(1.0f, value));
+            tlock.Release();
+        }
+    }
 
     /// <inheritdoc/>
     public void Apply
@@ -166,28 +182,29 @@ public class KasaneCompressor : IAudioEffect
             return;
         }
 
+        var dry = 1.0f - Wet;
         for (var i = 0; i < inLeft.Length; i++)
         {
             var left = inLeft[i] * drive;
             var envelopeLeft = envelopeFollowerL.Next(left);
             if (envelopeLeft <= threshold)
             {
-                outLeft[i] = left * makeup;
+                outLeft[i] = left * makeup * Wet + inLeft[i] * dry;
             }
             else
             {
-                outLeft[i] = (threshold + (left - threshold) / ratio) * makeup;
+                outLeft[i] = (threshold + (left - threshold) / ratio) * makeup * Wet + inLeft[i] * dry;
             }
 
             var right = inRight[i] * drive;
             var envelopeRight = envelopeFollowerR.Next(right);
             if (envelopeRight <= threshold)
             {
-                outRight[i] = right * makeup;
+                outRight[i] = right * makeup * Wet + inRight[i] * dry;
             }
             else
             {
-                outRight[i] = (threshold + (right - threshold) / ratio) * makeup;
+                outRight[i] = (threshold + (right - threshold) / ratio) * makeup * Wet + inRight[i] * dry;
             }
         }
 
