@@ -1,23 +1,7 @@
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Synthesis.Generators;
 
-namespace Kasane2D.Music;
-
-/// <summary>
-/// Configuration of a synthesizer engine.
-/// </summary>
-public class SynthConfig
-{
-    /// <summary>
-    /// Name of the synthesizer engine.
-    /// </summary>
-    public required string Name { get; set; }
-    
-    /// <summary>
-    /// Configurations of all tracks in this synthesizer engine.
-    /// </summary>
-    public List<TrackConfig> TrackConfigs { get; set; } = [];
-}
+namespace Kasane2D.Music.Configs;
 
 /// <summary>
 /// Configuration of a single track of a synthesizer engine.
@@ -39,4 +23,9 @@ public class TrackConfig
     /// </summary>
     /// <remarks>This is only used in case Kind is <see cref="GeneratorKind.Custom"/>.</remarks>
     public Func<int, Generator>? CustomGeneratorFactory { get; set; }
+    
+    /// <summary>
+    /// Optional: List of effects available to this track for direct control from the sequencer.
+    /// </summary>
+    public List<EffectConfig> Effects { get; set; } = [];
 }

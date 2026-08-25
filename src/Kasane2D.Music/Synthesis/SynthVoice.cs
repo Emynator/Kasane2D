@@ -1,4 +1,5 @@
 using Kasane2D.Music.Enums;
+using Kasane2D.Music.Synthesis.Effects;
 using Kasane2D.Music.Synthesis.Generators;
 using Kasane2D.Music.Types.SequenceEvents.ControlEvents;
 using Kasane2D.Sound.Interfaces;
@@ -10,30 +11,75 @@ internal class SynthVoice
     private readonly string systemKey;
     private readonly IMixBus bus;
     private readonly Generator generator;
+    private readonly List<VoiceEffect> effects;
     private readonly Envelope envelope;
+    private readonly float[] scratchBuffer0;
+    private readonly float[] scratchBuffer1;
+    private readonly float[] scratchBuffer2;
+    private readonly float[] scratchBuffer3;
     private double frequency = 0.0d;
 
-    public SynthVoice(string engineName, string name, int sampleRate, IMixBus bus, Generator generator)
+    public SynthVoice
+        (
+        string engineName,
+        string name,
+        int sampleRate,
+        int bufferSize,
+        IMixBus bus,
+        Generator generator,
+        List<VoiceEffect> effects
+        )
     {
-        systemKey = $"MusicSystem::{engineName}::Track::{name}::Process";
+        systemKey = $"MusicSystem::SynthEngine::{engineName}::Track::{name}::Process";
         this.bus = bus;
         this.generator = generator;
+        this.effects = effects;
         envelope = new(sampleRate);
+        scratchBuffer0 = new float[bufferSize];
+        scratchBuffer1 = new float[bufferSize];
+        scratchBuffer2 = new float[bufferSize];
+        scratchBuffer3 = new float[bufferSize];
     }
 
     public void Process(int sampleCount)
     {
         Engine.Monitor.StartMeasurement(systemKey);
-        
-        var generatorOut = new float[sampleCount];
-        var result = new float[sampleCount];
-        
+
+        var generatorOut = scratchBuffer0.AsSpan().Slice(0, sampleCount);
+        var result = scratchBuffer1.AsSpan().Slice(0, sampleCount);
+
         generator.Generate(generatorOut, frequency);
         envelope.Apply(generatorOut, result);
         
-        bus.WriteLeft(result);
-        bus.WriteRight(result);
+        var effectInLeft = scratchBuffer2.AsSpan().Slice(0, sampleCount);
+        var effectInRight = scratchBuffer3.AsSpan().Slice(0, sampleCount);
+        var effectOutLeft = scratchBuffer0.AsSpan().Slice(0, sampleCount);
+        var effectOutRight = scratchBuffer1.AsSpan().Slice(0, sampleCount);
         
+        result.CopyTo(effectInLeft);
+        result.CopyTo(effectInRight);
+
+        foreach (var effect in effects)
+        {
+            if (effect.Bypass)
+            {
+                continue;
+            }
+            
+            effect.Apply(effectInLeft, effectInRight, effectOutLeft, effectOutRight);
+            
+            var t = effectInLeft;
+            effectInLeft = effectOutLeft;
+            effectOutLeft = t;
+            
+            t = effectInRight;
+            effectInRight = effectOutRight;
+            effectOutRight = t;
+        }
+
+        bus.WriteLeft(effectInLeft);
+        bus.WriteRight(effectInRight);
+
         Engine.Monitor.FinishMeasurement(systemKey);
     }
 
@@ -72,6 +118,14 @@ internal class SynthVoice
         if (ev.GeneratorUpdate is not null)
         {
             generator.ControlUpdate(ev.GeneratorUpdate);
+        }
+
+        foreach (var effect in effects)
+        {
+            foreach (var update in ev.EffectUpdates)
+            {
+                effect.ControlUpdate(update);
+            }
         }
     }
 }

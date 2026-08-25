@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using Kasane2D.Exceptions.Engine;
 using Kasane2D.Music.Enums;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
 using Kasane2D.Music.Types.SequenceEvents;
-using Kasane2D.Music.Types.SequenceEvents.ControlEvents;
 
 namespace Kasane2D.Music.Synthesis;
 
@@ -220,10 +218,11 @@ internal class SynthEngine : ISynthEngine
         (
             new
             (
-                pattern.InitialSettings.VolumeUpdate,
-                pattern.InitialSettings.PanUpdate,
-                pattern.InitialSettings.EnvelopeUpdate,
-                pattern.InitialSettings.GeneratorUpdate
+                VolumeUpdate: pattern.InitialSettings.VolumeUpdate,
+                PanUpdate: pattern.InitialSettings.PanUpdate,
+                EnvelopeUpdate: pattern.InitialSettings.EnvelopeUpdate,
+                EffectUpdates: pattern.InitialSettings.EffectUpdates,
+                GeneratorUpdate: pattern.InitialSettings.GeneratorUpdate
             ),
             sequenceNoteEvents,
             pattern.ControlEvents

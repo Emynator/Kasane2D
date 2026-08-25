@@ -1,5 +1,7 @@
+using Kasane2D.Exceptions.Engine;
 using Kasane2D.Sound.Enums;
 using Kasane2D.Sound.Interfaces;
+using Kasane2D.Sound.Types;
 
 namespace Kasane2D.Sound.AudioEffects;
 
@@ -32,14 +34,46 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
+    /// Creates a KasaneFilter with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the filter's name. Default is a GUID.</param>
+    /// <returns>The created filter.</returns>
+    public static KasaneFilter CreateFilter(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreateFilter
+        (
+            FilterType.LowPass,
+            1,
+            soundSystem.SampleRate / 2.0f,
+            0.0f,
+            name
+        );
+    }
+
+    /// <summary>
     /// Creates a KasaneEq8.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="bandParams">The eq-band parameters.</param>
+    /// <param name="name">Optional: the eq's name. Default is a GUID.</param>
+    /// <returns>The created eq8.</returns>
+    public static KasaneEq8 CreateEq8(this ISoundSystem soundSystem, EqBandParams[] bandParams, string? name = null)
+    {
+        return bandParams.Length == 8
+            ? new(soundSystem.SampleRate, bandParams, name)
+            : throw new DataConsistencyException("Band param count must be 8.");
+    }
+
+    /// <summary>
+    /// Creates a KasaneEq8 with default params.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
     /// <param name="name">Optional: the eq's name. Default is a GUID.</param>
     /// <returns>The created eq8.</returns>
     public static KasaneEq8 CreateEq8(this ISoundSystem soundSystem, string? name = null)
     {
-        return new(soundSystem.SampleRate, name);
+        return soundSystem.CreateEq8(EqBandParams.DefaultParams, name);
     }
 
     /// <summary>
@@ -66,6 +100,17 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
+    /// Creates a KasaneDelay with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
+    /// <returns>The created delay.</returns>
+    public static KasaneDelay CreateDelay(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreateDelay(0.0f, 0.0f, 0.0f, 0.0f, name);
+    }
+
+    /// <summary>
     /// Creates a KasanePingPongDelay.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
@@ -89,6 +134,17 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
+    /// Creates a KasanePingPongDelay with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the delay's name. Default is a GUID.</param>
+    /// <returns>The created delay.</returns>
+    public static KasanePingPongDelay CreatePingPongDelay(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreatePingPongDelay(0.0f, 0.0f, 0.0f, 0.0f, name);
+    }
+
+    /// <summary>
     /// Creates a KasaneUtility.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
@@ -102,6 +158,17 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
+    /// Creates a KasaneUtility with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
+    /// <returns>The created utility.</returns>
+    public static KasaneUtility CreateUtility(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreateUtility(0.0f, 0, name);
+    }
+
+    /// <summary>
     /// Creates a KasaneCompressor.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
@@ -112,7 +179,7 @@ public static class AudioEffectFactories
     /// <param name="ratio">The compression ratio.</param>
     /// <param name="makeupGain">The makeup gain in dB.</param>
     /// <param name="wet">The wet percentage.</param>
-    /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
+    /// <param name="name">Optional: the compressor's name. Default is a GUID.</param>
     /// <returns>The created compressor.</returns>
     public static KasaneCompressor CreateCompressor
         (
@@ -131,7 +198,28 @@ public static class AudioEffectFactories
     }
 
     /// <summary>
-    /// Creates a KasaneCompressor.
+    /// Creates a KasaneCompressor with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the compressor's name. Default is a GUID.</param>
+    /// <returns>The created compressor.</returns>
+    public static KasaneCompressor CreateCompressor(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreateCompressor
+        (
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            1,
+            0.0f,
+            0.0f,
+            name
+        );
+    }
+
+    /// <summary>
+    /// Creates a KasaneLimiter.
     /// </summary>
     /// <param name="soundSystem">The sound system.</param>
     /// <param name="drive">The drive in dB.</param>
@@ -139,8 +227,8 @@ public static class AudioEffectFactories
     /// <param name="release">The release time in seconds.</param>
     /// <param name="ceiling">The ceiling in dBFS.</param>
     /// <param name="gain">The gain in dB.</param>
-    /// <param name="name">Optional: the utility's name. Default is a GUID.</param>
-    /// <returns>The created compressor.</returns>
+    /// <param name="name">Optional: the limiter's name. Default is a GUID.</param>
+    /// <returns>The created limiter.</returns>
     public static KasaneLimiter CreateLimiter
         (
         this ISoundSystem soundSystem,
@@ -153,6 +241,17 @@ public static class AudioEffectFactories
         )
     {
         return new(soundSystem.SampleRate, drive, attack, release, ceiling, gain, name);
+    }
+
+    /// <summary>
+    /// Creates a KasaneLimiter with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the limiter's name. Default is a GUID.</param>
+    /// <returns>The created limiter.</returns>
+    public static KasaneLimiter CreateLimiter(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreateLimiter(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, name);
     }
 
     /// <summary>
@@ -174,5 +273,16 @@ public static class AudioEffectFactories
         )
     {
         return new(drive, type, wet, name);
+    }
+
+    /// <summary>
+    /// Creates a KasaneOverdrive with default params.
+    /// </summary>
+    /// <param name="soundSystem">The sound system.</param>
+    /// <param name="name">Optional: the overdrive's name. Default is a GUID.</param>
+    /// <returns>The created overdrive.</returns>
+    public static KasaneOverdrive CreateOverdrive(this ISoundSystem soundSystem, string? name = null)
+    {
+        return soundSystem.CreateOverdrive(0.0f, DistortionType.DigitalClip, 0.0f, name);
     }
 }

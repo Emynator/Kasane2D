@@ -1,6 +1,7 @@
 using Kasane2D.Sound.AudioEffects.Dsp;
 using Kasane2D.Sound.Enums;
 using Kasane2D.Sound.Interfaces;
+using Kasane2D.Sound.Types;
 
 namespace Kasane2D.Sound.AudioEffects;
 
@@ -12,35 +13,19 @@ public class KasaneEq8 : IAudioEffect
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly DspFilter[] filtersL = new DspFilter[8];
     private readonly DspFilter[] filtersR = new DspFilter[8];
+    private readonly EqFilterType[] types = new EqFilterType[8];
 
-    private readonly EqFilterType[] types =
-    [
-        EqFilterType.LowShelf,
-        EqFilterType.Peak,
-        EqFilterType.Peak,
-        EqFilterType.Peak,
-        EqFilterType.Peak,
-        EqFilterType.Peak,
-        EqFilterType.Peak,
-        EqFilterType.HighShelf,
-    ];
-
-    internal KasaneEq8(int sampleRate, string? name)
+    internal KasaneEq8(int sampleRate, EqBandParams[] bandParams, string? name)
     {
         var actual = name ?? Guid.NewGuid().ToString();
         Name = $"KasaneEq8_{actual}";
 
         for (var i = 0; i < filtersL.Length; i++)
         {
-            var frequency = 50.0f * MathF.Pow(2.0f, i);
-
-            filtersL[i].Frequency = frequency;
             filtersL[i] = new(sampleRate)
             {
                 Type = DspFilterType.None,
             };
-
-            filtersR[i].Frequency = frequency;
             filtersR[i] = new(sampleRate)
             {
                 Type = DspFilterType.None,
@@ -64,9 +49,33 @@ public class KasaneEq8 : IAudioEffect
     } = false;
 
     /// <summary>
-    /// Gets the parameter's filter type.
+    /// Gets all parameters of an EQ band.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
+    /// <returns>The band's parameters.</returns>
+    public EqBandParams GetParams(int index)
+    {
+        return new(GetType(index), GetIsActive(index), GetFrequency(index), GetQ(index), GetGain(index));
+    }
+
+    /// <summary>
+    /// Sets all parameters of an EQ band.
+    /// </summary>
+    /// <param name="index">The band index from 0 to 7.</param>
+    /// <param name="bandParams">The band's parameters to set.</param>
+    public void SetParams(int index, EqBandParams bandParams)
+    {
+        SetType(index, bandParams.Type);
+        SetIsActive(index, bandParams.IsActive);
+        SetFrequency(index, bandParams.Frequency);
+        SetQ(index, bandParams.Q);
+        SetGain(index, bandParams.Gain);
+    }
+
+    /// <summary>
+    /// Gets the band's filter type.
+    /// </summary>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <returns>The value.</returns>
     public EqFilterType GetType(int index)
     {
@@ -74,9 +83,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Sets the parameter's filter type.
+    /// Sets the band's filter type.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <param name="type">The value to set.</param>
     public void SetType(int index, EqFilterType type)
     {
@@ -87,9 +96,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Gets if the parameter is active.
+    /// Gets if the band is active.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <returns>The value.</returns>
     public bool GetIsActive(int index)
     {
@@ -97,9 +106,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Sets if the parameter is active
+    /// Sets if the band is active
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <param name="isActive">The value to set.</param>
     public void SetIsActive(int index, bool isActive)
     {
@@ -120,9 +129,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Gets the parameter's frequency.
+    /// Gets the band's frequency.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <returns>The value.</returns>
     public float GetFrequency(int index)
     {
@@ -130,9 +139,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Sets the parameter's frequency.
+    /// Sets the band's frequency.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <param name="frequency">The value to set.</param>
     public void SetFrequency(int index, float frequency)
     {
@@ -143,9 +152,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Gets the parameter's Q.
+    /// Gets the band's Q.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <returns>The value.</returns>
     public float GetQ(int index)
     {
@@ -153,9 +162,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Sets the parameter's Q.
+    /// Sets the band's Q.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <param name="q">The value to set.</param>
     public void SetQ(int index, float q)
     {
@@ -166,9 +175,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Gets the parameter's gain.
+    /// Gets the band's gain.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <returns>The value.</returns>
     public float GetGain(int index)
     {
@@ -176,9 +185,9 @@ public class KasaneEq8 : IAudioEffect
     }
 
     /// <summary>
-    /// Sets the parameter's gain.
+    /// Sets the band's gain.
     /// </summary>
-    /// <param name="index">The parameter index from 0 to 7.</param>
+    /// <param name="index">The band index from 0 to 7.</param>
     /// <param name="gain">The value to set.</param>
     public void SetGain(int index, float gain)
     {
@@ -199,13 +208,13 @@ public class KasaneEq8 : IAudioEffect
         )
     {
         tlock.Wait();
-        
+
         if (Bypass)
         {
             inLeft.CopyTo(outLeft);
             inRight.CopyTo(outRight);
             tlock.Release();
-            
+
             return;
         }
 
