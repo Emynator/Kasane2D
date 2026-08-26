@@ -48,7 +48,7 @@ public abstract class Generator
     /// <summary>
     /// Resets the generator's phase.
     /// </summary>
-    public void Reset()
+    public virtual void Reset()
     {
         Phase = 0.0d;
     }

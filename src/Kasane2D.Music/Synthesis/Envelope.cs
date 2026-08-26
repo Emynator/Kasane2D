@@ -1,6 +1,6 @@
 namespace Kasane2D.Music.Synthesis;
 
-internal class Envelope
+internal struct Envelope
 {
     private readonly int samplesPerMs;
     private EnvelopeState state = EnvelopeState.End;
@@ -59,72 +59,80 @@ internal class Envelope
 
         for (var i = 0; i < input.Length; i++)
         {
-            var gain = 0.0f;
-            switch (state)
-            {
-                case EnvelopeState.Attack:
-                    gain = (float)double.Lerp(0.0d, 1.0d, (double)position / attackEnd);
-                    if (currentGain < gain)
-                    {
-                        currentGain = gain;
-                    }
-                    
-                    output[i] = input[i] * currentGain;
-                    
-                    position++;
-                    if (position >= attackEnd)
-                    {
-                        position = 0;
-                        state = EnvelopeState.Decay;
-                    }
-                    
-                    break;
-                
-                case EnvelopeState.Decay:
-                    gain = (float)double.Lerp(1.0d, Sustain, (double)(position) / decayEnd);
-                    if (currentGain > gain)
-                    {
-                        currentGain = gain;
-                    }
-                    
-                    output[i] = input[i] * currentGain;
-                    position++;
-                    if (position >= decayEnd)
-                    {
-                        position = 0;
-                        state = EnvelopeState.Sustain;
-                        currentGain = Sustain;
-                    }
-                    
-                    break;
-                
-                case EnvelopeState.Sustain:
-                    output[i] = input[i] * currentGain;
-                    break;
-                
-                case EnvelopeState.Release:
-                    gain = (float)double.Lerp(Sustain, 0.0d, (double)position / releaseEnd);
-                    if (currentGain > gain)
-                    {
-                        currentGain = gain;
-                    }
-                    
-                    output[i] = input[i] * currentGain;
-                    position++;
-                    if (position >= releaseEnd)
-                    {
-                        position = 0;
-                        state = EnvelopeState.End;
-                        currentGain = 0.0f;
-                    }
-
-                    break;
-                
-                default:
-                    output[i] = 0.0f;
-                    break;
-            }
+            output[i] = Apply(input[i]);
         }
+    }
+
+    public float Apply(float input)
+    {
+        var gain = 0.0f;
+        var result = 0.0f;
+        
+        switch (state)
+        {
+            case EnvelopeState.Attack:
+                gain = (float)double.Lerp(0.0d, 1.0d, (double)position / attackEnd);
+                if (currentGain < gain)
+                {
+                    currentGain = gain;
+                }
+
+                result = input * currentGain;
+
+                position++;
+                if (position >= attackEnd)
+                {
+                    position = 0;
+                    state = EnvelopeState.Decay;
+                }
+
+                break;
+
+            case EnvelopeState.Decay:
+                gain = (float)double.Lerp(1.0d, Sustain, (double)(position) / decayEnd);
+                if (currentGain > gain)
+                {
+                    currentGain = gain;
+                }
+
+                result = input * currentGain;
+                position++;
+                if (position >= decayEnd)
+                {
+                    position = 0;
+                    state = EnvelopeState.Sustain;
+                    currentGain = Sustain;
+                }
+
+                break;
+
+            case EnvelopeState.Sustain:
+                result = input * currentGain;
+                break;
+
+            case EnvelopeState.Release:
+                gain = (float)double.Lerp(Sustain, 0.0d, (double)position / releaseEnd);
+                if (currentGain > gain)
+                {
+                    currentGain = gain;
+                }
+
+                result = input * currentGain;
+                position++;
+                if (position >= releaseEnd)
+                {
+                    position = 0;
+                    state = EnvelopeState.End;
+                    currentGain = 0.0f;
+                }
+
+                break;
+
+            default:
+                break;
+        }
+        
+        return result;
     }
 
     public void EnterRelease()

@@ -33,4 +33,8 @@ public enum GeneratorKind
     /// A simple, tracker-inspired sampler.
     /// </summary>
     Sampler,
+    /// <summary>
+    /// YM3812 inspired 2-operator FM voice.
+    /// </summary>
+    Opl2Voice,
 }

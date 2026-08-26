@@ -37,6 +37,7 @@ public static class MusicSystem
                 GeneratorKind.SidNoise => new SidNoise(soundSystem.SampleRate),
                 GeneratorKind.RetroWaveTable => new RetroWaveTableOscillator(soundSystem.SampleRate),
                 GeneratorKind.Sampler => new Sampler(soundSystem.SampleRate),
+                GeneratorKind.Opl2Voice => new Opl2Voice(soundSystem.SampleRate),
                 _ => new EmptyGenerator(soundSystem.SampleRate),
             };
 

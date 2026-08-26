@@ -12,11 +12,11 @@ internal class SynthVoice
     private readonly IMixBus bus;
     private readonly Generator generator;
     private readonly List<VoiceEffect> effects;
-    private readonly Envelope envelope;
     private readonly float[] scratchBuffer0;
     private readonly float[] scratchBuffer1;
     private readonly float[] scratchBuffer2;
     private readonly float[] scratchBuffer3;
+    private Envelope envelope;
     private double frequency = 0.0d;
 
     public SynthVoice
