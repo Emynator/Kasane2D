@@ -1,3 +1,4 @@
+using Kasane2D.Enums;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Types;
 
@@ -8,6 +9,16 @@ namespace Kasane2D.Config;
 /// </summary>
 public class GraphicsConfiguration
 {
+    /// <summary>
+    /// Configures if the game should run in fullscreen mode or window mode.
+    /// </summary>
+    public bool Fullscreen { get; set; } = false;
+
+    /// <summary>
+    /// Configures how aspect ratio mismatch between screen resolution and viewport resolution should be handled.
+    /// </summary>
+    public AspectRatioScalingMode AspectRatioScalingMode { get; set; } = AspectRatioScalingMode.Keep;
+    
     /// <summary>
     /// Configures if the mouse is visible or not. Default is false.
     /// </summary>

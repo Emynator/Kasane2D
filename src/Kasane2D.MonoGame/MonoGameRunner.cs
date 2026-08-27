@@ -5,6 +5,7 @@ using Kasane2D.Interfaces;
 using Kasane2D.MonoGame.Graphics;
 using Kasane2D.MonoGame.Input;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Kasane2D.MonoGame;
 
@@ -36,8 +37,18 @@ internal class MonoGameRunner : Game, IEngineRunner
         assignInputSystem(inputSystem);
         
         graphics = new GraphicsDeviceManager(this);
-        graphics.PreferredBackBufferWidth = config.ScreenSize.X;
-        graphics.PreferredBackBufferHeight = config.ScreenSize.Y;
+        if (config.Fullscreen)
+        {
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.IsFullScreen = true;
+            config.ScreenSize = new(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+        }
+        else
+        {
+            graphics.PreferredBackBufferHeight = config.ScreenSize.Y;
+            graphics.PreferredBackBufferWidth = config.ScreenSize.X;
+        }
 
         IsMouseVisible = config.IsMouseVisibible;
     }
