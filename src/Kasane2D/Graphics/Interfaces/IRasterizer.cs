@@ -22,7 +22,7 @@ public interface IRasterizer
     public Color ClearColor { get; set; }
 
     /// <summary>
-    /// Create a new tilemap surface for the provided tilesize and dimensions.
+    /// Creates a new tilemap surface for the provided tilesize and dimensions.
     /// </summary>
     /// <param name="name">The name of the layer.</param>
     /// <param name="tileSize">With and height of a single tile in pixels.</param>
@@ -31,25 +31,41 @@ public interface IRasterizer
     public ITilemapSurface CreateTilemapSurface(string name, Vec2I tileSize, Vec2I dimensions);
 
     /// <summary>
-    /// Create a new texture surface with the provided size.
+    /// Creates a new texture surface with the provided size.
     /// </summary>
     /// <param name="name">The name of the layer.</param>
     /// <param name="dimensions">Width and height of the underlying texture in pixels.</param>
     /// <returns>The created texture surface.</returns>
-    /// <remarks>The engine's renderer calls the layer creation functions in order of lowest to highest layer. Higher
-    /// surfaces are assumed to be drawn on top of lower surfaces.</remarks>
     public ITextureSurface CreateTextureSurface(string name, Vec2I dimensions);
 
     /// <summary>
-    /// Create a new sprite layer with the provided spriteSize and sprite count.
+    /// Creates a new sprite layer with the provided spriteSize and sprite count.
     /// </summary>
     /// <param name="name">The name of the layer.</param>
     /// <param name="spriteSize">Width and height of the sprites in pixels.</param>
     /// <param name="spriteCount">Number of sprites available in the layer.</param>
     /// <returns>The created sprite layer.</returns>
-    /// <remarks>The engine's renderer calls the layer creation functions in order of lowest to highest layer. Higher
-    /// surfaces are assumed to be drawn on top of lower surfaces.</remarks>
     public ISpriteLayer CreateSpriteLayer(string name, Vec2I spriteSize, int spriteCount);
+
+    /// <summary>
+    /// Creates a new overlay layer with the provided child surface.
+    /// </summary>
+    /// <param name="name">The name of the layer.</param>
+    /// <param name="childSurface">The child surface of the overlay.</param>
+    /// <returns>The created overlay.</returns>
+    public IOverlay CreateOverlay(string name, ISurface childSurface);
+
+    /// <summary>
+    /// Pushes a surface to the layer stack.
+    /// </summary>
+    /// <param name="layer">The layer to push.</param>
+    public void PushLayer(ISurface layer);
+
+    /// <summary>
+    /// Pushes a sprite layer to the layer stack.
+    /// </summary>
+    /// <param name="layer">The layer to push.</param>
+    public void PushLayer(ISpriteLayer layer);
 
     /// <summary>
     /// Rasterize all surfaces to their viewports and draw them bottom to top to the final screen buffer.

@@ -111,7 +111,7 @@ internal class Rasterizer : IRasterizer, IDisposable
             deviceRect = new(0, (config.ScreenSize.Y - neededHeight) / 2, config.ScreenSize.X, neededHeight);
             return;
         }
-        
+
         deviceRect = new((config.ScreenSize.X - neededWidth) / 2, 0, neededWidth, config.ScreenSize.Y);
     }
 
@@ -125,7 +125,7 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public ITilemapSurface CreateTilemapSurface(string name, Vec2I tileSize, Vec2I dimensions)
     {
-        var result = new TilemapSurface
+        return new TilemapSurface
         (
             name,
             device,
@@ -134,23 +134,16 @@ internal class Rasterizer : IRasterizer, IDisposable
             tileSize,
             config.ViewportSize
         );
-
-        surfaces.Add(result);
-
-        return result;
     }
 
     public ITextureSurface CreateTextureSurface(string name, Vec2I dimensions)
     {
-        var result = new TextureSurface(name, device, spriteBatch, dimensions, config.ViewportSize);
-        surfaces.Add(result);
-
-        return result;
+        return new TextureSurface(name, device, spriteBatch, dimensions, config.ViewportSize);
     }
 
     public ISpriteLayer CreateSpriteLayer(string name, Vec2I spriteSize, int spriteCount)
     {
-        var result = new SpriteSurface
+        return new SpriteSurface
         (
             name,
             device,
@@ -160,10 +153,21 @@ internal class Rasterizer : IRasterizer, IDisposable
             spriteSize,
             spriteCount
         );
+    }
 
-        surfaces.Add(result);
+    public IOverlay CreateOverlay(string name, ISurface childSurface)
+    {
+        return new Overlay(name, device, childSurface.AsSurface());
+    }
 
-        return result;
+    public void PushLayer(ISurface layer)
+    {
+        surfaces.Add(layer.AsSurface());
+    }
+
+    public void PushLayer(ISpriteLayer layer)
+    {
+        surfaces.Add(layer.AsSurface());
     }
 
     public void Rasterize()
@@ -187,7 +191,14 @@ internal class Rasterizer : IRasterizer, IDisposable
         foreach (var surface in surfaces)
         {
             var tex = surface.GetSurface();
-            spriteBatch.Draw(tex, Vector2.Zero, MgColor.White);
+            if (surface is Overlay overlay)
+            {
+                spriteBatch.Draw(tex, Vector2.Zero, overlay.ClipRect, MgColor.White);
+            }
+            else
+            {
+                spriteBatch.Draw(tex, Vector2.Zero, MgColor.White);
+            }
         }
         spriteBatch.End();
 

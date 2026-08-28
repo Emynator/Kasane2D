@@ -166,24 +166,53 @@ internal class Renderer : IRenderer
         switch (config.Type)
         {
             case LayerType.Tilemap:
-                var tileSize = config.TileSize ?? defaultTileSize;
-                var dimensions = config.Dimensions ?? defaultTilemapDimensions;
-                surfaces.Add(config.Name, rasterizer.CreateTilemapSurface(config.Name, tileSize, dimensions));
+
+                var tilemap = CreateSurface(config);
+                rasterizer.PushLayer(tilemap);
+                surfaces.Add(config.Name, tilemap);
 
                 break;
 
             case LayerType.Sprite:
                 var spriteSize = config.SpriteSize ?? defaultSpriteSize;
                 var spriteCount = config.SpriteCount ?? defaultSpriteCount;
-                spriteLayers.Add(config.Name, rasterizer.CreateSpriteLayer(config.Name, spriteSize, spriteCount));
+                var spriteLayer = rasterizer.CreateSpriteLayer(config.Name, spriteSize, spriteCount);
+                rasterizer.PushLayer(spriteLayer);
+                spriteLayers.Add(config.Name, spriteLayer);
 
                 break;
 
             case LayerType.Texture:
-                var size = config.Dimensions ?? defaultSurfaceSize;
-                surfaces.Add(config.Name, rasterizer.CreateTextureSurface(config.Name, size));
+                var textureSurface = CreateSurface(config);
+                rasterizer.PushLayer(textureSurface);
+                surfaces.Add(config.Name, textureSurface);
+
+                break;
+
+            case LayerType.Overlay:
+                var child = CreateSurface(config.ChildLayer!);
+                var overlay = rasterizer.CreateOverlay(config.Name, child);
+                rasterizer.PushLayer(overlay);
+                surfaces.Add(config.Name, overlay);
 
                 break;
         }
+    }
+
+    private ISurface CreateSurface(RenderLayerConfig config)
+    {
+        switch (config.Type)
+        {
+            case LayerType.Tilemap:
+                var tileSize = config.TileSize ?? defaultTileSize;
+                var dimensions = config.Dimensions ?? defaultTilemapDimensions;
+                return rasterizer.CreateTilemapSurface(config.Name, tileSize, dimensions);
+            
+            case LayerType.Texture:
+                var size = config.Dimensions ?? defaultSurfaceSize;
+                return rasterizer.CreateTextureSurface(config.Name, size);
+        }
+
+        throw new InvalidOperationException();
     }
 }

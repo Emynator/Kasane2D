@@ -16,6 +16,11 @@ internal static class RenderObjectExtensions
         return surface as MonoGameSurface ?? throw new IncompatibleBackendDataException(nameof(ISurface));
     }
 
+    public static MonoGameSurface AsSurface(this ISpriteLayer layer)
+    {
+        return layer as MonoGameSurface ?? throw new IncompatibleBackendDataException(nameof(ISpriteLayer));
+    }
+
     public static TextureSurface AsTextureSurface(this ITextureSurface surface)
     {
         return surface as TextureSurface ?? throw new IncompatibleBackendDataException(nameof(ITextureSurface));
