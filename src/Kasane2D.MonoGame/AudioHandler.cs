@@ -8,7 +8,7 @@ namespace Kasane2D.MonoGame;
 internal class AudioHandler : IDisposable
 {
     private const string systemKey = "Backend::AudioHandler::BufferRefill";
-    
+
     private readonly ISoundSystem soundSystem;
     private readonly DynamicSoundEffectInstance audioBackend;
     private readonly float[] leftBuffer;
@@ -50,20 +50,23 @@ internal class AudioHandler : IDisposable
     private void BufferRefillHandler(object? sender, EventArgs e)
     {
         Engine.Monitor.StartMeasurement(systemKey);
-        
+
         while (true)
         {
             if (!backendBufferQueue.TryDequeue(out var buffer))
             {
                 continue;
             }
-            
-            audioBackend.SubmitBuffer(buffer.ToArray());
-            engineBufferQueue.Enqueue(buffer);
+
+            do
+            {
+                audioBackend.SubmitBuffer(buffer.ToArray());
+                engineBufferQueue.Enqueue(buffer);
+            } while (backendBufferQueue.TryDequeue(out buffer));
             bufferAvailable.Set();
             break;
         }
-        
+
         Engine.Monitor.FinishMeasurement(systemKey);
     }
 

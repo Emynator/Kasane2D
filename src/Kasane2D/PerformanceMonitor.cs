@@ -39,7 +39,13 @@ internal class PerformanceMonitor : IPerformanceMonitor
 
         tlock.Wait();
 
-        var result = Stopwatch.GetElapsedTime(timestamps[systemKey]).TotalMilliseconds;
+        if (!timestamps.TryGetValue(systemKey, out var timestamp))
+        {
+            tlock.Release();
+            return;
+        }
+        
+        var result = Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds;
         if (!measurements.TryGetValue(systemKey, out var measurement))
         {
             measurement = new();

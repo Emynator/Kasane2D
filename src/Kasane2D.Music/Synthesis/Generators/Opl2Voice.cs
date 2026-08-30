@@ -6,6 +6,7 @@ internal class Opl2Voice : Generator
 {
     private FmOperator op0;
     private FmOperator op1;
+    private float modulationDepth = 0.0f;
     private bool isAdditive = false;
     
     public Opl2Voice(int sampleRate) : base(sampleRate)
@@ -31,6 +32,12 @@ internal class Opl2Voice : Generator
             op1.Update(actual.Operator1.Value);
         }
 
+        if (actual.ModulationDepth is not null)
+        {
+            var x = Math.Clamp(actual.ModulationDepth.Value, 0.0f, 1.0f);
+            modulationDepth = 8.0f * MathF.PI * x * x;
+        }
+
         if (actual.IsAdditive is not null)
         {
             isAdditive = actual.IsAdditive.Value;
@@ -51,6 +58,6 @@ internal class Opl2Voice : Generator
             return op0.Next(frequency) + op1.Next(frequency);
         }
 
-        return op1.Next(frequency, op0.Next(frequency));
+        return op1.Next(frequency, modulationDepth * op0.Next(frequency));
     }
 }

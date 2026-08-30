@@ -41,7 +41,7 @@ internal class SynthEngine : ISynthEngine
         if (currentPattern is null || !isPlaying)
         {
             ProcessTracks(bufferSize);
-            
+
             Engine.Monitor.FinishMeasurement(systemKey);
             tlock.Release();
 
@@ -55,7 +55,7 @@ internal class SynthEngine : ISynthEngine
             {
                 ProcessTracks(bufferSize);
                 carryOverSamples -= bufferSize;
-                
+
                 Engine.Monitor.FinishMeasurement(systemKey);
                 tlock.Release();
 
@@ -205,11 +205,20 @@ internal class SynthEngine : ISynthEngine
                 ($"Length of {nameof(pattern.ControlEvents)} must match the sequence length.");
         }
 
+        var barNotes = barSteps / sequenceSteps;
+        var noteCount = barNotes * length;
+        if (pattern.NoteEvents.Count != noteCount)
+        {
+            throw new DataConsistencyException
+                ($"Length of {nameof(pattern.NoteEvents)} must match the sequence length.");
+        }
+
         var sequenceNoteEvents = new SequenceNoteEvent[sequenceLength];
+        var patternNoteEvents = pattern.NoteEvents.ToArray();
         for (var i = 0; i < length; i++)
         {
             var noteEventsSlice = sequenceNoteEvents.AsSpan().Slice(i * barSteps, barSteps);
-            var noteEvents = pattern.NoteEvents.Where(ev => ev.Bar == i).ToList();
+            var noteEvents = patternNoteEvents.AsSpan().Slice(i * barNotes, barNotes);
 
             ProcessBar(noteEventsSlice, noteEvents, sequenceSteps, barSteps);
         }
@@ -232,7 +241,7 @@ internal class SynthEngine : ISynthEngine
     private void ProcessBar
         (
         Span<SequenceNoteEvent> sequenceNoteEvents,
-        List<NoteEvent> noteEvents,
+        ReadOnlySpan<NoteEvent> noteEvents,
         int sequenceSteps,
         int barSteps
         )
@@ -251,7 +260,7 @@ internal class SynthEngine : ISynthEngine
 
             if (processNext)
             {
-                var noteEvent = noteEvents.FirstOrDefault(ev => ev.Step == patternStep);
+                var noteEvent = noteEvents[patternStep];
                 noteFill = noteEvent.Kind is NoteEventKind.Begin or NoteEventKind.Hold
                     ? new SequenceNoteEvent(Kind: SequenceNoteEventKind.Hold)
                     : new SequenceNoteEvent(Kind: SequenceNoteEventKind.Off);

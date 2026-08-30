@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Kasane2D.Sound.Interfaces;
 
 namespace Kasane2D.Sound.Mixer;
@@ -45,6 +46,8 @@ internal class MixBus : IMixBus
         scratchBuffer3 = new float[bufferSize];
         InternalParent = parent;
         parent?.InternalChildren.Add(this);
+        Gain = 0.0f;
+        Pan = 0;
     }
 
     public string Name { get; }
@@ -86,7 +89,7 @@ internal class MixBus : IMixBus
 
             tlock.Release();
         }
-    } = 0;
+    }
 
     public IMixBus? Parent => InternalParent;
 

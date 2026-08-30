@@ -8,7 +8,6 @@ internal struct FmOperator
     private readonly int sampleRate;
     private Envelope envelope;
     private OplWaveType waveType = OplWaveType.Sine;
-    private float modulationDepth = 0.0f;
     private float feedbackAmount = 0.0f;
     private double frequencyFactor = 0.0d;
     private bool isFixed = false;
@@ -21,9 +20,9 @@ internal struct FmOperator
         envelope = new(sampleRate);
     }
 
-    public float Next(double frequency, float modulator = 0.0f)
+    public float Next(double frequency, float modulation = 0.0f)
     {
-        var sine = Math.Sin(Math.Tau * phase + modulationDepth * modulator + feedbackAmount * feedBack);
+        var sine = Math.Sin(Math.Tau * phase + modulation + feedbackAmount * feedBack);
         feedBack = waveType switch
         {
             OplWaveType.Sine => (float)sine,
@@ -72,18 +71,18 @@ internal struct FmOperator
         {
             waveType = update.WaveType.Value;
         }
-        if (update.ModulationDepth is not null)
-        {
-            modulationDepth = update.ModulationDepth.Value;
-        }
+        
         if (update.FeedbackAmount is not null)
         {
-            feedbackAmount = update.FeedbackAmount.Value;
+            var x = Math.Clamp(update.FeedbackAmount.Value, 0.0f, 1.0f);
+            feedbackAmount = 4.0f * MathF.PI * x * x;
         }
+        
         if (update.Frequency is not null)
         {
             frequencyFactor = update.Frequency.Value;
         }
+        
         if (update.IsFixed is not null)
         {
             isFixed = update.IsFixed.Value;

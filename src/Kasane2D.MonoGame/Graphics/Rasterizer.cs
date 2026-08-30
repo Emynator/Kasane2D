@@ -188,6 +188,7 @@ internal class Rasterizer : IRasterizer, IDisposable
 
         Engine.Monitor.StartMeasurement(systemKey);
 
+        screenSurface.Rasterize();
         foreach (var surface in surfaces)
         {
             surface.Rasterize();
@@ -220,8 +221,6 @@ internal class Rasterizer : IRasterizer, IDisposable
 
         device.SetRenderTarget(null);
         device.Clear(ClearColor.ToMgColor());
-
-        screenSurface.Rasterize();
 
         spriteBatch.Begin(samplerState: SamplerState.LinearClamp);
         spriteBatch.Draw(upscaleBuffer, deviceRect, upscaleRect, MgColor.White);
