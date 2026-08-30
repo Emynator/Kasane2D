@@ -29,6 +29,8 @@ internal class Renderer : IRenderer
     }
 
     public ITextureManager TextureManager => rasterizer.TextureManager;
+    
+    public ITextureSurface ScreenSurface => rasterizer.ScreenSurface;
 
     public Color ClearColor
     {
@@ -124,6 +126,16 @@ internal class Renderer : IRenderer
         slotManagers.Add(layerName, result);
 
         return result;
+    }
+
+    public ITextureSurface CreateTextureSurface(string name, Vec2I? size = null)
+    {
+        return rasterizer.CreateTextureSurface(name, size ?? defaultSurfaceSize);
+    }
+
+    public void FreeTextureSurface(ITextureSurface surface)
+    {
+        rasterizer.FreeTextureSurface(surface);
     }
 
     public void BeginDraw(ITextureSurface target)

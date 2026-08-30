@@ -15,6 +15,13 @@ public interface IRenderer
     public ITextureManager TextureManager { get; }
     
     /// <summary>
+    /// Gets the screen surface with the native screen resolution.
+    /// </summary>
+    /// <remarks>The screen surface is the final surface that is drawn on top of the screen after every layer has been
+    /// rendered and upscaled. This can be used to for example render UIs at the native screen resolution.</remarks>
+    public ITextureSurface ScreenSurface { get; }
+    
+    /// <summary>
     /// The color used to clear the screen buffer before drawing.
     /// </summary>
     public Color ClearColor { get; set; }
@@ -50,6 +57,20 @@ public interface IRenderer
     /// <returns>Slot manager of the specified layer.</returns>
     /// <exception cref="KeyNotFoundException">Thrown when the sprite layer of the specified name does not exist.</exception>
     public ISlotManager GetSlotManager(string layerName);
+
+    /// <summary>
+    /// Creates a new texture surface with the provided size.
+    /// </summary>
+    /// <param name="name">The name of the surface.</param>
+    /// <param name="size">Width and height of the underlying texture in pixels.</param>
+    /// <returns>The created texture surface.</returns>
+    public ITextureSurface CreateTextureSurface(string name, Vec2I? size = null);
+    
+    /// <summary>
+    /// Frees a texture surface.
+    /// </summary>
+    /// <param name="surface">The surface to free.</param>
+    public void FreeTextureSurface(ITextureSurface surface);
 
     /// <summary>
     /// Begin free-form rendering on a render target.

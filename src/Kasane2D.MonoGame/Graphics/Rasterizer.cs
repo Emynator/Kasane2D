@@ -22,6 +22,7 @@ internal class Rasterizer : IRasterizer, IDisposable
     private readonly SpriteBatch spriteBatch;
     private readonly TextureManager textureManager;
     private readonly List<MonoGameSurface> surfaces = [];
+    private readonly TextureSurface screenSurface;
     private readonly RenderTarget2D backBuffer;
     private readonly RenderTarget2D upscaleBuffer;
     private readonly Rectangle backBufferRect;
@@ -42,6 +43,7 @@ internal class Rasterizer : IRasterizer, IDisposable
         backBufferRect = new(0, 0, config.ViewportSize.X, config.ViewportSize.Y);
         pixel = new Texture2D(device, 1, 1);
         pixel.SetData([MgColor.White]);
+        screenSurface = CreateTextureSurface("ScreenSurface", config.ScreenSize).AsTextureSurface();
 
         int width;
         int height;
@@ -117,6 +119,8 @@ internal class Rasterizer : IRasterizer, IDisposable
 
     public ITextureManager TextureManager => textureManager;
 
+    public ITextureSurface ScreenSurface => screenSurface;
+
     public KasaneColor ClearColor { get; set; } = KasaneColor.Black;
 
     public void Dispose()
@@ -139,6 +143,11 @@ internal class Rasterizer : IRasterizer, IDisposable
     public ITextureSurface CreateTextureSurface(string name, Vec2I dimensions)
     {
         return new TextureSurface(name, device, spriteBatch, dimensions, config.ViewportSize);
+    }
+
+    public void FreeTextureSurface(ITextureSurface surface)
+    {
+        surface.AsTextureSurface().Dispose();
     }
 
     public ISpriteLayer CreateSpriteLayer(string name, Vec2I spriteSize, int spriteCount)
@@ -212,8 +221,17 @@ internal class Rasterizer : IRasterizer, IDisposable
         device.SetRenderTarget(null);
         device.Clear(ClearColor.ToMgColor());
 
+        screenSurface.Rasterize();
+
         spriteBatch.Begin(samplerState: SamplerState.LinearClamp);
         spriteBatch.Draw(upscaleBuffer, deviceRect, upscaleRect, MgColor.White);
+        spriteBatch.Draw
+        (
+            screenSurface.GetSurface(),
+            deviceRect,
+            screenSurface.Viewport.ViewRect.ToRectangle(),
+            MgColor.White
+        );
         spriteBatch.End();
 
         Engine.Monitor.FinishMeasurement(systemKey);
