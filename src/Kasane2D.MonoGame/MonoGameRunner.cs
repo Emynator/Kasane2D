@@ -35,7 +35,7 @@ internal class MonoGameRunner : Game, IEngineRunner
         this.createRenderer = createRenderer;
         this.audioConfig = audioConfig;
         assignInputSystem(inputSystem);
-        
+
         graphics = new GraphicsDeviceManager(this);
         if (config.Fullscreen)
         {
@@ -59,7 +59,7 @@ internal class MonoGameRunner : Game, IEngineRunner
         {
             audioHandler?.Dispose();
         }
-        
+
         base.Dispose(disposing);
     }
 
@@ -70,9 +70,14 @@ internal class MonoGameRunner : Game, IEngineRunner
         initRenderer?.Invoke();
         if (main.SoundSystem is not null && audioConfig is not null)
         {
-            audioHandler = new(main.SoundSystem, audioConfig.BuffersInQueue);
+            audioHandler = new
+            (
+                main.SoundSystem,
+                audioConfig.BufferSizeInMs,
+                audioConfig.BuffersInQueue
+            );
         }
-        
+
         main.Init();
     }
 
@@ -82,10 +87,10 @@ internal class MonoGameRunner : Game, IEngineRunner
         {
             Exit();
         }
-        
+
         inputSystem.Update();
         main.MainTick((float)(gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f));
-        
+
         base.Update(gameTime);
     }
 

@@ -6,13 +6,13 @@ namespace Kasane2D.Config;
 public class AudioConfiguration
 {
     /// <summary>
-    /// Buffer size in ms the sound system processes. Default is 15ms.
+    /// Buffer size in ms the sound system processes. Default is 50ms.
     /// </summary>
     /// <remarks>The sound system thread processes one buffer at a time and puts that buffer into a queue. The
     /// backend takes an available buffer from that queue when its sound device requests another buffer. The buffer
     /// size and the maximum number of buffers in that queue influences the audio latency. At the same time, if the
     /// numbers are too low, there are cracks and pops because the sound driver runs out of samples to play.</remarks>
-    public int BufferSizeInMs { get; set; } = 15;
+    public int BufferSizeInMs { get; set; } = 50;
     
     /// <summary>
     /// Maximum number of sound buffers to be put in the buffer queue. Default is 4.

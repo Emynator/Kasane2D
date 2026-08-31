@@ -10,6 +10,7 @@ internal class AudioHandler : IDisposable
     private const string systemKey = "Backend::AudioHandler::BufferRefill";
 
     private readonly ISoundSystem soundSystem;
+    private readonly int timeout;
     private readonly DynamicSoundEffectInstance audioBackend;
     private readonly float[] leftBuffer;
     private readonly float[] rightBuffer;
@@ -20,9 +21,10 @@ internal class AudioHandler : IDisposable
     private readonly ConcurrentQueue<Memory<byte>> engineBufferQueue = new();
     private readonly ConcurrentQueue<Memory<byte>> backendBufferQueue = new();
 
-    public AudioHandler(ISoundSystem soundSystem, int buffersInQueue)
+    public AudioHandler(ISoundSystem soundSystem, int bufferLength, int buffersInQueue)
     {
         this.soundSystem = soundSystem;
+        timeout = bufferLength * 2;
         audioBackend = new(soundSystem.SampleRate, AudioChannels.Stereo);
         leftBuffer = new float[soundSystem.BufferSize];
         rightBuffer = new float[soundSystem.BufferSize];
@@ -74,7 +76,14 @@ internal class AudioHandler : IDisposable
     {
         while (!ct.IsCancellationRequested)
         {
-            bufferAvailable.WaitOne();
+            var bufferWait = Task.Run(() => bufferAvailable.WaitOne());
+            var timeOut = Task.Run(() => Task.Delay(timeout).Wait());
+            Task.WaitAny(bufferWait, timeOut);
+            if (timeOut.IsCompleted)
+            {
+                continue;
+            }
+            
             if (!engineBufferQueue.TryDequeue(out var buffer))
             {
                 bufferAvailable.Reset();
