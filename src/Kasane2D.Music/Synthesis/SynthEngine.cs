@@ -96,12 +96,7 @@ internal class SynthEngine : ISynthEngine
     {
         tlock.Wait();
 
-        foreach (var track in tracks.Values)
-        {
-            track.Stop();
-        }
-
-        nextPattern = null;
+        StopEngine();
         currentPattern = ProcessPattern(pattern);
         foreach (var seq in currentPattern.Value.Sequences)
         {
@@ -162,19 +157,7 @@ internal class SynthEngine : ISynthEngine
     public void Stop()
     {
         tlock.Wait();
-
-        isPlaying = false;
-        currentStep = 0;
-        carryOverSamples = 0;
-        currentPattern = null;
-        nextPattern = null;
-        foreach (var track in tracks.Values)
-        {
-            track.CurrentSequence = null;
-            track.NextSequence = null;
-            track.Reset();
-        }
-
+        StopEngine();
         tlock.Release();
     }
 
@@ -324,6 +307,21 @@ internal class SynthEngine : ISynthEngine
         if (InternalConductor is not null)
         {
             Task.Run(() => InternalConductor.UpdateSynthEngine());
+        }
+    }
+
+    private void StopEngine()
+    {
+        isPlaying = false;
+        currentStep = 0;
+        carryOverSamples = 0;
+        currentPattern = null;
+        nextPattern = null;
+        foreach (var track in tracks.Values)
+        {
+            track.CurrentSequence = null;
+            track.NextSequence = null;
+            track.Reset();
         }
     }
 

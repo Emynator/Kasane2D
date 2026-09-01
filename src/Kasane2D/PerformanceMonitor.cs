@@ -119,6 +119,8 @@ internal class PerformanceMonitor : IPerformanceMonitor
 
             measurement.LongTermAverages.Add(measurement.MediumTermAverages.Average());
             measurement.MediumTermAverages = [];
+            measurement.Best = double.NaN;
+            measurement.Worst = double.NaN;
         }
 
         tlock.Release();

@@ -11,23 +11,23 @@ public readonly record struct VolumeUpdate
     public VolumeUpdate()
     {
         DoUpdate = false;
-        Value = 0;
+        Value = 0.0f;
     }
 
     /// <summary>
     /// Creates an update that changes the track's volume.
     /// </summary>
-    /// <param name="value">The volume in dbFS.</param>
-    public VolumeUpdate(int value)
+    /// <param name="value">The volume in dBFS.</param>
+    public VolumeUpdate(float value)
     {
         DoUpdate = true;
         Value = value;
     }
 
-    internal bool DoUpdate { get; init; }
+    internal bool DoUpdate { get; }
 
     /// <summary>
-    /// The volume in dbFS.
+    /// The volume in dBFS.
     /// </summary>
-    public int Value { get; init; }
+    public float Value { get; }
 }
