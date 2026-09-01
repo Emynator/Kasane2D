@@ -1,8 +1,6 @@
-using Kasane2D.Exceptions.Engine;
-using Kasane2D.Music.Enums;
+using Kasane2D.Music.Extensions;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
-using Kasane2D.Music.Types.SequenceEvents;
 
 namespace Kasane2D.Music.Synthesis;
 
@@ -10,19 +8,18 @@ internal class SynthEngine : ISynthEngine
 {
     private readonly SemaphoreSlim tlock = new(1, 1);
     private readonly string systemKey;
-    private readonly int samplerate;
     private readonly int bufferSize;
     private readonly Dictionary<string, Sequencer> tracks;
     private bool isPlaying = false;
     private int currentStep = 0;
     private int carryOverSamples = 0;
-    private ProcessedPattern? currentPattern = null;
-    private ProcessedPattern? nextPattern = null;
+    private ProcessedSongPattern? currentPattern = null;
+    private ProcessedSongPattern? nextPattern = null;
 
     public SynthEngine(string name, int samplerate, int bufferSize, Dictionary<string, Sequencer> tracks)
     {
         systemKey = $"MusicSystem::SynthEngine::{name}::Process";
-        this.samplerate = samplerate;
+        this.Samplerate = samplerate;
         this.bufferSize = bufferSize;
         this.tracks = tracks;
     }
@@ -33,6 +30,8 @@ internal class SynthEngine : ISynthEngine
 
     public IConductor? Conductor => InternalConductor;
 
+    public int Samplerate { get; }
+    
     public void Process()
     {
         tlock.Wait();
@@ -67,9 +66,9 @@ internal class SynthEngine : ISynthEngine
             carryOverSamples = 0;
         }
 
-        var steps = samplesToProcess / currentPattern.Value.SamplesPerStep;
-        var remainingSamples = samplesToProcess - steps * currentPattern.Value.SamplesPerStep;
-        var samplesPerStep = currentPattern.Value.SamplesPerStep;
+        var steps = samplesToProcess / currentPattern.SamplesPerStep;
+        var remainingSamples = samplesToProcess - steps * currentPattern.SamplesPerStep;
+        var samplesPerStep = currentPattern.SamplesPerStep;
         for (var i = 0; i < steps; i++)
         {
             Step();
@@ -94,19 +93,24 @@ internal class SynthEngine : ISynthEngine
 
     public void Play(SongPattern pattern)
     {
+        Play(pattern.ProcessPattern(Samplerate));
+    }
+
+    public void Play(ProcessedSongPattern songPattern)
+    {
         tlock.Wait();
 
         StopEngine();
-        currentPattern = ProcessPattern(pattern);
-        foreach (var seq in currentPattern.Value.Sequences)
+        currentPattern = songPattern;
+        foreach (var seq in songPattern.Sequences)
         {
             if (!tracks.TryGetValue(seq.Key, out var track))
             {
                 continue;
             }
 
-            track.NextSequence = null;
             track.CurrentSequence = seq.Value;
+            track.NextSequence = null;
             track.Reset();
         }
 
@@ -117,8 +121,14 @@ internal class SynthEngine : ISynthEngine
 
     public void Queue(SongPattern pattern)
     {
-        nextPattern = ProcessPattern(pattern);
-        foreach (var seq in nextPattern.Value.Sequences)
+        Queue(pattern.ProcessPattern(Samplerate));
+    }
+    
+    public void Queue(ProcessedSongPattern songPattern)
+    {
+        tlock.Wait();
+        
+        foreach (var seq in songPattern.Sequences)
         {
             if (!tracks.TryGetValue(seq.Key, out var track))
             {
@@ -127,6 +137,8 @@ internal class SynthEngine : ISynthEngine
 
             track.NextSequence = seq.Value;
         }
+
+        tlock.Release();
     }
 
     public void Pause()
@@ -159,129 +171,6 @@ internal class SynthEngine : ISynthEngine
         tlock.Wait();
         StopEngine();
         tlock.Release();
-    }
-
-    private ProcessedPattern ProcessPattern(SongPattern pattern)
-    {
-        var sequenceSteps = pattern.StepSize.GetSequenceSteps();
-        var barSteps = pattern.TimeSignature.GetSequenceStepsPerBar();
-        var samplesPerStep = pattern.TimeSignature.GetSamplesPerStep(samplerate, pattern.Bpm);
-        var sequences = new Dictionary<string, Sequence>();
-        foreach (var trackPattern in pattern.TrackPatterns)
-        {
-            sequences.Add
-            (
-                trackPattern.TrackName,
-                CreateSequence(trackPattern, pattern.Length, sequenceSteps, barSteps)
-            );
-        }
-
-        return new(pattern.Length * barSteps, samplesPerStep, sequences);
-    }
-
-    private Sequence CreateSequence(TrackPattern pattern, int length, int sequenceSteps, int barSteps)
-    {
-        var sequenceLength = length * barSteps;
-        if (pattern.ControlEvents.Length != sequenceLength)
-        {
-            throw new DataConsistencyException
-                ($"Length of {nameof(pattern.ControlEvents)} must match the sequence length.");
-        }
-
-        var barNotes = barSteps / sequenceSteps;
-        var noteCount = barNotes * length;
-        if (pattern.NoteEvents.Count != noteCount)
-        {
-            throw new DataConsistencyException
-                ($"Length of {nameof(pattern.NoteEvents)} must match the sequence length.");
-        }
-
-        var sequenceNoteEvents = new SequenceNoteEvent[sequenceLength];
-        var patternNoteEvents = pattern.NoteEvents.ToArray();
-        for (var i = 0; i < length; i++)
-        {
-            var noteEventsSlice = sequenceNoteEvents.AsSpan().Slice(i * barSteps, barSteps);
-            var noteEvents = patternNoteEvents.AsSpan().Slice(i * barNotes, barNotes);
-
-            ProcessBar(noteEventsSlice, noteEvents, sequenceSteps, barSteps);
-        }
-
-        return new
-        (
-            new
-            (
-                VolumeUpdate: pattern.InitialSettings.VolumeUpdate,
-                PanUpdate: pattern.InitialSettings.PanUpdate,
-                EnvelopeUpdate: pattern.InitialSettings.EnvelopeUpdate,
-                EffectUpdates: pattern.InitialSettings.EffectUpdates,
-                GeneratorUpdate: pattern.InitialSettings.GeneratorUpdate
-            ),
-            sequenceNoteEvents,
-            pattern.ControlEvents
-        );
-    }
-
-    private void ProcessBar
-        (
-        Span<SequenceNoteEvent> sequenceNoteEvents,
-        ReadOnlySpan<NoteEvent> noteEvents,
-        int sequenceSteps,
-        int barSteps
-        )
-    {
-        var patternStep = 0;
-        var sequenceStep = 0;
-        var noteFill = new SequenceNoteEvent();
-        var processNext = true;
-        for (var i = 0; i < barSteps; i++)
-        {
-            if (i == barSteps - 1 && noteFill.Kind is SequenceNoteEventKind.Hold)
-            {
-                sequenceNoteEvents[i] = new(Kind: SequenceNoteEventKind.Release);
-                continue;
-            }
-
-            if (processNext)
-            {
-                var noteEvent = noteEvents[patternStep];
-                noteFill = noteEvent.Kind is NoteEventKind.Begin or NoteEventKind.Hold
-                    ? new SequenceNoteEvent(Kind: SequenceNoteEventKind.Hold)
-                    : new SequenceNoteEvent(Kind: SequenceNoteEventKind.Off);
-
-                var kind = noteEvent.Kind switch
-                {
-                    NoteEventKind.Begin => SequenceNoteEventKind.Begin,
-                    NoteEventKind.Hold => SequenceNoteEventKind.Hold,
-                    _ => SequenceNoteEventKind.Off,
-                };
-                sequenceNoteEvents[i] = new(noteEvent.Note, kind);
-
-                if (
-                    i > 0
-                    && noteEvent.Kind is NoteEventKind.Begin or NoteEventKind.None
-                    && sequenceNoteEvents[i - 1].Kind != SequenceNoteEventKind.Off
-                    )
-                {
-                    sequenceNoteEvents[i - 1].Kind = SequenceNoteEventKind.Release;
-                }
-
-                processNext = false;
-            }
-            else
-            {
-                sequenceNoteEvents[i] = noteFill;
-            }
-
-            sequenceStep++;
-            if (sequenceStep < sequenceSteps)
-            {
-                continue;
-            }
-
-            patternStep++;
-            sequenceStep = 0;
-            processNext = true;
-        }
     }
 
     private void ProcessTracks(int sampleCount)
@@ -324,11 +213,4 @@ internal class SynthEngine : ISynthEngine
             track.Reset();
         }
     }
-
-    private readonly record struct ProcessedPattern
-        (
-        int PatternLength,
-        int SamplesPerStep,
-        Dictionary<string, Sequence> Sequences
-        );
 }

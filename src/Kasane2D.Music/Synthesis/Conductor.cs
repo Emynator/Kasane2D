@@ -1,3 +1,4 @@
+using Kasane2D.Music.Extensions;
 using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
 
@@ -6,13 +7,13 @@ namespace Kasane2D.Music.Synthesis;
 internal class Conductor : IConductor
 {
     private readonly SynthEngine synthEngine;
-    private readonly Dictionary<string, Song> songs = new();
-    private Song? currentSong = null;
-    private Song? nextSong = null;
+    private readonly Dictionary<string, ProcessedSong> songs = new();
+    private ProcessedSong? currentSong = null;
+    private ProcessedSong? nextSong = null;
     private SongElement? nextElement = null;
     private SongElement? nextSongElement = null;
     private SongElement? transitionElement = null;
-    private SongPattern? currentPattern = null;
+    private ProcessedSongPattern? currentPattern = null;
     private int repeats = 0;
     private int maxRepeats = 0;
     private string? sectionNameToSet = null;
@@ -43,7 +44,7 @@ internal class Conductor : IConductor
 
     public void AddSong(Song song)
     {
-        songs[song.Name] = song;
+        songs[song.Name] = song.ProcessSong(synthEngine.Samplerate);
     }
 
     public void RemoveSong(string name)
@@ -55,7 +56,7 @@ internal class Conductor : IConductor
     {
         foreach (var song in songs)
         {
-            this.songs[song.Name] = song;
+            this.songs[song.Name] = song.ProcessSong(synthEngine.Samplerate);
         }
     }
 
