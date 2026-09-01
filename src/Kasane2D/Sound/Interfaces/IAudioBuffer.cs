@@ -45,4 +45,9 @@ public interface IAudioBuffer
     /// <param name="samples">Span to take the samples from. Length of the span is the number of samples that
     /// will be written.</param>
     public void Write(ReadOnlySpan<float> samples);
+
+    /// <summary>
+    /// Clears the audio buffer.
+    /// </summary>
+    public void Clear();
 }

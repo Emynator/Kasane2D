@@ -27,7 +27,7 @@ public static class MusicSystem
 
         foreach (var trackConfig in config.TrackConfigs)
         {
-            Generator generator = trackConfig.Kind switch
+            var generator = trackConfig.Kind switch
             {
                 GeneratorKind.Custom => trackConfig.CustomGeneratorFactory is not null
                     ? trackConfig.CustomGeneratorFactory(soundSystem.SampleRate)
@@ -43,22 +43,53 @@ public static class MusicSystem
 
             var voiceBus = soundSystem.AudioMixer.CreateMixBus(trackConfig.Name, mainBus);
             var effects = new List<VoiceEffect>();
+            var delays = new List<VoiceDelay>();
+            var ppDelays = new List<VoicePingPongDelay>();
             foreach (var effectConfig in trackConfig.Effects)
             {
-                var effect = effectConfig.Kind switch
+                VoiceEffect? effect = null;
+                switch (effectConfig.Kind)
                 {
-                    VoiceEffectKind.Custom => effectConfig.CustomEffectFactory?.Invoke(soundSystem.SampleRate),
-                    VoiceEffectKind.Utility => new VoiceUtility(soundSystem.CreateUtility(effectConfig.Name)),
-                    VoiceEffectKind.Filter => new VoiceFilter(soundSystem.CreateFilter(effectConfig.Name)),
-                    VoiceEffectKind.Eq8 => new VoiceEq8(soundSystem.CreateEq8(effectConfig.Name)),
-                    VoiceEffectKind.Compressor => new VoiceCompressor(soundSystem.CreateCompressor(effectConfig.Name)),
-                    VoiceEffectKind.Limiter => new VoiceLimiter(soundSystem.CreateLimiter(effectConfig.Name)),
-                    VoiceEffectKind.Overdrive => new VoiceOverdrive(soundSystem.CreateOverdrive(effectConfig.Name)),
-                    VoiceEffectKind.Delay => new VoiceDelay(soundSystem.CreateDelay(effectConfig.Name)),
-                    VoiceEffectKind.PingPongDelay => new VoicePingPongDelay
-                        (soundSystem.CreatePingPongDelay(effectConfig.Name)),
-                    _ => null,
-                };
+                    case VoiceEffectKind.Custom:
+                        effect = effectConfig.CustomEffectFactory?.Invoke(soundSystem.SampleRate);
+                        break;
+                    
+                    case VoiceEffectKind.Utility:
+                        effect = new VoiceUtility(soundSystem.CreateUtility(effectConfig.Name));
+                        break;
+                    
+                    case VoiceEffectKind.Filter:
+                        effect = new VoiceFilter(soundSystem.CreateFilter(effectConfig.Name));
+                        break;
+                    
+                    case VoiceEffectKind.Eq8:
+                        effect = new VoiceEq8(soundSystem.CreateEq8(effectConfig.Name));
+                        break;
+                    
+                    case VoiceEffectKind.Compressor:
+                        effect = new VoiceCompressor(soundSystem.CreateCompressor(effectConfig.Name));
+                        break;
+                    
+                    case VoiceEffectKind.Limiter:
+                        effect = new VoiceLimiter(soundSystem.CreateLimiter(effectConfig.Name));
+                        break;
+                    
+                    case VoiceEffectKind.Overdrive:
+                        effect = new VoiceOverdrive(soundSystem.CreateOverdrive(effectConfig.Name));
+                        break;
+                    
+                    case VoiceEffectKind.Delay:
+                        var delay = new VoiceDelay(soundSystem.CreateDelay(effectConfig.Name));
+                        delays.Add(delay);
+                        effect = delay;
+                        break;
+                    
+                    case VoiceEffectKind.PingPongDelay:
+                        var ppDelay = new VoicePingPongDelay(soundSystem.CreatePingPongDelay(effectConfig.Name));
+                        ppDelays.Add(ppDelay);
+                        effect = ppDelay;
+                        break;
+                }
 
                 if (effect is not null)
                 {
@@ -76,7 +107,18 @@ public static class MusicSystem
                 generator,
                 effects
             );
-            tracks.Add(trackConfig.Name, new Sequencer(trackConfig.Name, voice));
+            
+            var sequencer = new Sequencer(trackConfig.Name, voice);
+            foreach (var delay in delays)
+            {
+                delay.Sequencer = sequencer;
+            }
+            foreach (var delay in ppDelays)
+            {
+                delay.Sequencer = sequencer;
+            }
+            
+            tracks.Add(trackConfig.Name, sequencer);
         }
 
         var result = new SynthEngine(config.Name, soundSystem.SampleRate, soundSystem.BufferSize, tracks);

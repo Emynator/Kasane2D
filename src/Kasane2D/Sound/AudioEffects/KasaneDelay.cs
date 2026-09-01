@@ -182,4 +182,20 @@ public class KasaneDelay : IAudioEffect
 
         tlock.Release();
     }
+
+    /// <summary>
+    /// Resets the delay and clears all pending audio from it.
+    /// </summary>
+    public void Reset()
+    {
+        tlock.Wait();
+        
+        delayBufferL.Clear();
+        delayBufferR.Clear();
+        var tmp = new float[delaySamples];
+        delayBufferL.Write(tmp);
+        delayBufferR.Write(tmp);
+        
+        tlock.Release();
+    }
 }

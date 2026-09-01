@@ -1,3 +1,4 @@
+using Kasane2D.Music.Enums;
 using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Effects;
 using Kasane2D.Sound.AudioEffects;
 
@@ -13,6 +14,8 @@ internal class VoicePingPongDelay : VoiceEffect
     }
 
     public override bool Bypass => effect.Bypass;
+    
+    public Sequencer Sequencer { get; set; } = null!;
 
     public override void ControlUpdate(EffectUpdate ev)
     {
@@ -32,7 +35,7 @@ internal class VoicePingPongDelay : VoiceEffect
         }
         if (actual.Delay is not null)
         {
-            effect.Delay = actual.Delay.Value;
+            effect.Delay = actual.Delay.Value.CalculateDelayTime(Sequencer.CurrentBpm, Sequencer.BeatsPerBar);
         }
         if (actual.DecayGain is not null)
         {
@@ -57,5 +60,10 @@ internal class VoicePingPongDelay : VoiceEffect
         )
     {
         effect.Apply(inLeft, inRight, outLeft, outRight);
+    }
+    
+    public override void Reset()
+    {
+        effect.Reset();
     }
 }

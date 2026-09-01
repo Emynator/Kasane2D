@@ -101,4 +101,9 @@ internal class AudioBuffer : IAudioBuffer
         
         tlock.Release();
     }
+
+    public void Clear()
+    {
+        writeIndex = readIndex;
+    }
 }

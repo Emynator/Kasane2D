@@ -32,4 +32,11 @@ public abstract class VoiceEffect
         Span<float> outLeft,
         Span<float> outRight
         );
+
+    /// <summary>
+    /// Resets the effect state.
+    /// </summary>
+    public virtual void Reset()
+    {
+    }
 }

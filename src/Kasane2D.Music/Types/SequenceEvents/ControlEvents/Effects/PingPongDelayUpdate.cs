@@ -1,3 +1,5 @@
+using Kasane2D.Music.Enums;
+
 namespace Kasane2D.Music.Types.SequenceEvents.ControlEvents.Effects;
 
 /// <summary>
@@ -13,7 +15,7 @@ public sealed record class PingPongDelayUpdate
     (
     string EffectName,
     bool? Bypass = null,
-    float? Delay = null,
+    DelayLength? Delay = null,
     float? DecayGain = null,
     float? Feedback = null,
     float? Wet = null

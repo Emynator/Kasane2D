@@ -26,6 +26,10 @@ internal class Sequencer : ITrack
     public Sequence? CurrentSequence { get; set; }
     
     public Sequence? NextSequence { get; set; }
+    
+    public int CurrentBpm { get; private set; }
+    
+    public int BeatsPerBar { get; private set; }
 
     public void Process(int sampleCount)
     {
@@ -71,7 +75,7 @@ internal class Sequencer : ITrack
 
     public void Reset()
     {
-        voice.Stop();
+        voice.Reset();
         voice.ControlUpdate(CurrentSequence?.InitialSettings ?? default);
     }
 
@@ -79,5 +83,4 @@ internal class Sequencer : ITrack
     {
         voice.Stop();
     }
-
 }

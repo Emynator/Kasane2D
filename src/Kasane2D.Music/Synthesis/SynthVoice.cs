@@ -40,7 +40,7 @@ internal class SynthVoice
         scratchBuffer2 = new float[bufferSize];
         scratchBuffer3 = new float[bufferSize];
     }
-
+    
     public void Process(int sampleCount)
     {
         Engine.Monitor.StartMeasurement(systemKey);
@@ -93,6 +93,16 @@ internal class SynthVoice
     public void Stop()
     {
         envelope.EnterRelease();
+    }
+
+    public void Reset()
+    {
+        generator.Reset();
+        envelope.Reset();
+        foreach (var effect in effects)
+        {
+            effect.Reset();
+        }
     }
 
     public void ControlUpdate(ControlEvent ev)
