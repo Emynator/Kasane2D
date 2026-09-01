@@ -1,8 +1,10 @@
 using Kasane2D.Config;
+using Kasane2D.Events;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Input.Interfaces;
 using Kasane2D.Interfaces;
 using Kasane2D.MonoGame.Graphics;
+using Kasane2D.Sound.Types;
 
 namespace Kasane2D.MonoGame;
 
@@ -14,10 +16,11 @@ internal class Backend : IBackend
         GraphicsConfiguration config,
         Action<IRasterizer> createRenderer,
         Action<IInputSystem> assignInputSystem,
-        AudioConfiguration? audioConfig
+        AudioConfiguration? audioConfig,
+        Action<KasaneEvent<StereoAudioStream>> assignBufferProcessedEvent
         )
     {
-        return new MonoGameRunner(main, config, createRenderer, assignInputSystem, audioConfig);
+        return new MonoGameRunner(main, config, createRenderer, assignInputSystem, audioConfig, assignBufferProcessedEvent);
     }
 
     public bool IsSampleRateSupported(int sampleRate)

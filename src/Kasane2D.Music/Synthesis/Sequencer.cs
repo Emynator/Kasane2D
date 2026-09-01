@@ -1,16 +1,27 @@
+using Kasane2D.Events;
 using Kasane2D.Music.Enums;
+using Kasane2D.Music.Interfaces;
 using Kasane2D.Music.Types;
 
 namespace Kasane2D.Music.Synthesis;
 
-internal class Sequencer
+internal class Sequencer : ITrack
 {
     private readonly SynthVoice voice;
+    private readonly KasaneEventSource<Note> notePlayEvent = new();
+    private readonly KasaneEventSource noteReleaseEvent = new();
     
-    public Sequencer(SynthVoice voice)
+    public Sequencer(string name, SynthVoice voice)
     {
         this.voice = voice;
+        Name = name;
     }
+    
+    public string Name { get; }
+
+    public KasaneEvent<Note> NotePlayEvent => notePlayEvent.Event;
+    
+    public KasaneEvent NoteReleaseEvent => noteReleaseEvent.Event;
 
     public Sequence? CurrentSequence { get; set; }
     
@@ -35,10 +46,12 @@ internal class Sequencer
         {
             case SequenceNoteEventKind.Begin:
                 voice.Play(note.Note);
+                notePlayEvent.Trigger(note.Note);
                 break;
             
             case SequenceNoteEventKind.Release:
                 voice.Stop();
+                noteReleaseEvent.Trigger();
                 break;
         }
     }
@@ -66,4 +79,5 @@ internal class Sequencer
     {
         voice.Stop();
     }
+
 }

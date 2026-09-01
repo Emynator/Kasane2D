@@ -1,6 +1,8 @@
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using Kasane2D.Events;
 using Kasane2D.Sound.Interfaces;
+using Kasane2D.Sound.Types;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Kasane2D.MonoGame;
@@ -10,6 +12,7 @@ internal class AudioHandler : IDisposable
     private const string systemKey = "Backend::AudioHandler::BufferRefill";
 
     private readonly ISoundSystem soundSystem;
+    private readonly KasaneEventSource<StereoAudioStream> bufferProcessedEvent = new();
     private readonly int timeout;
     private readonly DynamicSoundEffectInstance audioBackend;
     private readonly float[] leftBuffer;
@@ -21,9 +24,16 @@ internal class AudioHandler : IDisposable
     private readonly ConcurrentQueue<Memory<byte>> engineBufferQueue = new();
     private readonly ConcurrentQueue<Memory<byte>> backendBufferQueue = new();
 
-    public AudioHandler(ISoundSystem soundSystem, int bufferLength, int buffersInQueue)
+    public AudioHandler
+        (
+        ISoundSystem soundSystem,
+        int bufferLength,
+        int buffersInQueue,
+        Action<KasaneEvent<StereoAudioStream>> assignBufferProcessedEvent
+        )
     {
         this.soundSystem = soundSystem;
+        assignBufferProcessedEvent(bufferProcessedEvent.Event);
         timeout = bufferLength * 2;
         audioBackend = new(soundSystem.SampleRate, AudioChannels.Stereo);
         leftBuffer = new float[soundSystem.BufferSize];
@@ -83,7 +93,7 @@ internal class AudioHandler : IDisposable
             {
                 continue;
             }
-            
+
             if (!engineBufferQueue.TryDequeue(out var buffer))
             {
                 bufferAvailable.Reset();
@@ -101,8 +111,18 @@ internal class AudioHandler : IDisposable
     {
         soundSystem.Process();
 
-        soundSystem.AudioMixer.Master.ReadLeft(leftBuffer);
-        soundSystem.AudioMixer.Master.ReadRight(rightBuffer);
+        var lb = leftBuffer.AsSpan();
+        var rb = rightBuffer.AsSpan();
+        soundSystem.AudioMixer.Master.ReadLeft(lb);
+        soundSystem.AudioMixer.Master.ReadRight(rb);
+        
+        var lbStream = new float[lb.Length];
+        var rbStream = new float[rb.Length];
+        lb.CopyTo(lbStream);
+        rb.CopyTo(rbStream);
+        var stream = new StereoAudioStream(lbStream.Length, lbStream, rbStream);
+        bufferProcessedEvent.Trigger(stream);
+        
         var left = leftBuffer
             .Select(s => s >= 0.0f ? MathF.Min(1.0f, s) : MathF.Max(-1.0f, s))
             .Select(s => (short)(s * (s >= 0.0f ? 32767.0f : 32768.0f)))

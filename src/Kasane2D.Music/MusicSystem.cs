@@ -76,7 +76,7 @@ public static class MusicSystem
                 generator,
                 effects
             );
-            tracks.Add(trackConfig.Name, new Sequencer(voice));
+            tracks.Add(trackConfig.Name, new Sequencer(trackConfig.Name, voice));
         }
 
         var result = new SynthEngine(config.Name, soundSystem.SampleRate, soundSystem.BufferSize, tracks);

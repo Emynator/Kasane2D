@@ -1,9 +1,11 @@
 using Kasane2D.Config;
+using Kasane2D.Events;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Input.Interfaces;
 using Kasane2D.Interfaces;
 using Kasane2D.MonoGame.Graphics;
 using Kasane2D.MonoGame.Input;
+using Kasane2D.Sound.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,6 +17,7 @@ internal class MonoGameRunner : Game, IEngineRunner
     private readonly GraphicsConfiguration config;
     private readonly Action<IRasterizer> createRenderer;
     private readonly AudioConfiguration? audioConfig;
+    private readonly Action<KasaneEvent<StereoAudioStream>> assignBufferProcessedEvent;
     private readonly GraphicsDeviceManager graphics;
     private readonly InputSystem inputSystem = new();
     private AudioHandler? audioHandler = null;
@@ -27,13 +30,15 @@ internal class MonoGameRunner : Game, IEngineRunner
         GraphicsConfiguration config,
         Action<IRasterizer> createRenderer,
         Action<IInputSystem> assignInputSystem,
-        AudioConfiguration? audioConfig
+        AudioConfiguration? audioConfig,
+        Action<KasaneEvent<StereoAudioStream>> assignBufferProcessedEvent
         )
     {
         this.main = main;
         this.config = config;
         this.createRenderer = createRenderer;
         this.audioConfig = audioConfig;
+        this.assignBufferProcessedEvent = assignBufferProcessedEvent;
         assignInputSystem(inputSystem);
 
         graphics = new GraphicsDeviceManager(this);
@@ -74,7 +79,8 @@ internal class MonoGameRunner : Game, IEngineRunner
             (
                 main.SoundSystem,
                 audioConfig.BufferSizeInMs,
-                audioConfig.BuffersInQueue
+                audioConfig.BuffersInQueue,
+                assignBufferProcessedEvent
             );
         }
 

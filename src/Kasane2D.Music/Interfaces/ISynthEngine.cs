@@ -9,6 +9,11 @@ namespace Kasane2D.Music.Interfaces;
 public interface ISynthEngine : ISoundSubSystem
 {
     /// <summary>
+    /// The tracks of this synth engine.
+    /// </summary>
+    public IReadOnlyCollection<ITrack> Tracks { get; }
+    
+    /// <summary>
     /// Gets the conductor assigned to this synth engine.
     /// </summary>
     public IConductor? Conductor { get; }

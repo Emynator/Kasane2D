@@ -19,13 +19,16 @@ internal class SynthEngine : ISynthEngine
     public SynthEngine(string name, int samplerate, int bufferSize, Dictionary<string, Sequencer> tracks)
     {
         systemKey = $"MusicSystem::SynthEngine::{name}::Process";
-        this.Samplerate = samplerate;
+        Samplerate = samplerate;
         this.bufferSize = bufferSize;
         this.tracks = tracks;
+        Tracks = tracks.Select(t => t.Value).ToList();
     }
 
     public Guid Id { get; } = Guid.NewGuid();
 
+    public IReadOnlyCollection<ITrack> Tracks { get; }
+    
     public Conductor? InternalConductor { get; set; }
 
     public IConductor? Conductor => InternalConductor;

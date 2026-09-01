@@ -1,3 +1,6 @@
+using Kasane2D.Events;
+using Kasane2D.Sound.Types;
+
 namespace Kasane2D.Sound.Interfaces;
 
 /// <summary>
@@ -19,6 +22,11 @@ public interface ISoundSystem
     /// Gets the sound system's audio mixer.
     /// </summary>
     public IAudioMixer AudioMixer { get; }
+    
+    /// <summary>
+    /// Event that triggers whenever the sound system has processed an audio buffer.
+    /// </summary>
+    public KasaneEvent<StereoAudioStream> BufferProcessedEvent { get; }
 
     /// <summary>
     /// Gets the sound system's sound effect manager.

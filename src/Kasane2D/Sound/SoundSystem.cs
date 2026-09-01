@@ -1,4 +1,5 @@
 using Kasane2D.Config;
+using Kasane2D.Events;
 using Kasane2D.Sound.Interfaces;
 using Kasane2D.Sound.Mixer;
 using Kasane2D.Sound.MusicPlayback;
@@ -35,6 +36,11 @@ internal class SoundSystem : ISoundSystem
     public int BufferSize { get; }
 
     public IAudioMixer AudioMixer => mixer;
+
+    public KasaneEvent<StereoAudioStream>? InternalBufferProcessedEvent { get; set; }
+
+    public KasaneEvent<StereoAudioStream> BufferProcessedEvent =>
+        InternalBufferProcessedEvent ?? throw new InvalidOperationException("Audio device not initialized.");
 
     public ISfxManager SfxManager => sfxManager;
 

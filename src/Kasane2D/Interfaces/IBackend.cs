@@ -1,6 +1,8 @@
 using Kasane2D.Config;
+using Kasane2D.Events;
 using Kasane2D.Graphics.Interfaces;
 using Kasane2D.Input.Interfaces;
+using Kasane2D.Sound.Types;
 
 namespace Kasane2D.Interfaces;
 
@@ -19,6 +21,7 @@ public interface IBackend
     /// <param name="createRenderer">Callback to create the IRenderer after the backend has created its rasterizer.</param>
     /// <param name="assignInputSystem">Callback to assign the input system implementation created by the backend.</param>
     /// <param name="audioConfig">Optional: the audio configuration. May be null.</param>
+    /// <param name="assignBufferProcessedEvent">Callback to assign the BufferProcessedEvent to the sound system.</param>
     /// <returns></returns>
     public IEngineRunner CreateRunner
         (
@@ -26,7 +29,8 @@ public interface IBackend
         GraphicsConfiguration config,
         Action<IRasterizer> createRenderer,
         Action<IInputSystem> assignInputSystem,
-        AudioConfiguration? audioConfig
+        AudioConfiguration? audioConfig,
+        Action<KasaneEvent<StereoAudioStream>> assignBufferProcessedEvent
         );
     
     /// <summary>

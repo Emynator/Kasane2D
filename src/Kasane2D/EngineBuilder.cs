@@ -129,20 +129,6 @@ public static class EngineBuilderExtensions
             throw new InvalidOperationException("Renderer not configured.");
         }
 
-        var runner = builder.Backend.CreateRunner
-        (
-            builder.Main,
-            builder.GraphicsConfig,
-            rasterizer =>
-            {
-                builder.Main.Rasterizer = rasterizer;
-                builder.Main.InternalRenderer = new Renderer(builder.GraphicsConfig, rasterizer);
-            },
-            inputSystem => builder.Main.InternalInputSystem = inputSystem,
-            builder.AudioConfig
-        );
-        builder.Main.EngineRunner = runner;
-
         if (builder.AudioConfig is not null)
         {
             if (!builder.Backend.IsSampleRateSupported(builder.AudioConfig.SampleRate))
@@ -164,6 +150,21 @@ public static class EngineBuilderExtensions
 
             builder.Main.InternalSoundSystem = new(builder.AudioConfig);
         }
+
+        var runner = builder.Backend.CreateRunner
+        (
+            builder.Main,
+            builder.GraphicsConfig,
+            rasterizer =>
+            {
+                builder.Main.Rasterizer = rasterizer;
+                builder.Main.InternalRenderer = new Renderer(builder.GraphicsConfig, rasterizer);
+            },
+            inputSystem => builder.Main.InternalInputSystem = inputSystem,
+            builder.AudioConfig,
+            ev => builder.Main.InternalSoundSystem?.InternalBufferProcessedEvent = ev
+        );
+        builder.Main.EngineRunner = runner;
 
         return new
         (
