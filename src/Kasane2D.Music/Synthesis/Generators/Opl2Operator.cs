@@ -3,7 +3,7 @@ using Kasane2D.Music.Types.SequenceEvents.ControlEvents.Generators;
 
 namespace Kasane2D.Music.Synthesis.Generators;
 
-internal struct FmOperator
+internal struct Opl2Operator
 {
     private readonly int sampleRate;
     private Envelope envelope;
@@ -14,7 +14,7 @@ internal struct FmOperator
     private double phase = 0.0d;
     private float feedBack = 0.0f;
 
-    public FmOperator(int sampleRate)
+    public Opl2Operator(int sampleRate)
     {
         this.sampleRate = sampleRate;
         envelope = new(sampleRate);
@@ -57,7 +57,7 @@ internal struct FmOperator
         envelope.Reset();
     }
 
-    public void Update(OperatorUpdate update)
+    public void Update(Opl2OperatorUpdate update)
     {
         if (update.EnvelopeUpdate.DoUpdate)
         {

@@ -4,8 +4,8 @@ namespace Kasane2D.Music.Synthesis.Generators;
 
 internal class Opl2Voice : Generator
 {
-    private FmOperator op0;
-    private FmOperator op1;
+    private Opl2Operator op0;
+    private Opl2Operator op1;
     private float modulationDepth = 0.0f;
     private bool isAdditive = false;
     
@@ -22,14 +22,14 @@ internal class Opl2Voice : Generator
             return;
         }
 
-        if (actual.Operator0 is not null)
+        if (actual.Modulator is not null)
         {
-            op0.Update(actual.Operator0.Value);
+            op0.Update(actual.Modulator.Value);
         }
 
-        if (actual.Operator1 is not null)
+        if (actual.Carrier is not null)
         {
-            op1.Update(actual.Operator1.Value);
+            op1.Update(actual.Carrier.Value);
         }
 
         if (actual.ModulationDepth is not null)

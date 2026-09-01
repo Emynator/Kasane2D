@@ -12,6 +12,9 @@ namespace Kasane2D.Sound.Types;
 /// <param name="Gain">The gain of the band.</param>
 public readonly record struct EqBandParams(EqFilterType Type, bool IsActive, float Frequency, float Q, float Gain)
 {
+    /// <summary>
+    /// A set of default band params for an EQ8.
+    /// </summary>
     public static readonly EqBandParams[] DefaultParams =
     [
         new(EqFilterType.LowShelf, true, 30.0f, 0.71f, 0.0f),
